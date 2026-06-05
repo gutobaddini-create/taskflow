@@ -469,24 +469,24 @@ Implementar identidade visual moderna, limpa e premium.
 
 ### Tarefas
 
-- [ ] Campo de título.
-- [ ] Campo de descrição.
-- [ ] Seleção de lista.
-- [ ] Seleção de prazo.
-- [ ] Seleção de responsável.
+- [x] Campo de título.
+- [x] Campo de descrição.
+- [x] Seleção de lista.
+- [x] Seleção de prazo.
+- [x] Seleção de responsável.
 - [ ] Convite de pessoas.
-- [ ] Seleção de prioridade.
+- [x] Seleção de prioridade.
 - [ ] Bloco de lembretes.
 - [ ] Bloco de materiais da tarefa.
-- [ ] Botão salvar.
+- [x] Botão salvar.
 
 ### Critérios de aceite
 
-- [ ] Tarefa não salva sem título.
-- [ ] Tarefa salva aparece na lista correta.
-- [ ] Prioridade é persistida.
-- [ ] Prazo é persistido.
-- [ ] Responsável é persistido.
+- [x] Tarefa não salva sem título.
+- [x] Tarefa salva aparece na lista correta.
+- [x] Prioridade é persistida.
+- [x] Prazo é persistido.
+- [x] Responsável é persistido.
 
 ---
 
@@ -494,19 +494,19 @@ Implementar identidade visual moderna, limpa e premium.
 
 ### Tarefas
 
-- [ ] Editar título.
-- [ ] Editar descrição.
+- [x] Editar título.
+- [x] Editar descrição.
 - [ ] Editar prazo.
-- [ ] Editar prioridade.
+- [x] Editar prioridade.
 - [ ] Editar responsável.
 - [ ] Editar status.
-- [ ] Salvar alterações.
+- [x] Salvar alterações.
 
 ### Critérios de aceite
 
 - [ ] Alterações aparecem na tela de detalhe.
-- [ ] Alterações aparecem na lista.
-- [ ] Histórico registra alteração relevante.
+- [x] Alterações aparecem na lista.
+- [x] Histórico registra alteração relevante.
 
 ---
 
@@ -514,15 +514,15 @@ Implementar identidade visual moderna, limpa e premium.
 
 ### Tarefas
 
-- [ ] Botão concluir.
-- [ ] Alterar status para concluída.
-- [ ] Registrar data de conclusão.
+- [x] Botão concluir.
+- [x] Alterar status para concluída.
+- [x] Registrar data de conclusão.
 - [ ] Perguntar sobre recorrências ativas, quando aplicável.
 
 ### Critérios de aceite
 
-- [ ] Tarefa concluída sai da lista de abertas.
-- [ ] Pode ser exibida em `Concluídas`.
+- [x] Tarefa concluída sai da lista de abertas.
+- [x] Pode ser exibida em `Concluídas`.
 - [ ] Recorrência não fica gerando notificações indesejadas.
 
 ---

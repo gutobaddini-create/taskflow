@@ -235,7 +235,7 @@ fun HomeScreen(vm: TaskFlowViewModel, onNew: () -> Unit, onDetail: (String) -> U
                 if (next != null) NextReminderCard(tasks.firstOrNull { it.id == next.first.taskId }?.title ?: "Lembrete", next.second)
             }
         }
-        FloatingActionButton(onClick = onNew, containerColor = Purple, contentColor = Color.White, modifier = Modifier.align(Alignment.BottomEnd).padding(end = 28.dp, bottom = 96.dp).size(70.dp)) {
+        FloatingActionButton(onClick = onNew, containerColor = Purple, contentColor = Color.White, modifier = Modifier.align(Alignment.BottomEnd).padding(end = 28.dp, bottom = 96.dp).size(70.dp).testTag("new-task").semantics { contentDescription = "Nova tarefa" }) {
             Icon(Icons.Default.Add, null, Modifier.size(34.dp))
         }
     }
@@ -244,22 +244,46 @@ fun HomeScreen(vm: TaskFlowViewModel, onNew: () -> Unit, onDetail: (String) -> U
 @Composable
 fun NewTaskScreen(vm: TaskFlowViewModel, onCancel: () -> Unit, onReminder: () -> Unit, onMaterials: () -> Unit) {
     val lists by vm.lists.collectAsState()
+    val users by vm.users.collectAsState()
     val user = vm.currentUser()
     var title by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
     var priority by remember { mutableStateOf(TaskPriority.Medium) }
+    var selectedListId by remember { mutableStateOf<String?>(null) }
+    var selectedAssigneeId by remember(user.id) { mutableStateOf(user.id) }
+    var dueDay by remember { mutableStateOf("Hoje") }
     var dueHour by remember { mutableStateOf("09:00") }
+    var attemptedSave by remember { mutableStateOf(false) }
+    val selectedList = lists.firstOrNull { it.id == selectedListId } ?: lists.firstOrNull()
+    val assigneeOptions = users.ifEmpty { listOf(user) }
+    val selectedAssignee = assigneeOptions.firstOrNull { it.id == selectedAssigneeId } ?: user
+    LaunchedEffect(lists) {
+        if (selectedListId == null && lists.isNotEmpty()) selectedListId = lists.first().id
+    }
     LazyColumn(Modifier.fillMaxSize().statusBarsPadding().padding(22.dp), contentPadding = PaddingValues(bottom = 36.dp)) {
         item {
             TopRow("Cancelar", "Nova tarefa", onCancel)
             Spacer(Modifier.height(18.dp))
-            OutlinedTextField(title, { title = it }, label = { Text("Titulo da tarefa *") }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(18.dp))
-            OutlinedTextField(description, { description = it }, label = { Text("Descricao") }, modifier = Modifier.fillMaxWidth().padding(top = 10.dp), shape = RoundedCornerShape(18.dp), minLines = 3)
+            OutlinedTextField(title, { title = it }, label = { Text("Titulo da tarefa *") }, modifier = Modifier.fillMaxWidth().testTag("new-task-title").semantics { contentDescription = "Campo titulo da tarefa" }, shape = RoundedCornerShape(18.dp), isError = attemptedSave && title.isBlank(), supportingText = { if (attemptedSave && title.isBlank()) Text("Informe um titulo para salvar.") })
+            OutlinedTextField(description, { description = it }, label = { Text("Descricao") }, modifier = Modifier.fillMaxWidth().padding(top = 10.dp).testTag("new-task-description").semantics { contentDescription = "Campo descricao da tarefa" }, shape = RoundedCornerShape(18.dp), minLines = 3)
             Spacer(Modifier.height(16.dp))
             TaskFlowCard {
-                InfoRow("Lista", lists.firstOrNull()?.name ?: "Prazos")
-                InfoRow("Prazo", "Hoje, $dueHour")
-                InfoRow("Responsavel", "Manuel")
+                Text("Lista", color = Muted)
+                if (lists.isEmpty()) {
+                    Text("Crie uma lista antes de salvar tarefas.", color = Color(0xFFEF4444), modifier = Modifier.padding(top = 8.dp))
+                } else {
+                    Segmented(lists.map { it.name }, selectedList?.name ?: lists.first().name) { name ->
+                        selectedListId = lists.first { it.name == name }.id
+                    }
+                }
+                Text("Prazo", color = Muted, modifier = Modifier.padding(top = 14.dp))
+                Segmented(listOf("Hoje", "Amanha"), dueDay) { dueDay = it }
+                Spacer(Modifier.height(8.dp))
+                Segmented(listOf("09:00", "11:00", "14:00", "16:30"), dueHour) { dueHour = it }
+                Text("Responsavel", color = Muted, modifier = Modifier.padding(top = 14.dp))
+                Segmented(assigneeOptions.map { it.name }, selectedAssignee.name) { name ->
+                    selectedAssigneeId = assigneeOptions.first { it.name == name }.id
+                }
                 InfoRow("Convidar pessoas", "WhatsApp, e-mail ou link")
             }
             SectionTitle("Lembretes")
@@ -283,15 +307,17 @@ fun NewTaskScreen(vm: TaskFlowViewModel, onCancel: () -> Unit, onReminder: () ->
             Segmented(TaskPriority.entries.map { it.label }, priority.label) { priority = TaskPriority.entries.first { p -> p.label == it } }
             Spacer(Modifier.height(24.dp))
             GradientButton("Salvar", {
+                attemptedSave = true
                 if (title.isNotBlank()) {
-                    val list = lists.firstOrNull()
+                    val list = selectedList
                     if (list != null) {
                         val time = LocalTime.parse(dueHour)
-                        vm.repo.createTask(Task(spaceId = list.spaceId, listId = list.id, title = title.trim(), description = description, priority = priority, createdBy = user.id, assignedTo = user.id, dueDate = LocalDateTime.of(LocalDate.now(), time)))
+                        val date = if (dueDay == "Amanha") LocalDate.now().plusDays(1) else LocalDate.now()
+                        vm.repo.createTask(Task(spaceId = list.spaceId, listId = list.id, title = title.trim(), description = description, priority = priority, createdBy = user.id, assignedTo = selectedAssignee.id, dueDate = LocalDateTime.of(date, time)))
                         onCancel()
                     }
                 }
-            }, Modifier.fillMaxWidth(), enabled = title.isNotBlank() && lists.isNotEmpty())
+            }, Modifier.fillMaxWidth().testTag("save-new-task").semantics { contentDescription = "Salvar nova tarefa" }, enabled = lists.isNotEmpty())
         }
     }
 }
@@ -299,6 +325,7 @@ fun NewTaskScreen(vm: TaskFlowViewModel, onCancel: () -> Unit, onReminder: () ->
 @Composable
 fun DetailScreen(vm: TaskFlowViewModel, onBack: () -> Unit, onMaterials: () -> Unit, onShare: () -> Unit) {
     val task = vm.selectedTask()
+    val users by vm.users.collectAsState()
     val reminders by vm.reminders.collectAsState()
     val attachments by vm.attachments.collectAsState()
     val links by vm.links.collectAsState()
@@ -313,6 +340,11 @@ fun DetailScreen(vm: TaskFlowViewModel, onBack: () -> Unit, onMaterials: () -> U
     var editDescription by remember(task.id) { mutableStateOf(task.description) }
     var editStatus by remember(task.id) { mutableStateOf(task.status) }
     var editPriority by remember(task.id) { mutableStateOf(task.priority) }
+    var editDueDay by remember(task.id) { mutableStateOf(if (task.dueDate?.toLocalDate() == LocalDate.now().plusDays(1)) "Amanha" else "Hoje") }
+    var editDueHour by remember(task.id) { mutableStateOf(task.dueDate?.toLocalTime()?.format(DateTimeFormatter.ofPattern("HH:mm")) ?: "09:00") }
+    var editAssignedTo by remember(task.id) { mutableStateOf(task.assignedTo ?: vm.currentUser().id) }
+    val userOptions = users.ifEmpty { listOf(vm.currentUser()) }
+    val assigneeName = userOptions.firstOrNull { it.id == task.assignedTo }?.name ?: "Manuel"
     LazyColumn(Modifier.fillMaxSize().statusBarsPadding().padding(22.dp), contentPadding = PaddingValues(bottom = 30.dp)) {
         item {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
@@ -329,13 +361,23 @@ fun DetailScreen(vm: TaskFlowViewModel, onBack: () -> Unit, onMaterials: () -> U
                 Segmented(TaskStatus.entries.map { it.label }, editStatus.label) { selected -> editStatus = TaskStatus.entries.first { it.label == selected } }
                 SectionTitle("Prioridade")
                 Segmented(TaskPriority.entries.map { it.label }, editPriority.label) { selected -> editPriority = TaskPriority.entries.first { it.label == selected } }
+                SectionTitle("Prazo")
+                Segmented(listOf("Hoje", "Amanha"), editDueDay) { editDueDay = it }
+                Spacer(Modifier.height(8.dp))
+                Segmented(listOf("09:00", "11:00", "14:00", "16:30"), editDueHour) { editDueHour = it }
+                SectionTitle("Responsavel")
+                Segmented(userOptions.map { it.name }, userOptions.firstOrNull { it.id == editAssignedTo }?.name ?: vm.currentUser().name) { name ->
+                    editAssignedTo = userOptions.first { it.name == name }.id
+                }
                 Spacer(Modifier.height(16.dp))
                 GradientButton("Salvar alteracoes", {
                     if (editTitle.isNotBlank()) {
-                        vm.repo.updateTask(task.copy(title = editTitle.trim(), description = editDescription, status = editStatus, priority = editPriority, isCompleted = editStatus == TaskStatus.Done))
+                        val date = if (editDueDay == "Amanha") LocalDate.now().plusDays(1) else LocalDate.now()
+                        val done = editStatus == TaskStatus.Done
+                        vm.repo.updateTask(task.copy(title = editTitle.trim(), description = editDescription, status = editStatus, priority = editPriority, assignedTo = editAssignedTo, dueDate = LocalDateTime.of(date, LocalTime.parse(editDueHour)), isCompleted = done, completedAt = if (done) task.completedAt ?: now() else null))
                         editing = false
                     }
-                }, Modifier.fillMaxWidth(), enabled = editTitle.isNotBlank())
+                }, Modifier.fillMaxWidth().testTag("save-task-edits").semantics { contentDescription = "Salvar alteracoes da tarefa" }, enabled = editTitle.isNotBlank())
                 TextButton(onClick = { vm.repo.deleteTask(task.id); onBack() }, modifier = Modifier.fillMaxWidth()) { Text("Excluir tarefa", color = Color(0xFFEF4444)) }
             } else {
                 Text(task.title, fontSize = 30.sp, fontWeight = FontWeight.Bold, color = Text, modifier = Modifier.padding(top = 18.dp))
@@ -354,7 +396,7 @@ fun DetailScreen(vm: TaskFlowViewModel, onBack: () -> Unit, onMaterials: () -> U
             SectionTitle("Dados principais")
             TaskFlowCard {
                 InfoRow("Prazo", task.dueDate?.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")) ?: "Sem prazo")
-                InfoRow("Responsavel", "Manuel")
+                InfoRow("Responsavel", assigneeName)
                 InfoRow("Participantes", "2 pessoas")
             }
             SectionTitle("Materiais da tarefa")
@@ -680,7 +722,7 @@ fun NextReminderCard(title: String, date: LocalDateTime) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             IconBubble(Icons.Default.Event, Purple.copy(.14f), Purple)
             Spacer(Modifier.width(14.dp))
-            Column(Modifier.weight(1f)) { Text("Proximo lembrete", color = Purple, fontWeight = FontWeight.Bold); Text(title, fontSize = 22.sp, fontWeight = FontWeight.Bold, color = Text); Text(date.format(DateTimeFormatter.ofPattern("amanha - HH:mm")), color = Muted) }
+            Column(Modifier.weight(1f)) { Text("Proximo lembrete", color = Purple, fontWeight = FontWeight.Bold); Text(title, fontSize = 22.sp, fontWeight = FontWeight.Bold, color = Text); Text(date.format(DateTimeFormatter.ofPattern("'amanha' - HH:mm")), color = Muted) }
             Icon(Icons.Default.ChevronRight, null, tint = Text)
         }
     }
