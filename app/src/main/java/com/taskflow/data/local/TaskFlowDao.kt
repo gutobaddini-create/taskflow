@@ -90,6 +90,21 @@ interface TaskFlowDao {
     @Query("SELECT * FROM tasks WHERE id = :taskId LIMIT 1")
     suspend fun taskById(taskId: String): TaskEntity?
 
+    @Query("SELECT COUNT(*) FROM tasks WHERE spaceId = :spaceId")
+    suspend fun taskCountBySpace(spaceId: String): Int
+
+    @Query("SELECT COUNT(*) FROM tasks WHERE listId = :listId")
+    suspend fun taskCountByList(listId: String): Int
+
     @Query("SELECT * FROM checklist_items WHERE id = :itemId LIMIT 1")
     suspend fun checklistItemById(itemId: String): ChecklistItemEntity?
+
+    @Query("DELETE FROM tasks WHERE id = :taskId")
+    suspend fun deleteTask(taskId: String)
+
+    @Query("DELETE FROM spaces WHERE id = :spaceId")
+    suspend fun deleteSpace(spaceId: String)
+
+    @Query("DELETE FROM task_lists WHERE id = :listId")
+    suspend fun deleteList(listId: String)
 }

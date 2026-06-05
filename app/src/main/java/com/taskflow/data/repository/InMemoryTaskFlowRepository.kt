@@ -58,12 +58,33 @@ class InMemoryTaskFlowRepository : TaskFlowRepository {
         activity.value = activity.value + ActivityLog(taskId = taskId, userId = users.value.first().id, action = "Tarefa concluida")
     }
 
+    override fun deleteTask(taskId: String) {
+        tasks.value = tasks.value.filterNot { it.id == taskId }
+        activity.value = activity.value + ActivityLog(taskId = taskId, userId = users.value.first().id, action = "Tarefa excluida")
+    }
+
     override fun createSpace(name: String) {
         spaces.value = spaces.value + Space(name = name, ownerId = manuel.id, members = listOf(manuel.id))
     }
 
+    override fun updateSpace(space: Space) {
+        spaces.value = spaces.value.map { if (it.id == space.id) space.copy(updatedAt = now()) else it }
+    }
+
+    override fun deleteSpace(spaceId: String) {
+        if (tasks.value.none { it.spaceId == spaceId }) spaces.value = spaces.value.filterNot { it.id == spaceId }
+    }
+
     override fun createList(spaceId: String, name: String) {
         lists.value = lists.value + TaskList(spaceId = spaceId, name = name, order = lists.value.size)
+    }
+
+    override fun updateList(list: TaskList) {
+        lists.value = lists.value.map { if (it.id == list.id) list.copy(updatedAt = now()) else it }
+    }
+
+    override fun deleteList(listId: String) {
+        if (tasks.value.none { it.listId == listId }) lists.value = lists.value.filterNot { it.id == listId }
     }
 
     override fun saveReminder(reminder: Reminder) {

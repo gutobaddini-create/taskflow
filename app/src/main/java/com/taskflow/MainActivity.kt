@@ -305,11 +305,39 @@ fun DetailScreen(vm: TaskFlowViewModel, onBack: () -> Unit, onMaterials: () -> U
         LoadingFullScreen("Carregando tarefa...")
         return
     }
+    var editing by remember(task.id) { mutableStateOf(false) }
+    var editTitle by remember(task.id) { mutableStateOf(task.title) }
+    var editDescription by remember(task.id) { mutableStateOf(task.description) }
+    var editStatus by remember(task.id) { mutableStateOf(task.status) }
+    var editPriority by remember(task.id) { mutableStateOf(task.priority) }
     LazyColumn(Modifier.fillMaxSize().statusBarsPadding().padding(22.dp), contentPadding = PaddingValues(bottom = 30.dp)) {
         item {
-            TopRow("<", "Detalhe da tarefa", onBack)
-            Text(task.title, fontSize = 30.sp, fontWeight = FontWeight.Bold, color = Text, modifier = Modifier.padding(top = 18.dp))
-            Row(Modifier.padding(top = 10.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) { StatusPill(task.status); PriorityPill(task.priority) }
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                TextButton(onClick = onBack) { Text("<") }
+                Spacer(Modifier.weight(1f))
+                Text("Detalhe da tarefa", fontWeight = FontWeight.Bold, color = Text)
+                Spacer(Modifier.weight(1f))
+                TextButton(onClick = { editing = !editing }) { Text(if (editing) "Cancelar" else "Editar") }
+            }
+            if (editing) {
+                OutlinedTextField(editTitle, { editTitle = it }, label = { Text("Titulo") }, modifier = Modifier.fillMaxWidth().padding(top = 18.dp), shape = RoundedCornerShape(18.dp))
+                OutlinedTextField(editDescription, { editDescription = it }, label = { Text("Descricao") }, modifier = Modifier.fillMaxWidth().padding(top = 10.dp), shape = RoundedCornerShape(18.dp), minLines = 3)
+                SectionTitle("Status")
+                Segmented(TaskStatus.entries.map { it.label }, editStatus.label) { selected -> editStatus = TaskStatus.entries.first { it.label == selected } }
+                SectionTitle("Prioridade")
+                Segmented(TaskPriority.entries.map { it.label }, editPriority.label) { selected -> editPriority = TaskPriority.entries.first { it.label == selected } }
+                Spacer(Modifier.height(16.dp))
+                GradientButton("Salvar alteracoes", {
+                    if (editTitle.isNotBlank()) {
+                        vm.repo.updateTask(task.copy(title = editTitle.trim(), description = editDescription, status = editStatus, priority = editPriority, isCompleted = editStatus == TaskStatus.Done))
+                        editing = false
+                    }
+                }, Modifier.fillMaxWidth(), enabled = editTitle.isNotBlank())
+                TextButton(onClick = { vm.repo.deleteTask(task.id); onBack() }, modifier = Modifier.fillMaxWidth()) { Text("Excluir tarefa", color = Color(0xFFEF4444)) }
+            } else {
+                Text(task.title, fontSize = 30.sp, fontWeight = FontWeight.Bold, color = Text, modifier = Modifier.padding(top = 18.dp))
+                Row(Modifier.padding(top = 10.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) { StatusPill(task.status); PriorityPill(task.priority) }
+            }
             SectionTitle("Proximo lembrete")
             TaskFlowCard {
                 val next = reminders.firstOrNull { it.taskId == task.id }?.let { ReminderEngine.nextOccurrence(it) }
@@ -319,7 +347,7 @@ fun DetailScreen(vm: TaskFlowViewModel, onBack: () -> Unit, onMaterials: () -> U
                 }
             }
             SectionTitle("Descricao")
-            TaskFlowCard { Text(task.description.ifBlank { "Sem descricao." }, color = Muted, lineHeight = 22.sp) }
+            TaskFlowCard { Text((if (editing) editDescription else task.description).ifBlank { "Sem descricao." }, color = Muted, lineHeight = 22.sp) }
             SectionTitle("Dados principais")
             TaskFlowCard {
                 InfoRow("Prazo", task.dueDate?.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")) ?: "Sem prazo")
@@ -481,21 +509,89 @@ fun SpacesScreen(vm: TaskFlowViewModel, onDetail: (String) -> Unit) {
     val spaces by vm.spaces.collectAsState()
     val lists by vm.lists.collectAsState()
     val tasks by vm.tasks.collectAsState()
+    var dialog by remember { mutableStateOf<CrudDialogState?>(null) }
+    var message by remember { mutableStateOf<String?>(null) }
+    dialog?.let { state ->
+        NameDialog(
+            title = state.title,
+            initialValue = state.initialValue,
+            onDismiss = { dialog = null },
+            onConfirm = { value ->
+                when (state.kind) {
+                    CrudKind.CreateSpace -> vm.repo.createSpace(value)
+                    CrudKind.EditSpace -> state.space?.let { vm.repo.updateSpace(it.copy(name = value)) }
+                    CrudKind.CreateList -> state.space?.let { vm.repo.createList(it.id, value) }
+                    CrudKind.EditList -> state.list?.let { vm.repo.updateList(it.copy(name = value)) }
+                }
+                dialog = null
+            }
+        )
+    }
     LazyColumn(Modifier.fillMaxSize().statusBarsPadding().padding(24.dp), contentPadding = PaddingValues(bottom = 120.dp)) {
-        item { Text("Espacos e listas", fontSize = 30.sp, fontWeight = FontWeight.Bold, color = Text); Spacer(Modifier.height(16.dp)) }
+        item {
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                Text("Espacos e listas", fontSize = 30.sp, fontWeight = FontWeight.Bold, color = Text)
+                FloatingActionButton(onClick = { dialog = CrudDialogState(CrudKind.CreateSpace, "Novo espaco") }, containerColor = Purple, contentColor = Color.White, modifier = Modifier.size(48.dp)) { Icon(Icons.Default.Add, null) }
+            }
+            message?.let { Text(it, color = Color(0xFFEF4444), modifier = Modifier.padding(top = 8.dp)) }
+            Spacer(Modifier.height(16.dp))
+        }
         items(spaces) { space ->
             TaskFlowCard {
-                Text(space.name, fontSize = 22.sp, fontWeight = FontWeight.Bold, color = Text)
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                    Text(space.name, fontSize = 22.sp, fontWeight = FontWeight.Bold, color = Text)
+                    Row {
+                        IconButton(onClick = { dialog = CrudDialogState(CrudKind.EditSpace, "Renomear espaco", space.name, space = space) }) { Icon(Icons.Default.Edit, null, tint = Muted) }
+                        IconButton(onClick = { dialog = CrudDialogState(CrudKind.CreateList, "Nova lista", space = space) }) { Icon(Icons.Default.PlaylistAdd, null, tint = Blue) }
+                        IconButton(onClick = {
+                            if (tasks.any { it.spaceId == space.id }) message = "Exclua ou mova as tarefas antes de remover este espaco." else vm.repo.deleteSpace(space.id)
+                        }) { Icon(Icons.Default.Delete, null, tint = Color(0xFFEF4444)) }
+                    }
+                }
                 lists.filter { it.spaceId == space.id }.forEach { list ->
-                    Row(Modifier.fillMaxWidth().clickable { tasks.firstOrNull { it.listId == list.id }?.id?.let(onDetail) }.padding(vertical = 8.dp), horizontalArrangement = Arrangement.SpaceBetween) {
-                        Text(list.name, color = Text)
-                        Text("${tasks.count { it.listId == list.id && !it.isCompleted }} abertas", color = Muted)
+                    Row(Modifier.fillMaxWidth().padding(vertical = 8.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                        Column(Modifier.weight(1f).clickable { tasks.firstOrNull { it.listId == list.id }?.id?.let(onDetail) }) {
+                            Text(list.name, color = Text)
+                            Text("${tasks.count { it.listId == list.id && !it.isCompleted }} abertas", color = Muted, fontSize = 13.sp)
+                        }
+                        IconButton(onClick = { dialog = CrudDialogState(CrudKind.EditList, "Renomear lista", list.name, list = list) }) { Icon(Icons.Default.Edit, null, tint = Muted) }
+                        IconButton(onClick = {
+                            if (tasks.any { it.listId == list.id }) message = "Exclua ou mova as tarefas antes de remover esta lista." else vm.repo.deleteList(list.id)
+                        }) { Icon(Icons.Default.Delete, null, tint = Color(0xFFEF4444)) }
                     }
                 }
             }
             Spacer(Modifier.height(12.dp))
         }
     }
+}
+
+enum class CrudKind { CreateSpace, EditSpace, CreateList, EditList }
+
+data class CrudDialogState(
+    val kind: CrudKind,
+    val title: String,
+    val initialValue: String = "",
+    val space: Space? = null,
+    val list: TaskList? = null
+)
+
+@Composable
+fun NameDialog(title: String, initialValue: String, onDismiss: () -> Unit, onConfirm: (String) -> Unit) {
+    var value by remember(title, initialValue) { mutableStateOf(initialValue) }
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(title, color = Text, fontWeight = FontWeight.Bold) },
+        text = {
+            OutlinedTextField(value, { value = it }, label = { Text("Nome") }, shape = RoundedCornerShape(18.dp), singleLine = true)
+        },
+        confirmButton = {
+            TextButton(onClick = { if (value.isNotBlank()) onConfirm(value.trim()) }, enabled = value.isNotBlank()) { Text("Salvar") }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) { Text("Cancelar") }
+        }
+    )
 }
 
 @Composable

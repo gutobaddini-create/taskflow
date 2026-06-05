@@ -107,6 +107,14 @@ class LocalTaskFlowRepository(
         }
     }
 
+    override fun deleteTask(taskId: String) {
+        scope.launch(Dispatchers.IO) {
+            val task = dao.taskById(taskId)?.toDomain() ?: return@launch
+            dao.deleteTask(taskId)
+            dao.upsertActivity(listOf(ActivityLog(taskId = taskId, userId = task.createdBy, action = "Tarefa excluida").toEntity()))
+        }
+    }
+
     override fun createSpace(name: String) {
         scope.launch(Dispatchers.IO) {
             val owner = users.value.firstOrNull()?.id ?: "local"
@@ -114,9 +122,33 @@ class LocalTaskFlowRepository(
         }
     }
 
+    override fun updateSpace(space: Space) {
+        scope.launch(Dispatchers.IO) {
+            dao.upsertSpaces(listOf(space.copy(updatedAt = now()).toEntity()))
+        }
+    }
+
+    override fun deleteSpace(spaceId: String) {
+        scope.launch(Dispatchers.IO) {
+            if (dao.taskCountBySpace(spaceId) == 0) dao.deleteSpace(spaceId)
+        }
+    }
+
     override fun createList(spaceId: String, name: String) {
         scope.launch(Dispatchers.IO) {
             dao.upsertLists(listOf(TaskList(spaceId = spaceId, name = name, order = lists.value.size).toEntity()))
+        }
+    }
+
+    override fun updateList(list: TaskList) {
+        scope.launch(Dispatchers.IO) {
+            dao.upsertLists(listOf(list.copy(updatedAt = now()).toEntity()))
+        }
+    }
+
+    override fun deleteList(listId: String) {
+        scope.launch(Dispatchers.IO) {
+            if (dao.taskCountByList(listId) == 0) dao.deleteList(listId)
         }
     }
 
