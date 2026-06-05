@@ -1,6 +1,7 @@
 package com.taskflow
 
 import android.os.Bundle
+import android.app.Application
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
@@ -24,10 +25,12 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.viewModelScope
+import com.taskflow.data.local.TaskFlowDatabase
+import com.taskflow.data.repository.LocalTaskFlowRepository
 import com.taskflow.core.notifications.ReminderEngine
-import com.taskflow.data.repository.InMemoryTaskFlowRepository
 import com.taskflow.domain.model.*
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -49,8 +52,8 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-class TaskFlowViewModel : ViewModel() {
-    val repo = InMemoryTaskFlowRepository()
+class TaskFlowViewModel(application: Application) : AndroidViewModel(application) {
+    val repo = LocalTaskFlowRepository(TaskFlowDatabase.get(application).dao(), viewModelScope)
     val users = repo.users
     val spaces = repo.spaces
     val lists = repo.lists
@@ -68,8 +71,8 @@ class TaskFlowViewModel : ViewModel() {
     var selectedTaskId by mutableStateOf<String?>(null)
     var materialsTab by mutableStateOf("Anexos")
 
-    fun currentUser() = users.value.first()
-    fun selectedTask(): Task = tasks.value.firstOrNull { it.id == selectedTaskId } ?: tasks.value.first()
+    fun currentUser() = users.value.firstOrNull() ?: User(name = "Manuel", email = "manuel@taskflow.local")
+    fun selectedTask(): Task? = tasks.value.firstOrNull { it.id == selectedTaskId } ?: tasks.value.firstOrNull()
 }
 
 sealed class Screen(val label: String) {
@@ -225,12 +228,14 @@ fun NewTaskScreen(vm: TaskFlowViewModel, onCancel: () -> Unit, onReminder: () ->
             Spacer(Modifier.height(24.dp))
             GradientButton("Salvar", {
                 if (title.isNotBlank()) {
-                    val list = lists.first()
-                    val time = LocalTime.parse(dueHour)
-                    vm.repo.createTask(Task(spaceId = list.spaceId, listId = list.id, title = title.trim(), description = description, priority = priority, createdBy = user.id, assignedTo = user.id, dueDate = LocalDateTime.of(LocalDate.now(), time)))
-                    onCancel()
+                    val list = lists.firstOrNull()
+                    if (list != null) {
+                        val time = LocalTime.parse(dueHour)
+                        vm.repo.createTask(Task(spaceId = list.spaceId, listId = list.id, title = title.trim(), description = description, priority = priority, createdBy = user.id, assignedTo = user.id, dueDate = LocalDateTime.of(LocalDate.now(), time)))
+                        onCancel()
+                    }
                 }
-            }, Modifier.fillMaxWidth(), enabled = title.isNotBlank())
+            }, Modifier.fillMaxWidth(), enabled = title.isNotBlank() && lists.isNotEmpty())
         }
     }
 }
@@ -243,6 +248,10 @@ fun DetailScreen(vm: TaskFlowViewModel, onBack: () -> Unit, onMaterials: () -> U
     val links by vm.links.collectAsState()
     val fields by vm.customFields.collectAsState()
     val comments by vm.comments.collectAsState()
+    if (task == null) {
+        LoadingFullScreen("Carregando tarefa...")
+        return
+    }
     LazyColumn(Modifier.fillMaxSize().statusBarsPadding().padding(22.dp), contentPadding = PaddingValues(bottom = 30.dp)) {
         item {
             TopRow("<", "Detalhe da tarefa", onBack)
@@ -289,6 +298,10 @@ fun DetailScreen(vm: TaskFlowViewModel, onBack: () -> Unit, onMaterials: () -> U
 @Composable
 fun ReminderScreen(vm: TaskFlowViewModel, onSave: () -> Unit) {
     val task = vm.selectedTask()
+    if (task == null) {
+        LoadingFullScreen("Carregando lembrete...")
+        return
+    }
     var enabled by remember { mutableStateOf(true) }
     var interval by remember { mutableIntStateOf(2) }
     var unit by remember { mutableStateOf("semanas") }
@@ -332,6 +345,10 @@ fun MaterialsScreen(vm: TaskFlowViewModel, onBack: () -> Unit) {
     val attachments by vm.attachments.collectAsState()
     val links by vm.links.collectAsState()
     val fields by vm.customFields.collectAsState()
+    if (task == null) {
+        LoadingFullScreen("Carregando materiais...")
+        return
+    }
     LazyColumn(Modifier.fillMaxSize().statusBarsPadding().padding(22.dp), contentPadding = PaddingValues(bottom = 30.dp)) {
         item {
             TopRow("<", "Materiais da tarefa", onBack)
@@ -369,6 +386,10 @@ fun ShareScreen(vm: TaskFlowViewModel, onBack: () -> Unit) {
     val attachments by vm.attachments.collectAsState()
     val links by vm.links.collectAsState()
     var permission by remember { mutableStateOf("Editar") }
+    if (task == null) {
+        LoadingFullScreen("Carregando convite...")
+        return
+    }
     LazyColumn(Modifier.fillMaxSize().statusBarsPadding().padding(22.dp), contentPadding = PaddingValues(bottom = 30.dp)) {
         item {
             TopRow("<", "Compartilhar", onBack)
@@ -450,6 +471,17 @@ fun SettingsScreen() {
                 InfoRow("Ajuda e suporte", "Disponivel")
             }
             TextButton(onClick = {}) { Text("Sair da conta", color = Color(0xFFEF4444)) }
+        }
+    }
+}
+
+@Composable
+fun LoadingFullScreen(label: String) {
+    Box(Modifier.fillMaxSize().background(OffWhite), contentAlignment = Alignment.Center) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            CircularProgressIndicator(color = Purple)
+            Spacer(Modifier.height(12.dp))
+            Text(label, color = Muted)
         }
     }
 }

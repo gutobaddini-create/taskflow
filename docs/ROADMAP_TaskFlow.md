@@ -106,7 +106,7 @@ O TaskFlow deve funcionar como uma lista de tarefas moderna e colaborativa, pare
 
 ## 2.2 Persistência local
 
-- [ ] Room Database.
+- [x] Room Database.
 - [ ] DataStore para preferências.
 
 ## 2.3 Backend sugerido
@@ -871,23 +871,23 @@ Implementar identidade visual moderna, limpa e premium.
 
 ### Tarefas
 
-- [ ] Criar entidades Room.
-- [ ] Criar DAOs.
-- [ ] Criar database.
-- [ ] Criar migrations iniciais.
-- [ ] Criar repositories locais.
-- [ ] Persistir tarefas.
-- [ ] Persistir lembretes.
-- [ ] Persistir anexos como metadados.
-- [ ] Persistir links.
-- [ ] Persistir campos complementares.
+- [x] Criar entidades Room.
+- [x] Criar DAOs.
+- [x] Criar database.
+- [x] Criar migrations iniciais.
+- [x] Criar repositories locais.
+- [x] Persistir tarefas.
+- [x] Persistir lembretes.
+- [x] Persistir anexos como metadados.
+- [x] Persistir links.
+- [x] Persistir campos complementares.
 
 ### Critérios de aceite
 
-- [ ] Dados continuam após fechar e abrir app.
-- [ ] Tarefas são carregadas do banco local.
-- [ ] Lembretes são restaurados.
-- [ ] Anexos preservam metadados.
+- [x] Dados continuam após fechar e abrir app.
+- [x] Tarefas são carregadas do banco local.
+- [x] Lembretes são restaurados.
+- [x] Anexos preservam metadados.
 
 ---
 
