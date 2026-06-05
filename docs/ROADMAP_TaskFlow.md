@@ -107,7 +107,7 @@ O TaskFlow deve funcionar como uma lista de tarefas moderna e colaborativa, pare
 ## 2.2 Persistência local
 
 - [x] Room Database.
-- [ ] DataStore para preferências.
+- [x] DataStore para preferências.
 
 ## 2.3 Backend sugerido
 
@@ -895,15 +895,15 @@ Implementar identidade visual moderna, limpa e premium.
 
 ### Tarefas
 
-- [ ] Salvar preferências de tema.
-- [ ] Salvar preferência de notificações.
-- [ ] Salvar usuário local atual.
-- [ ] Salvar filtros usados.
+- [x] Salvar preferências de tema.
+- [x] Salvar preferência de notificações.
+- [x] Salvar usuário local atual.
+- [x] Salvar filtros usados.
 
 ### Critérios de aceite
 
-- [ ] Preferências persistem após reiniciar app.
-- [ ] Toggle de notificações mantém estado.
+- [x] Preferências persistem após reiniciar app.
+- [x] Toggle de notificações mantém estado.
 
 ---
 
@@ -1110,9 +1110,9 @@ Implementar identidade visual moderna, limpa e premium.
 
 ### Tarefas
 
-- [ ] Exibir perfil.
-- [ ] Configurar notificações.
-- [ ] Configurar tema.
+- [x] Exibir perfil.
+- [x] Configurar notificações.
+- [x] Configurar tema.
 - [ ] Configurar conta.
 - [ ] Configurar privacidade.
 - [ ] Configurar ajuda e suporte.
@@ -1120,9 +1120,9 @@ Implementar identidade visual moderna, limpa e premium.
 
 ### Critérios de aceite
 
-- [ ] Configurações principais persistem.
+- [x] Configurações principais persistem.
 - [ ] Logout retorna para login.
-- [ ] Usuário consegue revisar preferências de notificação.
+- [x] Usuário consegue revisar preferências de notificação.
 
 ---
 

@@ -28,6 +28,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewModelScope
+import com.taskflow.data.local.TaskFlowPreferences
+import com.taskflow.data.local.TaskFlowUserPreferences
 import com.taskflow.data.local.TaskFlowDatabase
 import com.taskflow.data.repository.LocalTaskFlowRepository
 import com.taskflow.core.notifications.ReminderEngine
@@ -36,6 +38,9 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 
 private val OffWhite = Color(0xFFF7F8FC)
 private val Text = Color(0xFF07132F)
@@ -54,6 +59,7 @@ class MainActivity : ComponentActivity() {
 
 class TaskFlowViewModel(application: Application) : AndroidViewModel(application) {
     val repo = LocalTaskFlowRepository(TaskFlowDatabase.get(application).dao(), viewModelScope)
+    private val preferencesStore = TaskFlowPreferences(application)
     val users = repo.users
     val spaces = repo.spaces
     val lists = repo.lists
@@ -66,10 +72,55 @@ class TaskFlowViewModel(application: Application) : AndroidViewModel(application
     val comments = repo.comments
     val invites = repo.invites
     val activity = repo.activity
+    private val _preferences = MutableStateFlow(TaskFlowUserPreferences())
+    val preferences: StateFlow<TaskFlowUserPreferences> = _preferences
     var remindersVisible by mutableStateOf(true)
+        private set
     var homeFilter by mutableStateOf("Hoje")
+        private set
     var selectedTaskId by mutableStateOf<String?>(null)
     var materialsTab by mutableStateOf("Anexos")
+
+    init {
+        viewModelScope.launch {
+            preferencesStore.values.collect { prefs ->
+                _preferences.value = prefs
+                remindersVisible = prefs.remindersVisible
+                homeFilter = prefs.homeFilter
+            }
+        }
+    }
+
+    fun updateHomeFilter(value: String) {
+        homeFilter = value
+        viewModelScope.launch { preferencesStore.setHomeFilter(value) }
+    }
+
+    fun updateRemindersVisible(value: Boolean) {
+        remindersVisible = value
+        viewModelScope.launch {
+            preferencesStore.setRemindersVisible(value)
+            preferencesStore.setNotificationsEnabled(value)
+        }
+    }
+
+    fun setTheme(value: String) {
+        viewModelScope.launch { preferencesStore.setTheme(value) }
+    }
+
+    fun setNotificationsEnabled(value: Boolean) {
+        remindersVisible = value
+        viewModelScope.launch {
+            preferencesStore.setNotificationsEnabled(value)
+            preferencesStore.setRemindersVisible(value)
+        }
+    }
+
+    fun setCurrentUserIfNeeded(userId: String) {
+        if (preferences.value.currentUserId.isBlank()) {
+            viewModelScope.launch { preferencesStore.setCurrentUserId(userId) }
+        }
+    }
 
     fun currentUser() = users.value.firstOrNull() ?: User(name = "Manuel", email = "manuel@taskflow.local")
     fun selectedTask(): Task? = tasks.value.firstOrNull { it.id == selectedTaskId } ?: tasks.value.firstOrNull()
@@ -98,7 +149,7 @@ fun TaskFlowRoot(vm: TaskFlowViewModel = viewModel()) {
                 Screen.Home -> Shell(screen, { screen = it }) { HomeScreen(vm, { screen = Screen.NewTask }, { vm.selectedTaskId = it; screen = Screen.Detail }) }
                 Screen.Spaces -> Shell(screen, { screen = it }) { SpacesScreen(vm, { vm.selectedTaskId = it; screen = Screen.Detail }) }
                 Screen.People -> Shell(screen, { screen = it }) { PeopleScreen(vm) }
-                Screen.Settings -> Shell(screen, { screen = it }) { SettingsScreen() }
+                Screen.Settings -> Shell(screen, { screen = it }) { SettingsScreen(vm) }
                 Screen.NewTask -> NewTaskScreen(vm, { screen = Screen.Home }, { screen = Screen.Reminder }, { screen = Screen.Materials })
                 Screen.Detail -> DetailScreen(vm, { screen = Screen.Home }, { screen = Screen.Materials }, { screen = Screen.Share })
                 Screen.Reminder -> ReminderScreen(vm) { screen = Screen.NewTask }
@@ -144,6 +195,8 @@ fun HomeScreen(vm: TaskFlowViewModel, onNew: () -> Unit, onDetail: (String) -> U
     val tasks by vm.tasks.collectAsState()
     val reminders by vm.reminders.collectAsState()
     val lists by vm.lists.collectAsState()
+    val users by vm.users.collectAsState()
+    users.firstOrNull()?.let { LaunchedEffect(it.id) { vm.setCurrentUserIfNeeded(it.id) } }
     val filtered = when (vm.homeFilter) {
         "Concluidas" -> tasks.filter { it.isCompleted }
         "Proximas" -> tasks.filter { !it.isCompleted && (it.dueDate?.isAfter(LocalDateTime.now()) ?: true) }
@@ -160,12 +213,12 @@ fun HomeScreen(vm: TaskFlowViewModel, onNew: () -> Unit, onDetail: (String) -> U
                     Row { IconTile(Icons.Default.Notifications); Spacer(Modifier.width(8.dp)); IconTile(Icons.Default.AutoAwesome, Purple.copy(alpha = .12f), Purple) }
                 }
                 Spacer(Modifier.height(24.dp))
-                Segmented(listOf("Hoje", "Proximas", "Concluidas"), vm.homeFilter) { vm.homeFilter = it }
+                Segmented(listOf("Hoje", "Proximas", "Concluidas"), vm.homeFilter) { vm.updateHomeFilter(it) }
                 Spacer(Modifier.height(20.dp))
                 TaskFlowCard {
                     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
                         Row(verticalAlignment = Alignment.CenterVertically) { IconBubble(Icons.Default.NotificationsActive); Spacer(Modifier.width(14.dp)); Text("Lembretes ativos", fontSize = 20.sp, fontWeight = FontWeight.SemiBold, color = Text) }
-                        Switch(checked = vm.remindersVisible, onCheckedChange = { vm.remindersVisible = it })
+                        Switch(checked = vm.remindersVisible, onCheckedChange = { vm.updateRemindersVisible(it) })
                     }
                 }
                 Spacer(Modifier.height(12.dp))
@@ -458,15 +511,21 @@ fun PeopleScreen(vm: TaskFlowViewModel) {
 }
 
 @Composable
-fun SettingsScreen() {
+fun SettingsScreen(vm: TaskFlowViewModel) {
+    val preferences by vm.preferences.collectAsState()
     LazyColumn(Modifier.fillMaxSize().statusBarsPadding().padding(24.dp), contentPadding = PaddingValues(bottom = 120.dp)) {
         item {
             Text("Ajustes", fontSize = 30.sp, fontWeight = FontWeight.Bold, color = Text)
             Spacer(Modifier.height(16.dp))
             TaskFlowCard {
                 InfoRow("Meu perfil", "Manuel")
-                InfoRow("Notificacoes", "Ativas")
-                InfoRow("Tema", "Claro")
+                Row(Modifier.fillMaxWidth().padding(vertical = 7.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                    Text("Notificacoes", color = Muted)
+                    Switch(checked = preferences.notificationsEnabled, onCheckedChange = vm::setNotificationsEnabled)
+                }
+                Text("Tema", color = Muted, modifier = Modifier.padding(top = 10.dp))
+                Segmented(listOf("Claro", "Escuro futuro"), preferences.theme) { vm.setTheme(it) }
+                InfoRow("Filtro inicial", preferences.homeFilter)
                 InfoRow("Backups e sincronizacao", "Local-first")
                 InfoRow("Ajuda e suporte", "Disponivel")
             }
