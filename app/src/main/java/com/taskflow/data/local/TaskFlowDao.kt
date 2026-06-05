@@ -90,6 +90,12 @@ interface TaskFlowDao {
     @Query("SELECT * FROM tasks WHERE id = :taskId LIMIT 1")
     suspend fun taskById(taskId: String): TaskEntity?
 
+    @Query("SELECT * FROM reminders WHERE id = :reminderId LIMIT 1")
+    suspend fun reminderById(reminderId: String): ReminderEntity?
+
+    @Query("SELECT * FROM reminders WHERE taskId = :taskId")
+    suspend fun remindersByTaskId(taskId: String): List<ReminderEntity>
+
     @Query("SELECT COUNT(*) FROM tasks WHERE spaceId = :spaceId")
     suspend fun taskCountBySpace(spaceId: String): Int
 

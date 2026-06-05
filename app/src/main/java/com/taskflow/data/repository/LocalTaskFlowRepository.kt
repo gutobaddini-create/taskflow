@@ -1,5 +1,8 @@
 package com.taskflow.data.repository
 
+import android.content.Context
+import com.taskflow.core.notifications.ReminderEngine
+import com.taskflow.core.notifications.ReminderScheduler
 import com.taskflow.data.local.TaskFlowDao
 import com.taskflow.data.mapper.*
 import com.taskflow.domain.model.*
@@ -15,8 +18,10 @@ import java.time.LocalDateTime
 
 class LocalTaskFlowRepository(
     private val dao: TaskFlowDao,
+    context: Context,
     private val scope: CoroutineScope
 ) : TaskFlowRepository {
+    private val reminderScheduler = ReminderScheduler(context.applicationContext)
     override val users = MutableStateFlow(emptyList<User>())
     override val spaces = MutableStateFlow(emptyList<Space>())
     override val lists = MutableStateFlow(emptyList<TaskList>())
@@ -103,6 +108,13 @@ class LocalTaskFlowRepository(
         scope.launch(Dispatchers.IO) {
             val task = dao.taskById(taskId)?.toDomain() ?: return@launch
             dao.upsertTasks(listOf(task.copy(status = TaskStatus.Done, isCompleted = true, completedAt = now(), updatedAt = now()).toEntity()))
+            dao.remindersByTaskId(taskId)
+                .map { it.toDomain() }
+                .filter { it.endType == ReminderEndType.OnTaskDone }
+                .forEach { reminder ->
+                    reminderScheduler.cancel(reminder.id, reminder.taskId)
+                    dao.upsertReminders(listOf(reminder.copy(isActive = false, updatedAt = now()).toEntity()))
+                }
             dao.upsertActivity(listOf(ActivityLog(taskId = taskId, userId = task.createdBy, action = "Tarefa concluida").toEntity()))
         }
     }
@@ -153,7 +165,12 @@ class LocalTaskFlowRepository(
     }
 
     override fun saveReminder(reminder: Reminder) {
-        scope.launch(Dispatchers.IO) { dao.upsertReminders(listOf(reminder.toEntity())) }
+        scope.launch(Dispatchers.IO) {
+            val nextTriggerAt = ReminderEngine.nextOccurrence(reminder)
+            val value = reminder.copy(nextTriggerAt = nextTriggerAt, updatedAt = now())
+            dao.upsertReminders(listOf(value.toEntity()))
+            reminderScheduler.schedule(value, nextTriggerAt)
+        }
     }
 
     override fun addAttachment(attachment: Attachment) {

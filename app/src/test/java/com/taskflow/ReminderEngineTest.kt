@@ -38,6 +38,45 @@ class ReminderEngineTest {
     }
 
     @Test
+    fun dailyReminderAdvancesToNextDay() {
+        val reminder = Reminder(
+            taskId = "task",
+            userId = "user",
+            recurrenceType = RecurrenceType.Daily,
+            startDate = LocalDate.of(2026, 6, 1),
+            startTime = LocalTime.of(9, 0)
+        )
+        assertEquals(LocalDateTime.of(2026, 6, 6, 9, 0), ReminderEngine.nextOccurrence(reminder, LocalDateTime.of(2026, 6, 5, 10, 0)))
+    }
+
+    @Test
+    fun weeklyReminderUsesSelectedWeekday() {
+        val reminder = Reminder(
+            taskId = "task",
+            userId = "user",
+            recurrenceType = RecurrenceType.Weekly,
+            selectedWeekDays = listOf(WeekDay.Thursday),
+            startDate = LocalDate.of(2026, 6, 1),
+            startTime = LocalTime.of(9, 0)
+        )
+        assertEquals(LocalDateTime.of(2026, 6, 11, 9, 0), ReminderEngine.nextOccurrence(reminder, LocalDateTime.of(2026, 6, 5, 8, 0)))
+    }
+
+    @Test
+    fun everyFifteenDaysAdvancesByCustomInterval() {
+        val reminder = Reminder(
+            taskId = "task",
+            userId = "user",
+            recurrenceType = RecurrenceType.Custom,
+            recurrenceInterval = 15,
+            recurrenceUnit = RecurrenceUnit.Days,
+            startDate = LocalDate.of(2026, 6, 1),
+            startTime = LocalTime.of(9, 0)
+        )
+        assertEquals(LocalDateTime.of(2026, 6, 16, 9, 0), ReminderEngine.nextOccurrence(reminder, LocalDateTime.of(2026, 6, 5, 8, 0)))
+    }
+
+    @Test
     fun monthlyFixedDayClampsToEndOfShortMonth() {
         val reminder = Reminder(
             taskId = "task",
@@ -51,6 +90,19 @@ class ReminderEngineTest {
     }
 
     @Test
+    fun monthlyFixedDayCanUseDayTen() {
+        val reminder = Reminder(
+            taskId = "task",
+            userId = "user",
+            recurrenceType = RecurrenceType.Monthly,
+            selectedMonthDay = 10,
+            startDate = LocalDate.of(2026, 1, 10),
+            startTime = LocalTime.of(9, 0)
+        )
+        assertEquals(LocalDateTime.of(2026, 2, 10, 9, 0), ReminderEngine.nextOccurrence(reminder, LocalDateTime.of(2026, 2, 1, 8, 0)))
+    }
+
+    @Test
     fun lastBusinessDaySkipsWeekend() {
         val reminder = Reminder(
             taskId = "task",
@@ -61,5 +113,34 @@ class ReminderEngineTest {
             startTime = LocalTime.of(9, 0)
         )
         assertEquals(LocalDateTime.of(2026, 2, 27, 9, 0), ReminderEngine.nextOccurrence(reminder, LocalDateTime.of(2026, 2, 1, 8, 0)))
+    }
+
+    @Test
+    fun endDateStopsFutureOccurrence() {
+        val reminder = Reminder(
+            taskId = "task",
+            userId = "user",
+            recurrenceType = RecurrenceType.Daily,
+            endType = ReminderEndType.OnDate,
+            endDate = LocalDate.of(2026, 6, 5),
+            startDate = LocalDate.of(2026, 6, 1),
+            startTime = LocalTime.of(9, 0)
+        )
+        assertNull(ReminderEngine.nextOccurrence(reminder, LocalDateTime.of(2026, 6, 5, 10, 0)))
+    }
+
+    @Test
+    fun occurrenceLimitStopsWhenReached() {
+        val reminder = Reminder(
+            taskId = "task",
+            userId = "user",
+            recurrenceType = RecurrenceType.Daily,
+            endType = ReminderEndType.AfterOccurrences,
+            maxOccurrences = 3,
+            occurrencesCompleted = 3,
+            startDate = LocalDate.of(2026, 6, 1),
+            startTime = LocalTime.of(9, 0)
+        )
+        assertNull(ReminderEngine.nextOccurrence(reminder, LocalDateTime.of(2026, 6, 5, 8, 0)))
     }
 }

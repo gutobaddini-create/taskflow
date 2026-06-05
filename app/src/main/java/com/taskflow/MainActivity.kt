@@ -1,7 +1,10 @@
 package com.taskflow
 
+import android.Manifest
 import android.os.Bundle
 import android.app.Application
+import android.content.pm.PackageManager
+import android.os.Build
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
@@ -56,12 +59,15 @@ private val Gradient = Brush.horizontalGradient(listOf(Blue, Purple))
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), 1001)
+        }
         setContent { TaskFlowRoot() }
     }
 }
 
 class TaskFlowViewModel(application: Application) : AndroidViewModel(application) {
-    val repo = LocalTaskFlowRepository(TaskFlowDatabase.get(application).dao(), viewModelScope)
+    val repo = LocalTaskFlowRepository(TaskFlowDatabase.get(application).dao(), application, viewModelScope)
     private val preferencesStore = TaskFlowPreferences(application)
     val users = repo.users
     val spaces = repo.spaces
@@ -154,7 +160,7 @@ fun TaskFlowRoot(vm: TaskFlowViewModel = viewModel()) {
                 Screen.People -> Shell(screen, { screen = it }) { PeopleScreen(vm) }
                 Screen.Settings -> Shell(screen, { screen = it }) { SettingsScreen(vm) }
                 Screen.NewTask -> NewTaskScreen(vm, { screen = Screen.Home }, { screen = Screen.Reminder }, { screen = Screen.Materials })
-                Screen.Detail -> DetailScreen(vm, { screen = Screen.Home }, { screen = Screen.Materials }, { screen = Screen.Share })
+                Screen.Detail -> DetailScreen(vm, { screen = Screen.Home }, { screen = Screen.Materials }, { screen = Screen.Share }, { screen = Screen.Reminder })
                 Screen.Reminder -> ReminderScreen(vm) { screen = Screen.NewTask }
                 Screen.Materials -> MaterialsScreen(vm) { screen = Screen.Detail }
                 Screen.Share -> ShareScreen(vm) { screen = Screen.Detail }
@@ -323,7 +329,7 @@ fun NewTaskScreen(vm: TaskFlowViewModel, onCancel: () -> Unit, onReminder: () ->
 }
 
 @Composable
-fun DetailScreen(vm: TaskFlowViewModel, onBack: () -> Unit, onMaterials: () -> Unit, onShare: () -> Unit) {
+fun DetailScreen(vm: TaskFlowViewModel, onBack: () -> Unit, onMaterials: () -> Unit, onShare: () -> Unit, onReminder: () -> Unit) {
     val task = vm.selectedTask()
     val users by vm.users.collectAsState()
     val reminders by vm.reminders.collectAsState()
@@ -384,7 +390,7 @@ fun DetailScreen(vm: TaskFlowViewModel, onBack: () -> Unit, onMaterials: () -> U
                 Row(Modifier.padding(top = 10.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) { StatusPill(task.status); PriorityPill(task.priority) }
             }
             SectionTitle("Proximo lembrete")
-            TaskFlowCard {
+            TaskFlowCard(Modifier.clickable(onClick = onReminder).testTag("open-reminder").semantics { contentDescription = "Configurar lembrete" }) {
                 val next = reminders.firstOrNull { it.taskId == task.id }?.let { ReminderEngine.nextOccurrence(it) }
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                     Column { Text("Recorrencia personalizada", fontWeight = FontWeight.Bold, color = Text); Text(next?.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")) ?: "Nenhum lembrete", color = Muted) }

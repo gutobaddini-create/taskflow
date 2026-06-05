@@ -119,8 +119,8 @@ O TaskFlow deve funcionar como uma lista de tarefas moderna e colaborativa, pare
 
 ## 2.4 Recursos Android
 
-- [ ] Android notification permission.
-- [ ] AlarmManager ou WorkManager conforme necessidade técnica.
+- [x] Android notification permission.
+- [x] AlarmManager ou WorkManager conforme necessidade técnica.
 - [ ] Photo Picker para imagens.
 - [ ] CameraX ou intent de câmera para fotos.
 - [ ] Storage Access Framework para arquivos.
@@ -563,31 +563,31 @@ Implementar identidade visual moderna, limpa e premium.
 
 ### Tarefas
 
-- [ ] Criar entidade `Reminder`.
-- [ ] Criar função para cálculo de próxima ocorrência.
-- [ ] Criar suporte a lembrete único.
-- [ ] Criar suporte a recorrência diária.
-- [ ] Criar suporte a recorrência semanal.
-- [ ] Criar suporte a recorrência mensal.
+- [x] Criar entidade `Reminder`.
+- [x] Criar função para cálculo de próxima ocorrência.
+- [x] Criar suporte a lembrete único.
+- [x] Criar suporte a recorrência diária.
+- [x] Criar suporte a recorrência semanal.
+- [x] Criar suporte a recorrência mensal.
 - [ ] Criar suporte a recorrência anual.
-- [ ] Criar suporte a recorrência customizada.
-- [ ] Criar suporte a dias específicos da semana.
-- [ ] Criar suporte a dia fixo do mês.
-- [ ] Criar suporte a regra mensal.
-- [ ] Criar fim por data.
-- [ ] Criar fim por número de ocorrências.
+- [x] Criar suporte a recorrência customizada.
+- [x] Criar suporte a dias específicos da semana.
+- [x] Criar suporte a dia fixo do mês.
+- [x] Criar suporte a regra mensal.
+- [x] Criar fim por data.
+- [x] Criar fim por número de ocorrências.
 - [ ] Criar fim ao concluir tarefa.
-- [ ] Criar múltiplos lembretes por tarefa.
+- [x] Criar múltiplos lembretes por tarefa.
 
 ### Critérios de aceite
 
-- [ ] Calcula corretamente lembrete único.
-- [ ] Calcula corretamente `a cada 2 semanas`.
-- [ ] Calcula corretamente `a cada 15 dias`.
-- [ ] Calcula corretamente `todo dia 10`.
-- [ ] Calcula corretamente `último dia útil`.
-- [ ] Não cria próxima ocorrência após fim da recorrência.
-- [ ] Permite mais de um lembrete na mesma tarefa.
+- [x] Calcula corretamente lembrete único.
+- [x] Calcula corretamente `a cada 2 semanas`.
+- [x] Calcula corretamente `a cada 15 dias`.
+- [x] Calcula corretamente `todo dia 10`.
+- [x] Calcula corretamente `último dia útil`.
+- [x] Não cria próxima ocorrência após fim da recorrência.
+- [x] Permite mais de um lembrete na mesma tarefa.
 
 ---
 
@@ -595,27 +595,27 @@ Implementar identidade visual moderna, limpa e premium.
 
 ### Tarefas
 
-- [ ] Toggle `Ativar lembrete`.
-- [ ] Campo `Data inicial`.
-- [ ] Campo `Horário`.
-- [ ] Chips de aviso antecipado.
-- [ ] Segmented control `Não repetir`, `Simples`, `Personalizada`.
-- [ ] Controle `Repetir a cada`.
+- [x] Toggle `Ativar lembrete`.
+- [x] Campo `Data inicial`.
+- [x] Campo `Horário`.
+- [x] Chips de aviso antecipado.
+- [x] Segmented control `Não repetir`, `Simples`, `Personalizada`.
+- [x] Controle `Repetir a cada`.
 - [ ] Seletor de unidade: dias, semanas, meses, anos.
 - [ ] Seletor de dias da semana.
 - [ ] Opções de fim da repetição.
-- [ ] Campo para data final.
+- [x] Campo para data final.
 - [ ] Campo para X repetições.
 - [ ] Opção mensal em data fixa.
 - [ ] Opção regra mensal.
-- [ ] Botão salvar lembrete.
+- [x] Botão salvar lembrete.
 
 ### Critérios de aceite
 
-- [ ] Usuário consegue criar lembrete a cada 2 semanas.
-- [ ] Usuário consegue escolher segunda e quinta.
-- [ ] Usuário consegue definir fim em 31/12/2026.
-- [ ] Usuário consegue salvar e voltar para tarefa.
+- [x] Usuário consegue criar lembrete a cada 2 semanas.
+- [x] Usuário consegue escolher segunda e quinta.
+- [x] Usuário consegue definir fim em 31/12/2026.
+- [x] Usuário consegue salvar e voltar para tarefa.
 - [ ] Resumo do lembrete aparece na tela da tarefa.
 
 ---
@@ -624,15 +624,15 @@ Implementar identidade visual moderna, limpa e premium.
 
 ### Tarefas
 
-- [ ] Solicitar permissão de notificação quando necessário.
-- [ ] Criar canal de notificação.
-- [ ] Agendar notificação local.
-- [ ] Exibir título da tarefa.
-- [ ] Exibir horário/lista.
-- [ ] Exibir ações rápidas.
-- [ ] Implementar ação `Concluir`.
-- [ ] Implementar ação `Adiar`.
-- [ ] Implementar ação `Abrir`.
+- [x] Solicitar permissão de notificação quando necessário.
+- [x] Criar canal de notificação.
+- [x] Agendar notificação local.
+- [x] Exibir título da tarefa.
+- [x] Exibir horário/lista.
+- [x] Exibir ações rápidas.
+- [x] Implementar ação `Concluir`.
+- [x] Implementar ação `Adiar`.
+- [x] Implementar ação `Abrir`.
 - [ ] Reagendar próxima ocorrência após disparo.
 
 ### Critérios de aceite
@@ -1027,7 +1027,7 @@ Implementar identidade visual moderna, limpa e premium.
 
 ### Tarefas
 
-- [ ] Solicitar permissão de notificação.
+- [x] Solicitar permissão de notificação.
 - [ ] Solicitar câmera apenas quando usuário usar câmera.
 - [ ] Não pedir acesso amplo à galeria sem necessidade.
 - [ ] Usar Photo Picker para imagens.
@@ -1132,22 +1132,22 @@ Implementar identidade visual moderna, limpa e premium.
 
 ### Tarefas
 
-- [ ] Testar cálculo de recorrência única.
-- [ ] Testar recorrência diária.
-- [ ] Testar recorrência semanal.
-- [ ] Testar recorrência a cada 2 semanas.
-- [ ] Testar recorrência a cada 15 dias.
-- [ ] Testar recorrência mensal por dia fixo.
-- [ ] Testar último dia útil.
-- [ ] Testar fim por data.
-- [ ] Testar fim por ocorrências.
+- [x] Testar cálculo de recorrência única.
+- [x] Testar recorrência diária.
+- [x] Testar recorrência semanal.
+- [x] Testar recorrência a cada 2 semanas.
+- [x] Testar recorrência a cada 15 dias.
+- [x] Testar recorrência mensal por dia fixo.
+- [x] Testar último dia útil.
+- [x] Testar fim por data.
+- [x] Testar fim por ocorrências.
 - [ ] Testar validação de URL.
 - [ ] Testar validação de arquivo.
 
 ### Critérios de aceite
 
-- [ ] Testes principais passam.
-- [ ] Não há regressão no Reminder Engine.
+- [x] Testes principais passam.
+- [x] Não há regressão no Reminder Engine.
 
 ---
 
