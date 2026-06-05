@@ -1,0 +1,533 @@
+package com.taskflow
+
+import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.taskflow.core.notifications.ReminderEngine
+import com.taskflow.data.repository.InMemoryTaskFlowRepository
+import com.taskflow.domain.model.*
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
+
+private val OffWhite = Color(0xFFF7F8FC)
+private val Text = Color(0xFF07132F)
+private val Muted = Color(0xFF667085)
+private val Blue = Color(0xFF2563FF)
+private val Purple = Color(0xFF7C3AED)
+private val Border = Color(0xFFE5E7EB)
+private val Gradient = Brush.horizontalGradient(listOf(Blue, Purple))
+
+class MainActivity : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContent { TaskFlowRoot() }
+    }
+}
+
+class TaskFlowViewModel : ViewModel() {
+    val repo = InMemoryTaskFlowRepository()
+    val users = repo.users
+    val spaces = repo.spaces
+    val lists = repo.lists
+    val tasks = repo.tasks
+    val reminders = repo.reminders
+    val attachments = repo.attachments
+    val links = repo.links
+    val customFields = repo.customFields
+    val checklist = repo.checklist
+    val comments = repo.comments
+    val invites = repo.invites
+    val activity = repo.activity
+    var remindersVisible by mutableStateOf(true)
+    var homeFilter by mutableStateOf("Hoje")
+    var selectedTaskId by mutableStateOf<String?>(null)
+    var materialsTab by mutableStateOf("Anexos")
+
+    fun currentUser() = users.value.first()
+    fun selectedTask(): Task = tasks.value.firstOrNull { it.id == selectedTaskId } ?: tasks.value.first()
+}
+
+sealed class Screen(val label: String) {
+    data object Onboarding : Screen("Inicio")
+    data object Home : Screen("Hoje")
+    data object Spaces : Screen("Listas")
+    data object People : Screen("Pessoas")
+    data object Settings : Screen("Ajustes")
+    data object NewTask : Screen("Nova tarefa")
+    data object Detail : Screen("Detalhe")
+    data object Reminder : Screen("Lembrete")
+    data object Materials : Screen("Materiais")
+    data object Share : Screen("Compartilhar")
+}
+
+@Composable
+fun TaskFlowRoot(vm: TaskFlowViewModel = viewModel()) {
+    var screen by remember { mutableStateOf<Screen>(Screen.Onboarding) }
+    MaterialTheme(colorScheme = lightColorScheme(primary = Blue, secondary = Purple, background = OffWhite)) {
+        Surface(Modifier.fillMaxSize(), color = OffWhite) {
+            when (screen) {
+                Screen.Onboarding -> OnboardingScreen { screen = Screen.Home }
+                Screen.Home -> Shell(screen, { screen = it }) { HomeScreen(vm, { screen = Screen.NewTask }, { vm.selectedTaskId = it; screen = Screen.Detail }) }
+                Screen.Spaces -> Shell(screen, { screen = it }) { SpacesScreen(vm, { vm.selectedTaskId = it; screen = Screen.Detail }) }
+                Screen.People -> Shell(screen, { screen = it }) { PeopleScreen(vm) }
+                Screen.Settings -> Shell(screen, { screen = it }) { SettingsScreen() }
+                Screen.NewTask -> NewTaskScreen(vm, { screen = Screen.Home }, { screen = Screen.Reminder }, { screen = Screen.Materials })
+                Screen.Detail -> DetailScreen(vm, { screen = Screen.Home }, { screen = Screen.Materials }, { screen = Screen.Share })
+                Screen.Reminder -> ReminderScreen(vm) { screen = Screen.NewTask }
+                Screen.Materials -> MaterialsScreen(vm) { screen = Screen.Detail }
+                Screen.Share -> ShareScreen(vm) { screen = Screen.Detail }
+            }
+        }
+    }
+}
+
+@Composable
+fun Shell(current: Screen, navigate: (Screen) -> Unit, content: @Composable () -> Unit) {
+    Box(Modifier.fillMaxSize()) {
+        content()
+        NavigationBar(
+            Modifier.align(Alignment.BottomCenter).padding(horizontal = 18.dp, vertical = 14.dp).clip(RoundedCornerShape(26.dp)),
+            containerColor = Color.White
+        ) {
+            navItems().forEach { (screen, icon) ->
+                NavigationBarItem(selected = current == screen, onClick = { navigate(screen) }, icon = { Icon(icon, null) }, label = { Text(screen.label) })
+            }
+        }
+    }
+}
+
+fun navItems() = listOf(Screen.Home to Icons.Default.CalendarToday, Screen.Spaces to Icons.Default.List, Screen.People to Icons.Default.Groups, Screen.Settings to Icons.Default.Settings)
+
+@Composable
+fun OnboardingScreen(onStart: () -> Unit) {
+    Column(Modifier.fillMaxSize().padding(28.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+        Icon(Icons.Default.NotificationsActive, null, tint = Purple, modifier = Modifier.size(86.dp))
+        Spacer(Modifier.height(26.dp))
+        Text("TaskFlow", fontSize = 38.sp, fontWeight = FontWeight.Bold, color = Text)
+        Text("Organize tarefas, lembretes e materiais em um fluxo unico.", color = Muted, modifier = Modifier.padding(top = 12.dp), lineHeight = 22.sp)
+        Spacer(Modifier.height(52.dp))
+        GradientButton("Comecar", onStart, Modifier.fillMaxWidth())
+        TextButton(onClick = onStart) { Text("Ja tenho uma conta") }
+    }
+}
+
+@Composable
+fun HomeScreen(vm: TaskFlowViewModel, onNew: () -> Unit, onDetail: (String) -> Unit) {
+    val tasks by vm.tasks.collectAsState()
+    val reminders by vm.reminders.collectAsState()
+    val lists by vm.lists.collectAsState()
+    val filtered = when (vm.homeFilter) {
+        "Concluidas" -> tasks.filter { it.isCompleted }
+        "Proximas" -> tasks.filter { !it.isCompleted && (it.dueDate?.isAfter(LocalDateTime.now()) ?: true) }
+        else -> tasks.filter { !it.isCompleted }
+    }
+    Box {
+        LazyColumn(Modifier.fillMaxSize().statusBarsPadding().padding(horizontal = 24.dp, vertical = 12.dp), contentPadding = PaddingValues(bottom = 120.dp)) {
+            item {
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                    Column {
+                        Text("Bom dia, Manuel", fontSize = 30.sp, fontWeight = FontWeight.Bold, color = Text)
+                        Text("Sexta, 5 de junho", color = Muted, fontSize = 18.sp)
+                    }
+                    Row { IconTile(Icons.Default.Notifications); Spacer(Modifier.width(8.dp)); IconTile(Icons.Default.AutoAwesome, Purple.copy(alpha = .12f), Purple) }
+                }
+                Spacer(Modifier.height(24.dp))
+                Segmented(listOf("Hoje", "Proximas", "Concluidas"), vm.homeFilter) { vm.homeFilter = it }
+                Spacer(Modifier.height(20.dp))
+                TaskFlowCard {
+                    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
+                        Row(verticalAlignment = Alignment.CenterVertically) { IconBubble(Icons.Default.NotificationsActive); Spacer(Modifier.width(14.dp)); Text("Lembretes ativos", fontSize = 20.sp, fontWeight = FontWeight.SemiBold, color = Text) }
+                        Switch(checked = vm.remindersVisible, onCheckedChange = { vm.remindersVisible = it })
+                    }
+                }
+                Spacer(Modifier.height(12.dp))
+            }
+            items(filtered) { task ->
+                TaskCard(task, lists.firstOrNull { it.id == task.listId }?.name ?: "Lista", reminders.any { it.taskId == task.id && it.isActive }) { onDetail(task.id) }
+                Spacer(Modifier.height(14.dp))
+            }
+            item {
+                val next = reminders.mapNotNull { r -> ReminderEngine.nextOccurrence(r)?.let { r to it } }.minByOrNull { it.second }
+                if (next != null) NextReminderCard(tasks.firstOrNull { it.id == next.first.taskId }?.title ?: "Lembrete", next.second)
+            }
+        }
+        FloatingActionButton(onClick = onNew, containerColor = Purple, contentColor = Color.White, modifier = Modifier.align(Alignment.BottomEnd).padding(end = 28.dp, bottom = 96.dp).size(70.dp)) {
+            Icon(Icons.Default.Add, null, Modifier.size(34.dp))
+        }
+    }
+}
+
+@Composable
+fun NewTaskScreen(vm: TaskFlowViewModel, onCancel: () -> Unit, onReminder: () -> Unit, onMaterials: () -> Unit) {
+    val lists by vm.lists.collectAsState()
+    val user = vm.currentUser()
+    var title by remember { mutableStateOf("") }
+    var description by remember { mutableStateOf("") }
+    var priority by remember { mutableStateOf(TaskPriority.Medium) }
+    var dueHour by remember { mutableStateOf("09:00") }
+    LazyColumn(Modifier.fillMaxSize().statusBarsPadding().padding(22.dp), contentPadding = PaddingValues(bottom = 36.dp)) {
+        item {
+            TopRow("Cancelar", "Nova tarefa", onCancel)
+            Spacer(Modifier.height(18.dp))
+            OutlinedTextField(title, { title = it }, label = { Text("Titulo da tarefa *") }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(18.dp))
+            OutlinedTextField(description, { description = it }, label = { Text("Descricao") }, modifier = Modifier.fillMaxWidth().padding(top = 10.dp), shape = RoundedCornerShape(18.dp), minLines = 3)
+            Spacer(Modifier.height(16.dp))
+            TaskFlowCard {
+                InfoRow("Lista", lists.firstOrNull()?.name ?: "Prazos")
+                InfoRow("Prazo", "Hoje, $dueHour")
+                InfoRow("Responsavel", "Manuel")
+                InfoRow("Convidar pessoas", "WhatsApp, e-mail ou link")
+            }
+            SectionTitle("Lembretes")
+            TaskFlowCard(Modifier.clickable(onClick = onReminder)) {
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                    Column { Text("A cada 2 semanas", fontWeight = FontWeight.Bold, color = Text); Text("seg e qui - termina em 31/12/2026", color = Muted) }
+                    Icon(Icons.Default.ChevronRight, null, tint = Muted)
+                }
+            }
+            SectionTitle("Materiais da tarefa")
+            TaskFlowCard(Modifier.clickable(onClick = onMaterials)) {
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) { ChipText("2 anexos"); ChipText("1 link"); ChipText("3 campos") }
+                Spacer(Modifier.height(14.dp))
+                Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    SmallAction(Icons.Default.AttachFile, "Arquivo")
+                    SmallAction(Icons.Default.PhotoCamera, "Foto")
+                    SmallAction(Icons.Default.Link, "Link")
+                }
+            }
+            SectionTitle("Prioridade")
+            Segmented(TaskPriority.entries.map { it.label }, priority.label) { priority = TaskPriority.entries.first { p -> p.label == it } }
+            Spacer(Modifier.height(24.dp))
+            GradientButton("Salvar", {
+                if (title.isNotBlank()) {
+                    val list = lists.first()
+                    val time = LocalTime.parse(dueHour)
+                    vm.repo.createTask(Task(spaceId = list.spaceId, listId = list.id, title = title.trim(), description = description, priority = priority, createdBy = user.id, assignedTo = user.id, dueDate = LocalDateTime.of(LocalDate.now(), time)))
+                    onCancel()
+                }
+            }, Modifier.fillMaxWidth(), enabled = title.isNotBlank())
+        }
+    }
+}
+
+@Composable
+fun DetailScreen(vm: TaskFlowViewModel, onBack: () -> Unit, onMaterials: () -> Unit, onShare: () -> Unit) {
+    val task = vm.selectedTask()
+    val reminders by vm.reminders.collectAsState()
+    val attachments by vm.attachments.collectAsState()
+    val links by vm.links.collectAsState()
+    val fields by vm.customFields.collectAsState()
+    val comments by vm.comments.collectAsState()
+    LazyColumn(Modifier.fillMaxSize().statusBarsPadding().padding(22.dp), contentPadding = PaddingValues(bottom = 30.dp)) {
+        item {
+            TopRow("<", "Detalhe da tarefa", onBack)
+            Text(task.title, fontSize = 30.sp, fontWeight = FontWeight.Bold, color = Text, modifier = Modifier.padding(top = 18.dp))
+            Row(Modifier.padding(top = 10.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) { StatusPill(task.status); PriorityPill(task.priority) }
+            SectionTitle("Proximo lembrete")
+            TaskFlowCard {
+                val next = reminders.firstOrNull { it.taskId == task.id }?.let { ReminderEngine.nextOccurrence(it) }
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                    Column { Text("Recorrencia personalizada", fontWeight = FontWeight.Bold, color = Text); Text(next?.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")) ?: "Nenhum lembrete", color = Muted) }
+                    Switch(checked = reminders.any { it.taskId == task.id && it.isActive }, onCheckedChange = {})
+                }
+            }
+            SectionTitle("Descricao")
+            TaskFlowCard { Text(task.description.ifBlank { "Sem descricao." }, color = Muted, lineHeight = 22.sp) }
+            SectionTitle("Dados principais")
+            TaskFlowCard {
+                InfoRow("Prazo", task.dueDate?.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")) ?: "Sem prazo")
+                InfoRow("Responsavel", "Manuel")
+                InfoRow("Participantes", "2 pessoas")
+            }
+            SectionTitle("Materiais da tarefa")
+            TaskFlowCard(Modifier.clickable(onClick = onMaterials)) {
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    ChipText("${attachments.count { it.taskId == task.id }} anexos")
+                    ChipText("${links.count { it.taskId == task.id }} link")
+                    ChipText("${fields.count { it.taskId == task.id }} campos")
+                }
+                Spacer(Modifier.height(12.dp))
+                Text(attachments.firstOrNull { it.taskId == task.id }?.fileName ?: "Nenhum anexo", color = Text)
+                Text(links.firstOrNull { it.taskId == task.id }?.title ?: "Nenhum link", color = Text)
+            }
+            SectionTitle("Comentarios")
+            comments.filter { it.taskId == task.id }.forEach { Text("Manuel: ${it.text}", color = Muted, modifier = Modifier.padding(vertical = 4.dp)) }
+            Spacer(Modifier.height(20.dp))
+            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                OutlinedButton(onClick = onShare, modifier = Modifier.weight(1f), shape = RoundedCornerShape(50)) { Text("Compartilhar") }
+                GradientButton("Concluir", { vm.repo.completeTask(task.id); onBack() }, Modifier.weight(1f))
+            }
+        }
+    }
+}
+
+@Composable
+fun ReminderScreen(vm: TaskFlowViewModel, onSave: () -> Unit) {
+    val task = vm.selectedTask()
+    var enabled by remember { mutableStateOf(true) }
+    var interval by remember { mutableIntStateOf(2) }
+    var unit by remember { mutableStateOf("semanas") }
+    var endDate by remember { mutableStateOf("31/12/2026") }
+    LazyColumn(Modifier.fillMaxSize().statusBarsPadding().padding(22.dp), contentPadding = PaddingValues(bottom = 30.dp)) {
+        item {
+            TopRow("<", "Lembrete personalizado", onSave)
+            SectionTitle("Ativar lembrete")
+            TaskFlowCard { Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) { Text("Notificar esta tarefa", fontWeight = FontWeight.Bold); Switch(enabled, { enabled = it }) } }
+            SectionTitle("Quando")
+            TaskFlowCard { InfoRow("Data inicial", "10/06/2026"); InfoRow("Horario", "09:00") }
+            SectionTitle("Avisar antes")
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) { listOf("5 min", "15 min", "30 min", "1 h").forEach { ChipText(it) } }
+            SectionTitle("Repeticao")
+            Segmented(listOf("Nao repetir", "Simples", "Personalizada"), "Personalizada") {}
+            TaskFlowCard {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text("Repetir a cada", color = Muted)
+                    Spacer(Modifier.weight(1f))
+                    IconButton({ if (interval > 1) interval-- }) { Icon(Icons.Default.Remove, null) }
+                    Text("$interval", fontSize = 22.sp, fontWeight = FontWeight.Bold)
+                    IconButton({ interval++ }) { Icon(Icons.Default.Add, null) }
+                    Text(unit, color = Muted)
+                }
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) { listOf("seg", "ter", "qua", "qui", "sex").forEach { ChipText(it, active = it in listOf("seg", "qui")) } }
+            }
+            SectionTitle("Fim da repeticao")
+            TaskFlowCard { InfoRow("Termino", "Em uma data"); OutlinedTextField(endDate, { endDate = it }, label = { Text("Data final") }, shape = RoundedCornerShape(18.dp), modifier = Modifier.fillMaxWidth()) }
+            Spacer(Modifier.height(24.dp))
+            GradientButton("Salvar lembrete", {
+                vm.repo.saveReminder(Reminder(taskId = task.id, userId = vm.currentUser().id, type = ReminderType.Recurring, recurrenceType = RecurrenceType.Custom, recurrenceInterval = interval, recurrenceUnit = RecurrenceUnit.Weeks, selectedWeekDays = listOf(WeekDay.Monday, WeekDay.Thursday), endType = ReminderEndType.OnDate, endDate = LocalDate.of(2026, 12, 31), isActive = enabled))
+                onSave()
+            }, Modifier.fillMaxWidth(), enabled = enabled)
+        }
+    }
+}
+
+@Composable
+fun MaterialsScreen(vm: TaskFlowViewModel, onBack: () -> Unit) {
+    val task = vm.selectedTask()
+    val attachments by vm.attachments.collectAsState()
+    val links by vm.links.collectAsState()
+    val fields by vm.customFields.collectAsState()
+    LazyColumn(Modifier.fillMaxSize().statusBarsPadding().padding(22.dp), contentPadding = PaddingValues(bottom = 30.dp)) {
+        item {
+            TopRow("<", "Materiais da tarefa", onBack)
+            Spacer(Modifier.height(18.dp))
+            Segmented(listOf("Anexos", "Links", "Campos"), vm.materialsTab) { vm.materialsTab = it }
+            Spacer(Modifier.height(16.dp))
+            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                SmallAction(Icons.Default.AttachFile, "Arquivo") { vm.repo.addAttachment(Attachment(taskId = task.id, uploadedBy = vm.currentUser().id, fileName = "Contrato_assinado.pdf", originalFileName = "Contrato_assinado.pdf", fileType = AttachmentType.Pdf, mimeType = "application/pdf", fileSize = 2_400_000, storagePath = "local/contrato.pdf")) }
+                SmallAction(Icons.Default.PhotoCamera, "Foto") { vm.repo.addAttachment(Attachment(taskId = task.id, uploadedBy = vm.currentUser().id, fileName = "Documento_foto.jpg", originalFileName = "Documento_foto.jpg", fileType = AttachmentType.Image, mimeType = "image/jpeg", fileSize = 930_000, storagePath = "local/foto.jpg", source = AttachmentSource.Camera)) }
+                SmallAction(Icons.Default.Link, "Link") { vm.repo.addLink(TaskLink(taskId = task.id, createdBy = vm.currentUser().id, title = "Link de referencia", url = "https://taskflow.local/convite/${task.shareToken}")) }
+            }
+            Spacer(Modifier.height(16.dp))
+            TaskFlowCard(Modifier.border(1.dp, Purple.copy(.35f), RoundedCornerShape(22.dp))) {
+                Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+                    Icon(Icons.Default.CloudUpload, null, tint = Purple, modifier = Modifier.size(42.dp))
+                    Text("Toque para selecionar", fontWeight = FontWeight.Bold, color = Text)
+                    Text("PDF, DOC, XLS, JPG, PNG ate 20 MB", color = Muted, fontSize = 13.sp)
+                }
+            }
+            SectionTitle(vm.materialsTab)
+            when (vm.materialsTab) {
+                "Anexos" -> attachments.filter { it.taskId == task.id }.forEach { MaterialRow(Icons.Default.Description, it.fileName, "${it.fileSize / 1024} KB") }
+                "Links" -> links.filter { it.taskId == task.id }.forEach { MaterialRow(Icons.Default.Link, it.title, it.url) }
+                else -> fields.filter { it.taskId == task.id }.forEach { MaterialRow(Icons.Default.EditNote, it.fieldName, it.fieldValue) }
+            }
+            Spacer(Modifier.height(18.dp))
+            if (vm.materialsTab == "Campos") GradientButton("Adicionar campo", { vm.repo.addCustomField(CustomField(taskId = task.id, createdBy = vm.currentUser().id, fieldName = "Contato", fieldType = CustomFieldType.Phone, fieldValue = "(11) 99999-0000")) }, Modifier.fillMaxWidth())
+        }
+    }
+}
+
+@Composable
+fun ShareScreen(vm: TaskFlowViewModel, onBack: () -> Unit) {
+    val task = vm.selectedTask()
+    val attachments by vm.attachments.collectAsState()
+    val links by vm.links.collectAsState()
+    var permission by remember { mutableStateOf("Editar") }
+    LazyColumn(Modifier.fillMaxSize().statusBarsPadding().padding(22.dp), contentPadding = PaddingValues(bottom = 30.dp)) {
+        item {
+            TopRow("<", "Compartilhar", onBack)
+            Text("Convide alguem para esta tarefa", color = Muted, modifier = Modifier.padding(top = 8.dp))
+            SectionTitle("Permissao")
+            Segmented(listOf("Editar", "Comentar", "Ver"), permission) { permission = it }
+            SectionTitle("Compartilhar por")
+            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                SmallAction(Icons.Default.Chat, "WhatsApp")
+                SmallAction(Icons.Default.Email, "E-mail")
+                SmallAction(Icons.Default.ContentCopy, "Copiar")
+            }
+            SectionTitle("Previa da mensagem")
+            TaskFlowCard {
+                Text("Voce foi convidado para participar desta tarefa:", color = Muted)
+                Text(task.title, fontSize = 22.sp, fontWeight = FontWeight.Bold, color = Text, modifier = Modifier.padding(top = 8.dp))
+                Text("Prazo: ${task.dueDate?.format(DateTimeFormatter.ofPattern("dd/MM HH:mm")) ?: "sem prazo"}", color = Muted)
+                Row(Modifier.padding(top = 10.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    ChipText("${attachments.count { it.taskId == task.id }} anexos")
+                    ChipText("${links.count { it.taskId == task.id }} links")
+                }
+                Text("taskflow://invite/${task.shareToken}", color = Purple, modifier = Modifier.padding(top = 12.dp))
+            }
+            Spacer(Modifier.height(24.dp))
+            GradientButton("Enviar convite", {
+                val p = when (permission) { "Ver" -> UserPermission.Viewer else -> UserPermission.Participant }
+                vm.repo.createInvite(Invite(taskId = task.id, createdBy = vm.currentUser().id, permission = p))
+                onBack()
+            }, Modifier.fillMaxWidth())
+        }
+    }
+}
+
+@Composable
+fun SpacesScreen(vm: TaskFlowViewModel, onDetail: (String) -> Unit) {
+    val spaces by vm.spaces.collectAsState()
+    val lists by vm.lists.collectAsState()
+    val tasks by vm.tasks.collectAsState()
+    LazyColumn(Modifier.fillMaxSize().statusBarsPadding().padding(24.dp), contentPadding = PaddingValues(bottom = 120.dp)) {
+        item { Text("Espacos e listas", fontSize = 30.sp, fontWeight = FontWeight.Bold, color = Text); Spacer(Modifier.height(16.dp)) }
+        items(spaces) { space ->
+            TaskFlowCard {
+                Text(space.name, fontSize = 22.sp, fontWeight = FontWeight.Bold, color = Text)
+                lists.filter { it.spaceId == space.id }.forEach { list ->
+                    Row(Modifier.fillMaxWidth().clickable { tasks.firstOrNull { it.listId == list.id }?.id?.let(onDetail) }.padding(vertical = 8.dp), horizontalArrangement = Arrangement.SpaceBetween) {
+                        Text(list.name, color = Text)
+                        Text("${tasks.count { it.listId == list.id && !it.isCompleted }} abertas", color = Muted)
+                    }
+                }
+            }
+            Spacer(Modifier.height(12.dp))
+        }
+    }
+}
+
+@Composable
+fun PeopleScreen(vm: TaskFlowViewModel) {
+    val invites by vm.invites.collectAsState()
+    LazyColumn(Modifier.fillMaxSize().statusBarsPadding().padding(24.dp), contentPadding = PaddingValues(bottom = 120.dp)) {
+        item { Text("Pessoas", fontSize = 30.sp, fontWeight = FontWeight.Bold, color = Text); Text("Convites e participantes", color = Muted); Spacer(Modifier.height(16.dp)) }
+        items(invites.ifEmpty { listOf(Invite(taskId = "demo", createdBy = "demo", permission = UserPermission.Participant)) }) {
+            TaskFlowCard { InfoRow("Permissao", it.permission.label); InfoRow("Token", it.token.take(8)); InfoRow("Status", if (it.acceptedBy == null) "Pendente" else "Aceito") }
+            Spacer(Modifier.height(12.dp))
+        }
+    }
+}
+
+@Composable
+fun SettingsScreen() {
+    LazyColumn(Modifier.fillMaxSize().statusBarsPadding().padding(24.dp), contentPadding = PaddingValues(bottom = 120.dp)) {
+        item {
+            Text("Ajustes", fontSize = 30.sp, fontWeight = FontWeight.Bold, color = Text)
+            Spacer(Modifier.height(16.dp))
+            TaskFlowCard {
+                InfoRow("Meu perfil", "Manuel")
+                InfoRow("Notificacoes", "Ativas")
+                InfoRow("Tema", "Claro")
+                InfoRow("Backups e sincronizacao", "Local-first")
+                InfoRow("Ajuda e suporte", "Disponivel")
+            }
+            TextButton(onClick = {}) { Text("Sair da conta", color = Color(0xFFEF4444)) }
+        }
+    }
+}
+
+@Composable
+fun TaskFlowCard(modifier: Modifier = Modifier, content: @Composable ColumnScope.() -> Unit) {
+    Card(modifier.fillMaxWidth(), shape = RoundedCornerShape(24.dp), colors = CardDefaults.cardColors(containerColor = Color.White), elevation = CardDefaults.cardElevation(3.dp)) {
+        Column(Modifier.padding(18.dp), content = content)
+    }
+}
+
+@Composable
+fun TaskCard(task: Task, listName: String, hasReminder: Boolean, onClick: () -> Unit) {
+    TaskFlowCard(Modifier.clickable(onClick = onClick)) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Box(Modifier.width(5.dp).height(66.dp).clip(RoundedCornerShape(20.dp)).background(priorityColor(task.priority)))
+            Spacer(Modifier.width(14.dp))
+            Box(Modifier.size(34.dp).border(2.dp, Border, CircleShape).clip(CircleShape))
+            Spacer(Modifier.width(14.dp))
+            Column(Modifier.weight(1f)) {
+                Text(task.title, fontSize = 21.sp, fontWeight = FontWeight.Bold, color = Text)
+                Text("${task.dueDate?.format(DateTimeFormatter.ofPattern("HH:mm")) ?: "--:--"}  -  $listName", color = Muted)
+            }
+            PriorityPill(task.priority)
+            if (hasReminder) Icon(Icons.Default.Notifications, null, tint = Muted, modifier = Modifier.padding(start = 8.dp))
+        }
+    }
+}
+
+@Composable
+fun NextReminderCard(title: String, date: LocalDateTime) {
+    TaskFlowCard {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            IconBubble(Icons.Default.Event, Purple.copy(.14f), Purple)
+            Spacer(Modifier.width(14.dp))
+            Column(Modifier.weight(1f)) { Text("Proximo lembrete", color = Purple, fontWeight = FontWeight.Bold); Text(title, fontSize = 22.sp, fontWeight = FontWeight.Bold, color = Text); Text(date.format(DateTimeFormatter.ofPattern("amanha - HH:mm")), color = Muted) }
+            Icon(Icons.Default.ChevronRight, null, tint = Text)
+        }
+    }
+}
+
+@Composable
+fun Segmented(options: List<String>, selected: String, onSelect: (String) -> Unit) {
+    Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(22.dp)).background(Color.White).border(1.dp, Border, RoundedCornerShape(22.dp)).padding(4.dp)) {
+        options.forEach { option ->
+            val active = option == selected
+            Box(Modifier.weight(1f).clip(RoundedCornerShape(18.dp)).background(if (active) Gradient else Brush.linearGradient(listOf(Color.Transparent, Color.Transparent))).clickable { onSelect(option) }.padding(vertical = 12.dp), contentAlignment = Alignment.Center) {
+                Text(option, color = if (active) Color.White else Text, fontWeight = FontWeight.SemiBold)
+            }
+        }
+    }
+}
+
+@Composable
+fun GradientButton(text: String, onClick: () -> Unit, modifier: Modifier = Modifier, enabled: Boolean = true) {
+    Button(onClick = onClick, modifier = modifier.height(54.dp), enabled = enabled, shape = RoundedCornerShape(50), colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent), contentPadding = PaddingValues()) {
+        Box(Modifier.fillMaxSize().background(if (enabled) Gradient else Brush.linearGradient(listOf(Border, Border))), contentAlignment = Alignment.Center) { Text(text, color = Color.White, fontWeight = FontWeight.Bold) }
+    }
+}
+
+@Composable
+fun IconTile(icon: ImageVector, bg: Color = Color.White, tint: Color = Text) = Box(Modifier.size(48.dp).clip(RoundedCornerShape(16.dp)).background(bg), contentAlignment = Alignment.Center) { Icon(icon, null, tint = tint) }
+@Composable
+fun IconBubble(icon: ImageVector, bg: Color = Blue.copy(.12f), tint: Color = Blue) = Box(Modifier.size(42.dp).clip(CircleShape).background(bg), contentAlignment = Alignment.Center) { Icon(icon, null, tint = tint) }
+@Composable
+fun SectionTitle(text: String) = Text(text, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Text, modifier = Modifier.padding(top = 22.dp, bottom = 10.dp))
+@Composable
+fun ChipText(text: String, active: Boolean = true) = Text(text, color = if (active) Purple else Muted, fontWeight = FontWeight.SemiBold, modifier = Modifier.clip(RoundedCornerShape(50)).background(if (active) Purple.copy(.10f) else Border.copy(.45f)).padding(horizontal = 12.dp, vertical = 8.dp))
+@Composable
+fun PriorityPill(priority: TaskPriority) = Text(priority.label, color = priorityColor(priority), modifier = Modifier.clip(RoundedCornerShape(50)).background(priorityColor(priority).copy(.12f)).padding(horizontal = 12.dp, vertical = 8.dp))
+@Composable
+fun StatusPill(status: TaskStatus) = Text(status.label, color = Blue, modifier = Modifier.clip(RoundedCornerShape(50)).background(Blue.copy(.10f)).padding(horizontal = 12.dp, vertical = 8.dp))
+@Composable
+fun SmallAction(icon: ImageVector, label: String, onClick: () -> Unit = {}) = OutlinedButton(onClick = onClick, shape = RoundedCornerShape(18.dp), contentPadding = PaddingValues(10.dp)) { Icon(icon, null); Spacer(Modifier.width(6.dp)); Text(label) }
+@Composable
+fun TopRow(action: String, title: String, onAction: () -> Unit) = Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) { TextButton(onClick = onAction) { Text(action) }; Spacer(Modifier.weight(1f)); Text(title, fontWeight = FontWeight.Bold, color = Text); Spacer(Modifier.weight(1f)); Spacer(Modifier.width(76.dp)) }
+@Composable
+fun InfoRow(label: String, value: String) = Row(Modifier.fillMaxWidth().padding(vertical = 7.dp), horizontalArrangement = Arrangement.SpaceBetween) { Text(label, color = Muted); Text(value, color = Text, fontWeight = FontWeight.SemiBold) }
+@Composable
+fun MaterialRow(icon: ImageVector, title: String, subtitle: String) = TaskFlowCard(Modifier.padding(bottom = 10.dp)) { Row(verticalAlignment = Alignment.CenterVertically) { IconBubble(icon, Purple.copy(.10f), Purple); Spacer(Modifier.width(12.dp)); Column(Modifier.weight(1f)) { Text(title, fontWeight = FontWeight.Bold, color = Text); Text(subtitle, color = Muted, maxLines = 1) }; Icon(Icons.Default.MoreVert, null, tint = Muted) } }
+fun priorityColor(priority: TaskPriority) = when (priority) { TaskPriority.High -> Color(0xFFEF4444); TaskPriority.Medium -> Blue; TaskPriority.Low -> Color(0xFF22C55E) }
