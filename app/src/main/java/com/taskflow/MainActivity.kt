@@ -22,6 +22,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -531,7 +534,12 @@ fun SpacesScreen(vm: TaskFlowViewModel, onDetail: (String) -> Unit) {
         item {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                 Text("Espacos e listas", fontSize = 30.sp, fontWeight = FontWeight.Bold, color = Text)
-                FloatingActionButton(onClick = { dialog = CrudDialogState(CrudKind.CreateSpace, "Novo espaco") }, containerColor = Purple, contentColor = Color.White, modifier = Modifier.size(48.dp)) { Icon(Icons.Default.Add, null) }
+                FloatingActionButton(
+                    onClick = { dialog = CrudDialogState(CrudKind.CreateSpace, "Novo espaco") },
+                    containerColor = Purple,
+                    contentColor = Color.White,
+                    modifier = Modifier.size(48.dp).testTag("create-space").semantics { contentDescription = "Criar espaco" }
+                ) { Icon(Icons.Default.Add, null) }
             }
             message?.let { Text(it, color = Color(0xFFEF4444), modifier = Modifier.padding(top = 8.dp)) }
             Spacer(Modifier.height(16.dp))
@@ -541,23 +549,23 @@ fun SpacesScreen(vm: TaskFlowViewModel, onDetail: (String) -> Unit) {
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                     Text(space.name, fontSize = 22.sp, fontWeight = FontWeight.Bold, color = Text)
                     Row {
-                        IconButton(onClick = { dialog = CrudDialogState(CrudKind.EditSpace, "Renomear espaco", space.name, space = space) }) { Icon(Icons.Default.Edit, null, tint = Muted) }
-                        IconButton(onClick = { dialog = CrudDialogState(CrudKind.CreateList, "Nova lista", space = space) }) { Icon(Icons.Default.PlaylistAdd, null, tint = Blue) }
+                        IconButton(onClick = { dialog = CrudDialogState(CrudKind.EditSpace, "Renomear espaco", space.name, space = space) }, modifier = Modifier.testTag("edit-space-${space.name}").semantics { contentDescription = "Renomear espaco ${space.name}" }) { Icon(Icons.Default.Edit, null, tint = Muted) }
+                        IconButton(onClick = { dialog = CrudDialogState(CrudKind.CreateList, "Nova lista", space = space) }, modifier = Modifier.testTag("create-list-${space.name}").semantics { contentDescription = "Criar lista em ${space.name}" }) { Icon(Icons.Default.PlaylistAdd, null, tint = Blue) }
                         IconButton(onClick = {
                             if (tasks.any { it.spaceId == space.id }) message = "Exclua ou mova as tarefas antes de remover este espaco." else vm.repo.deleteSpace(space.id)
-                        }) { Icon(Icons.Default.Delete, null, tint = Color(0xFFEF4444)) }
+                        }, modifier = Modifier.testTag("delete-space-${space.name}").semantics { contentDescription = "Excluir espaco ${space.name}" }) { Icon(Icons.Default.Delete, null, tint = Color(0xFFEF4444)) }
                     }
                 }
                 lists.filter { it.spaceId == space.id }.forEach { list ->
                     Row(Modifier.fillMaxWidth().padding(vertical = 8.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                        Column(Modifier.weight(1f).clickable { tasks.firstOrNull { it.listId == list.id }?.id?.let(onDetail) }) {
+                        Column(Modifier.weight(1f).clickable { tasks.firstOrNull { it.listId == list.id }?.id?.let(onDetail) }.testTag("open-list-${list.name}").semantics { contentDescription = "Abrir lista ${list.name}" }) {
                             Text(list.name, color = Text)
                             Text("${tasks.count { it.listId == list.id && !it.isCompleted }} abertas", color = Muted, fontSize = 13.sp)
                         }
-                        IconButton(onClick = { dialog = CrudDialogState(CrudKind.EditList, "Renomear lista", list.name, list = list) }) { Icon(Icons.Default.Edit, null, tint = Muted) }
+                        IconButton(onClick = { dialog = CrudDialogState(CrudKind.EditList, "Renomear lista", list.name, list = list) }, modifier = Modifier.testTag("edit-list-${list.name}").semantics { contentDescription = "Renomear lista ${list.name}" }) { Icon(Icons.Default.Edit, null, tint = Muted) }
                         IconButton(onClick = {
                             if (tasks.any { it.listId == list.id }) message = "Exclua ou mova as tarefas antes de remover esta lista." else vm.repo.deleteList(list.id)
-                        }) { Icon(Icons.Default.Delete, null, tint = Color(0xFFEF4444)) }
+                        }, modifier = Modifier.testTag("delete-list-${list.name}").semantics { contentDescription = "Excluir lista ${list.name}" }) { Icon(Icons.Default.Delete, null, tint = Color(0xFFEF4444)) }
                     }
                 }
             }
@@ -583,13 +591,13 @@ fun NameDialog(title: String, initialValue: String, onDismiss: () -> Unit, onCon
         onDismissRequest = onDismiss,
         title = { Text(title, color = Text, fontWeight = FontWeight.Bold) },
         text = {
-            OutlinedTextField(value, { value = it }, label = { Text("Nome") }, shape = RoundedCornerShape(18.dp), singleLine = true)
+            OutlinedTextField(value, { value = it }, label = { Text("Nome") }, shape = RoundedCornerShape(18.dp), singleLine = true, modifier = Modifier.testTag("name-dialog-field").semantics { contentDescription = "Campo nome" })
         },
         confirmButton = {
-            TextButton(onClick = { if (value.isNotBlank()) onConfirm(value.trim()) }, enabled = value.isNotBlank()) { Text("Salvar") }
+            TextButton(onClick = { if (value.isNotBlank()) onConfirm(value.trim()) }, enabled = value.isNotBlank(), modifier = Modifier.testTag("name-dialog-save").semantics { contentDescription = "Salvar nome" }) { Text("Salvar") }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Cancelar") }
+            TextButton(onClick = onDismiss, modifier = Modifier.testTag("name-dialog-cancel").semantics { contentDescription = "Cancelar nome" }) { Text("Cancelar") }
         }
     )
 }
