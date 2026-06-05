@@ -430,17 +430,17 @@ Implementar identidade visual moderna, limpa e premium.
 
 ### Tarefas
 
-- [ ] Listar espaços.
-- [ ] Criar novo espaço.
-- [ ] Editar espaço.
-- [ ] Excluir espaço.
-- [ ] Mostrar quantidade de tarefas abertas.
+- [x] Listar espaços.
+- [x] Criar novo espaço.
+- [x] Editar espaço.
+- [x] Excluir espaço.
+- [x] Mostrar quantidade de tarefas abertas.
 - [ ] Mostrar espaços compartilhados.
 
 ### Critérios de aceite
 
-- [ ] Espaços aparecem em cards.
-- [ ] Novo espaço pode ser criado.
+- [x] Espaços aparecem em cards.
+- [x] Novo espaço pode ser criado.
 - [ ] Ao tocar em espaço, abre listas/tarefas daquele espaço.
 
 ---
@@ -449,12 +449,12 @@ Implementar identidade visual moderna, limpa e premium.
 
 ### Tarefas
 
-- [ ] Listar listas dentro de um espaço.
-- [ ] Criar lista.
-- [ ] Editar lista.
-- [ ] Excluir lista.
+- [x] Listar listas dentro de um espaço.
+- [x] Criar lista.
+- [x] Editar lista.
+- [x] Excluir lista.
 - [ ] Ordenar listas.
-- [ ] Exibir quantidade de tarefas por lista.
+- [x] Exibir quantidade de tarefas por lista.
 
 ### Critérios de aceite
 
