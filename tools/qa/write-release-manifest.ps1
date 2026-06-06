@@ -1,13 +1,13 @@
 $ErrorActionPreference = "Stop"
 
-$root = Resolve-Path (Join-Path $PSScriptRoot "..\..")
+$root = Resolve-Path (Join-Path $PSScriptRoot "../..")
 Set-Location $root
 
-$manifestPath = Join-Path $root "docs\qa\release-manifest.json"
+$manifestPath = Join-Path $root "docs/qa/release-manifest.json"
 $artifacts = @(
-    "app\build\outputs\apk\debug\app-debug.apk",
-    "app\build\outputs\apk\release\app-release.apk",
-    "app\build\outputs\bundle\release\app-release.aab"
+    "app/build/outputs/apk/debug/app-debug.apk",
+    "app/build/outputs/apk/release/app-release.apk",
+    "app/build/outputs/bundle/release/app-release.aab"
 )
 
 function Get-Sha256 {
@@ -49,5 +49,7 @@ $manifest = [ordered]@{
 }
 
 New-Item -ItemType Directory -Force (Split-Path $manifestPath) | Out-Null
-$manifest | ConvertTo-Json -Depth 5 | Set-Content -Encoding UTF8 $manifestPath
+$json = $manifest | ConvertTo-Json -Depth 5 -Compress
+$encoding = New-Object System.Text.UTF8Encoding($false)
+[System.IO.File]::WriteAllText($manifestPath, $json + [Environment]::NewLine, $encoding)
 Write-Host "Release manifest written to $manifestPath"

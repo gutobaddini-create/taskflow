@@ -17,12 +17,12 @@ Validated target:
 Command executed:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File tools/qa/verify-local-mvp.ps1 -SkipFirebaseRules
+pwsh -NoProfile -File tools/qa/verify-local-mvp.ps1 -SkipFirebaseRules
 ```
 
 Result: passed.
 
-Latest run: 2026-06-06 22:50 UTC.
+Latest run: 2026-06-06 22:58 UTC.
 
 Covered by the command:
 
@@ -35,13 +35,15 @@ Covered by the command:
 - artifact existence checks
 - release manifest generation with SHA-256 checksums
 
+The release manifest writer was also executed successfully with both Windows PowerShell and PowerShell Core (`pwsh`) to cover the local Windows workflow and the Ubuntu GitHub Actions workflow.
+
 Artifacts verified:
 
 | Artifact | Size |
 | --- | ---: |
 | `app/build/outputs/apk/debug/app-debug.apk` | 18,397,193 bytes |
 | `app/build/outputs/apk/release/app-release.apk` | 11,911,970 bytes |
-| `app/build/outputs/bundle/release/app-release.aab` | 11,534,309 bytes |
+| `app/build/outputs/bundle/release/app-release.aab` | 11,534,301 bytes |
 
 Release integrity manifest:
 

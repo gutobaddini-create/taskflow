@@ -31,7 +31,7 @@ function Assert-File {
     Write-Host "ok - $Path ($($item.Length) bytes)"
 }
 
-$root = Resolve-Path (Join-Path $PSScriptRoot "..\..")
+$root = Resolve-Path (Join-Path $PSScriptRoot "../..")
 Set-Location $root
 $gradle = if ($IsWindows -or $env:OS -eq "Windows_NT") { ".\gradlew.bat" } else { "./gradlew" }
 
@@ -55,12 +55,12 @@ if (-not $SkipFirebaseRules) {
 
 Write-Host ""
 Write-Host "==> Artifact check"
-Assert-File "app\build\outputs\apk\debug\app-debug.apk"
-Assert-File "app\build\outputs\apk\release\app-release.apk"
-Assert-File "app\build\outputs\bundle\release\app-release.aab"
+Assert-File "app/build/outputs/apk/debug/app-debug.apk"
+Assert-File "app/build/outputs/apk/release/app-release.apk"
+Assert-File "app/build/outputs/bundle/release/app-release.aab"
 
 Invoke-Step "Release artifact manifest" {
-    powershell -NoProfile -ExecutionPolicy Bypass -File tools\qa\write-release-manifest.ps1
+    & (Join-Path $root "tools/qa/write-release-manifest.ps1")
 }
 
 Write-Host ""
