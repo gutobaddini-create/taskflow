@@ -499,9 +499,24 @@ fun DetailScreen(vm: TaskFlowViewModel, onBack: () -> Unit, onMaterials: () -> U
     var editAssignedTo by remember(task.id, currentUser.id) { mutableStateOf(task.assignedTo ?: currentUser.id) }
     val userOptions = users.ifEmpty { listOf(currentUser) }
     val effectivePermission = PermissionPolicy.acceptedPermission(task.id, currentUser.id, invites)
+    val canViewTask = PermissionPolicy.canViewTask(task, currentUser.id, effectivePermission)
     val canEditTask = PermissionPolicy.canEditTask(task, currentUser.id, effectivePermission)
     val canComment = PermissionPolicy.canCommentOnTask(task, currentUser.id, effectivePermission)
     val assigneeName = userOptions.firstOrNull { it.id == task.assignedTo }?.name ?: "Manuel"
+    if (!canViewTask) {
+        LazyColumn(Modifier.fillMaxSize().statusBarsPadding().padding(22.dp), contentPadding = PaddingValues(bottom = 30.dp)) {
+            item {
+                TopRow("<", "Detalhe da tarefa", onBack)
+                Spacer(Modifier.height(24.dp))
+                TaskFlowCard {
+                    Icon(Icons.Default.Lock, null, tint = Muted, modifier = Modifier.size(42.dp))
+                    Text("Sem acesso a esta tarefa", fontWeight = FontWeight.Bold, color = Text, modifier = Modifier.padding(top = 12.dp))
+                    Text("Solicite um convite ao responsavel para visualizar detalhes, anexos, links e campos.", color = Muted, modifier = Modifier.padding(top = 6.dp))
+                }
+            }
+        }
+        return
+    }
     LazyColumn(Modifier.fillMaxSize().statusBarsPadding().padding(22.dp), contentPadding = PaddingValues(bottom = 30.dp)) {
         item {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
@@ -796,6 +811,9 @@ fun <T> ReminderChoiceRow(
 fun MaterialsScreen(vm: TaskFlowViewModel, onBack: () -> Unit) {
     val context = LocalContext.current
     val task = vm.selectedTask()
+    val users by vm.users.collectAsState()
+    val preferences by vm.preferences.collectAsState()
+    val invites by vm.invites.collectAsState()
     val attachments by vm.attachments.collectAsState()
     val links by vm.links.collectAsState()
     val fields by vm.customFields.collectAsState()
@@ -810,6 +828,24 @@ fun MaterialsScreen(vm: TaskFlowViewModel, onBack: () -> Unit) {
     var cameraUri by remember { mutableStateOf<Uri?>(null) }
     if (task == null) {
         LoadingFullScreen("Carregando materiais...")
+        return
+    }
+    val currentUser = users.firstOrNull { it.id == preferences.currentUserId } ?: users.firstOrNull() ?: vm.currentUser()
+    val effectivePermission = PermissionPolicy.acceptedPermission(task.id, currentUser.id, invites)
+    val canViewMaterial = PermissionPolicy.canViewMaterial(task, currentUser.id, effectivePermission)
+    val canManageMaterial = PermissionPolicy.canManageMaterial(task, currentUser.id, effectivePermission)
+    if (!canViewMaterial) {
+        LazyColumn(Modifier.fillMaxSize().statusBarsPadding().padding(22.dp), contentPadding = PaddingValues(bottom = 30.dp)) {
+            item {
+                TopRow("<", "Materiais da tarefa", onBack)
+                Spacer(Modifier.height(24.dp))
+                TaskFlowCard {
+                    Icon(Icons.Default.Lock, null, tint = Muted, modifier = Modifier.size(42.dp))
+                    Text("Sem acesso aos materiais", fontWeight = FontWeight.Bold, color = Text, modifier = Modifier.padding(top = 12.dp))
+                    Text("Anexos, links e campos ficam disponiveis apenas para participantes autorizados.", color = Muted, modifier = Modifier.padding(top = 6.dp))
+                }
+            }
+        }
         return
     }
     fun addUriAttachment(uri: Uri, source: AttachmentSource) {
@@ -955,9 +991,13 @@ fun MaterialsScreen(vm: TaskFlowViewModel, onBack: () -> Unit) {
             Spacer(Modifier.height(16.dp))
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    SmallAction(Icons.Default.AttachFile, "Arquivo", Modifier.weight(1f)) { filePicker.launch(arrayOf("application/pdf", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "application/vnd.ms-excel", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "text/plain")) }
+                    SmallAction(Icons.Default.AttachFile, "Arquivo", Modifier.weight(1f)) {
+                        if (canManageMaterial) filePicker.launch(arrayOf("application/pdf", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "application/vnd.ms-excel", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "text/plain")) else message = "Sem permissao para alterar materiais."
+                    }
                     SmallAction(Icons.Default.PhotoCamera, "Foto", Modifier.weight(1f)) {
-                        if (context.checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+                        if (!canManageMaterial) {
+                            message = "Sem permissao para alterar materiais."
+                        } else if (context.checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
                             openCamera()
                         } else {
                             cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
@@ -965,13 +1005,19 @@ fun MaterialsScreen(vm: TaskFlowViewModel, onBack: () -> Unit) {
                     }
                 }
                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    SmallAction(Icons.Default.Image, "Imagem", Modifier.weight(1f)) { photoPicker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) }
-                    SmallAction(Icons.Default.Link, "Link", Modifier.weight(1f)) { linkDialog = true }
+                    SmallAction(Icons.Default.Image, "Imagem", Modifier.weight(1f)) {
+                        if (canManageMaterial) photoPicker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) else message = "Sem permissao para alterar materiais."
+                    }
+                    SmallAction(Icons.Default.Link, "Link", Modifier.weight(1f)) {
+                        if (canManageMaterial) linkDialog = true else message = "Sem permissao para alterar materiais."
+                    }
                 }
             }
             message?.let { Text(it, color = if (it.contains("invalida", true) || it.contains("invalido", true)) Color(0xFFEF4444) else Purple, modifier = Modifier.padding(top = 10.dp)) }
             Spacer(Modifier.height(16.dp))
-            TaskFlowCard(Modifier.border(1.dp, Purple.copy(.35f), RoundedCornerShape(22.dp)).clickable { filePicker.launch(arrayOf("*/*")) }) {
+            TaskFlowCard(Modifier.border(1.dp, Purple.copy(.35f), RoundedCornerShape(22.dp)).clickable {
+                if (canManageMaterial) filePicker.launch(arrayOf("*/*")) else message = "Sem permissao para alterar materiais."
+            }) {
                 Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
                     Icon(Icons.Default.CloudUpload, null, tint = Purple, modifier = Modifier.size(42.dp))
                     Text("Toque para selecionar", fontWeight = FontWeight.Bold, color = Text)
@@ -983,6 +1029,7 @@ fun MaterialsScreen(vm: TaskFlowViewModel, onBack: () -> Unit) {
                 "Anexos" -> attachments.filter { it.taskId == task.id }.forEach {
                     AttachmentRow(
                         attachment = it,
+                        canManage = canManageMaterial,
                         onOpen = { openAttachment(it) },
                         onShare = { shareAttachment(it) },
                         onDelete = {
@@ -994,6 +1041,7 @@ fun MaterialsScreen(vm: TaskFlowViewModel, onBack: () -> Unit) {
                 "Links" -> links.filter { it.taskId == task.id }.forEach {
                     LinkRow(
                         link = it,
+                        canManage = canManageMaterial,
                         onOpen = { openLink(it) },
                         onCopy = { copyLink(it) },
                         onEdit = { editingLink = it },
@@ -1006,6 +1054,7 @@ fun MaterialsScreen(vm: TaskFlowViewModel, onBack: () -> Unit) {
                 else -> fields.filter { it.taskId == task.id }.forEach {
                     FieldRow(
                         field = it,
+                        canManage = canManageMaterial,
                         onEdit = { editingField = it },
                         onDelete = {
                             vm.repo.deleteCustomField(it.id)
@@ -1022,10 +1071,16 @@ fun MaterialsScreen(vm: TaskFlowViewModel, onBack: () -> Unit) {
                 } else {
                     taskChecklist.forEach { item ->
                         Row(Modifier.fillMaxWidth().padding(vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
-                            Checkbox(item.isDone, { vm.repo.toggleChecklistItem(item.id) })
+                            Checkbox(
+                                checked = item.isDone,
+                                onCheckedChange = { if (canManageMaterial) vm.repo.toggleChecklistItem(item.id) else message = "Sem permissao para alterar materiais." },
+                                enabled = canManageMaterial
+                            )
                             Text(item.title, color = Text, modifier = Modifier.weight(1f))
-                            IconButton({ editingChecklist = item }) { Icon(Icons.Default.Edit, null, tint = Muted) }
-                            IconButton({ vm.repo.deleteChecklistItem(item.id); message = "Item removido." }) { Icon(Icons.Default.DeleteOutline, null, tint = Muted) }
+                            if (canManageMaterial) {
+                                IconButton({ editingChecklist = item }) { Icon(Icons.Default.Edit, null, tint = Muted) }
+                                IconButton({ vm.repo.deleteChecklistItem(item.id); message = "Item removido." }) { Icon(Icons.Default.DeleteOutline, null, tint = Muted) }
+                            }
                         }
                     }
                     val done = taskChecklist.count { it.isDone }
@@ -1033,8 +1088,8 @@ fun MaterialsScreen(vm: TaskFlowViewModel, onBack: () -> Unit) {
                 }
             }
             Spacer(Modifier.height(18.dp))
-            if (vm.materialsTab == "Campos") TextButton({ fieldDialog = true }, Modifier.fillMaxWidth()) { Text("Adicionar campo personalizado") }
-            TextButton({ checklistDialog = true }, Modifier.fillMaxWidth()) { Text("Adicionar item do checklist") }
+            if (canManageMaterial && vm.materialsTab == "Campos") TextButton({ fieldDialog = true }, Modifier.fillMaxWidth()) { Text("Adicionar campo personalizado") }
+            if (canManageMaterial) TextButton({ checklistDialog = true }, Modifier.fillMaxWidth()) { Text("Adicionar item do checklist") }
         }
     }
 }
@@ -1560,7 +1615,7 @@ fun InfoRow(label: String, value: String) = Row(Modifier.fillMaxWidth().padding(
 @Composable
 fun MaterialRow(icon: ImageVector, title: String, subtitle: String) = TaskFlowCard(Modifier.padding(bottom = 10.dp)) { Row(verticalAlignment = Alignment.CenterVertically) { IconBubble(icon, Purple.copy(.10f), Purple); Spacer(Modifier.width(12.dp)); Column(Modifier.weight(1f)) { Text(title, fontWeight = FontWeight.Bold, color = Text); Text(subtitle, color = Muted, maxLines = 1) }; Icon(Icons.Default.MoreVert, null, tint = Muted) } }
 @Composable
-fun AttachmentRow(attachment: Attachment, onOpen: () -> Unit, onShare: () -> Unit, onDelete: () -> Unit) = TaskFlowCard(Modifier.padding(bottom = 10.dp)) {
+fun AttachmentRow(attachment: Attachment, canManage: Boolean = true, onOpen: () -> Unit, onShare: () -> Unit, onDelete: () -> Unit) = TaskFlowCard(Modifier.padding(bottom = 10.dp)) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         AttachmentPreview(attachment)
         Spacer(Modifier.width(12.dp))
@@ -1570,17 +1625,17 @@ fun AttachmentRow(attachment: Attachment, onOpen: () -> Unit, onShare: () -> Uni
         }
         ItemActionMenu(
             contentDescription = "Menu do anexo ${attachment.fileName}",
-            actions = listOf(
+            actions = listOfNotNull(
                 ItemAction("Abrir", Icons.Default.OpenInNew, onOpen),
                 ItemAction("Compartilhar", Icons.Default.IosShare, onShare),
-                ItemAction("Excluir", Icons.Default.DeleteOutline, onDelete)
+                if (canManage) ItemAction("Excluir", Icons.Default.DeleteOutline, onDelete) else null
             )
         )
     }
     Row(Modifier.fillMaxWidth().padding(top = 12.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         SmallAction(Icons.Default.OpenInNew, "Abrir", Modifier.weight(1f), onOpen)
         SmallAction(Icons.Default.IosShare, "Compart.", Modifier.weight(1f), onShare)
-        SmallAction(Icons.Default.DeleteOutline, "Excluir", Modifier.weight(1f), onDelete)
+        if (canManage) SmallAction(Icons.Default.DeleteOutline, "Excluir", Modifier.weight(1f), onDelete)
     }
 }
 
@@ -1621,7 +1676,7 @@ private fun loadAttachmentImageBitmap(context: Context, storagePath: String) = r
     }
 }.getOrNull()
 @Composable
-fun LinkRow(link: TaskLink, onOpen: () -> Unit, onCopy: () -> Unit, onEdit: () -> Unit, onDelete: () -> Unit) = TaskFlowCard(Modifier.padding(bottom = 10.dp)) {
+fun LinkRow(link: TaskLink, canManage: Boolean = true, onOpen: () -> Unit, onCopy: () -> Unit, onEdit: () -> Unit, onDelete: () -> Unit) = TaskFlowCard(Modifier.padding(bottom = 10.dp)) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         IconBubble(Icons.Default.Link, Purple.copy(.10f), Purple)
         Spacer(Modifier.width(12.dp))
@@ -1631,11 +1686,11 @@ fun LinkRow(link: TaskLink, onOpen: () -> Unit, onCopy: () -> Unit, onEdit: () -
         }
         ItemActionMenu(
             contentDescription = "Menu do link ${link.title}",
-            actions = listOf(
+            actions = listOfNotNull(
                 ItemAction("Abrir", Icons.Default.OpenInBrowser, onOpen),
                 ItemAction("Copiar", Icons.Default.ContentCopy, onCopy),
-                ItemAction("Editar", Icons.Default.Edit, onEdit),
-                ItemAction("Excluir", Icons.Default.DeleteOutline, onDelete)
+                if (canManage) ItemAction("Editar", Icons.Default.Edit, onEdit) else null,
+                if (canManage) ItemAction("Excluir", Icons.Default.DeleteOutline, onDelete) else null
             )
         )
     }
@@ -1643,13 +1698,15 @@ fun LinkRow(link: TaskLink, onOpen: () -> Unit, onCopy: () -> Unit, onEdit: () -
         SmallAction(Icons.Default.OpenInBrowser, "Abrir", Modifier.weight(1f), onOpen)
         SmallAction(Icons.Default.ContentCopy, "Copiar", Modifier.weight(1f), onCopy)
     }
-    Row(Modifier.fillMaxWidth().padding(top = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        SmallAction(Icons.Default.Edit, "Editar", Modifier.weight(1f), onEdit)
-        SmallAction(Icons.Default.DeleteOutline, "Excluir", Modifier.weight(1f), onDelete)
+    if (canManage) {
+        Row(Modifier.fillMaxWidth().padding(top = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            SmallAction(Icons.Default.Edit, "Editar", Modifier.weight(1f), onEdit)
+            SmallAction(Icons.Default.DeleteOutline, "Excluir", Modifier.weight(1f), onDelete)
+        }
     }
 }
 @Composable
-fun FieldRow(field: CustomField, onEdit: () -> Unit, onDelete: () -> Unit) = TaskFlowCard(Modifier.padding(bottom = 10.dp)) {
+fun FieldRow(field: CustomField, canManage: Boolean = true, onEdit: () -> Unit, onDelete: () -> Unit) = TaskFlowCard(Modifier.padding(bottom = 10.dp)) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         IconBubble(Icons.Default.EditNote, Purple.copy(.10f), Purple)
         Spacer(Modifier.width(12.dp))
@@ -1657,17 +1714,21 @@ fun FieldRow(field: CustomField, onEdit: () -> Unit, onDelete: () -> Unit) = Tas
             Text(field.fieldName, fontWeight = FontWeight.Bold, color = Text)
             Text("${field.fieldType.label()} - ${field.fieldValue}", color = Muted, maxLines = 1)
         }
-        ItemActionMenu(
-            contentDescription = "Menu do campo ${field.fieldName}",
-            actions = listOf(
-                ItemAction("Editar", Icons.Default.Edit, onEdit),
-                ItemAction("Excluir", Icons.Default.DeleteOutline, onDelete)
+        if (canManage) {
+            ItemActionMenu(
+                contentDescription = "Menu do campo ${field.fieldName}",
+                actions = listOf(
+                    ItemAction("Editar", Icons.Default.Edit, onEdit),
+                    ItemAction("Excluir", Icons.Default.DeleteOutline, onDelete)
+                )
             )
-        )
+        }
     }
-    Row(Modifier.fillMaxWidth().padding(top = 12.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        SmallAction(Icons.Default.Edit, "Editar", Modifier.weight(1f), onEdit)
-        SmallAction(Icons.Default.DeleteOutline, "Excluir", Modifier.weight(1f), onDelete)
+    if (canManage) {
+        Row(Modifier.fillMaxWidth().padding(top = 12.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            SmallAction(Icons.Default.Edit, "Editar", Modifier.weight(1f), onEdit)
+            SmallAction(Icons.Default.DeleteOutline, "Excluir", Modifier.weight(1f), onDelete)
+        }
     }
 }
 

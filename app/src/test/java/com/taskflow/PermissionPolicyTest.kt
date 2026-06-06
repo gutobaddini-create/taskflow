@@ -33,13 +33,30 @@ class PermissionPolicyTest {
 
     @Test
     fun viewerCannotEditOrComment() {
+        assertTrue(PermissionPolicy.canViewTask(task, "ana", UserPermission.Viewer))
         assertFalse(PermissionPolicy.canEditTask(task, "ana", UserPermission.Viewer))
         assertFalse(PermissionPolicy.canCommentOnTask(task, "ana", UserPermission.Viewer))
+        assertTrue(PermissionPolicy.canViewMaterial(task, "ana", UserPermission.Viewer))
+        assertFalse(PermissionPolicy.canManageMaterial(task, "ana", UserPermission.Viewer))
     }
 
     @Test
     fun participantCanCommentWithoutEditing() {
         assertFalse(PermissionPolicy.canEditTask(task, "ana", UserPermission.Participant))
         assertTrue(PermissionPolicy.canCommentOnTask(task, "ana", UserPermission.Participant))
+    }
+
+    @Test
+    fun unrelatedUserCannotViewTaskOrMaterials() {
+        assertFalse(PermissionPolicy.canViewTask(task, "ana", null))
+        assertFalse(PermissionPolicy.canViewMaterial(task, "ana", null))
+        assertFalse(PermissionPolicy.canManageMaterial(task, "ana", null))
+    }
+
+    @Test
+    fun assigneeCanManageTaskAndMaterials() {
+        assertTrue(PermissionPolicy.canViewTask(task, "manuel", null))
+        assertTrue(PermissionPolicy.canEditTask(task, "manuel", null))
+        assertTrue(PermissionPolicy.canManageMaterial(task, "manuel", null))
     }
 }

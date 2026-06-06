@@ -1045,19 +1045,19 @@ Implementar identidade visual moderna, limpa e premium.
 
 ### Tarefas
 
-- [ ] Criar regras de acesso por usuário.
-- [ ] Criar regras por participante.
-- [ ] Validar permissão de anexos.
-- [ ] Validar permissão de links.
-- [ ] Validar permissão de campos.
+- [x] Criar regras de acesso por usuário.
+- [x] Criar regras por participante.
+- [x] Validar permissão de anexos.
+- [x] Validar permissão de links.
+- [x] Validar permissão de campos.
 - [ ] Evitar URLs públicas permanentes.
-- [ ] Remover logs com dados sensíveis.
+- [x] Remover logs com dados sensíveis.
 
 ### Critérios de aceite
 
-- [ ] Usuário sem permissão não acessa tarefa.
-- [ ] Usuário sem permissão não acessa anexo.
-- [ ] Dados sensíveis não aparecem em logs.
+- [x] Usuário sem permissão não acessa tarefa.
+- [x] Usuário sem permissão não acessa anexo.
+- [x] Dados sensíveis não aparecem em logs.
 
 ---
 

@@ -14,6 +14,11 @@ object PermissionPolicy {
             .maxByOrNull { permissionRank(it.permission) }
             ?.permission
 
+    fun canViewTask(task: Task, userId: String, permission: UserPermission?): Boolean =
+        task.createdBy == userId ||
+            task.assignedTo == userId ||
+            permission != null
+
     fun canEditTask(task: Task, userId: String, permission: UserPermission?): Boolean =
         task.createdBy == userId || task.assignedTo == userId || permission == UserPermission.Owner
 
@@ -21,6 +26,12 @@ object PermissionPolicy {
         canEditTask(task, userId, permission) ||
             permission == UserPermission.Participant ||
             permission == UserPermission.Responsible
+
+    fun canViewMaterial(task: Task, userId: String, permission: UserPermission?): Boolean =
+        canViewTask(task, userId, permission)
+
+    fun canManageMaterial(task: Task, userId: String, permission: UserPermission?): Boolean =
+        canEditTask(task, userId, permission)
 
     private fun permissionRank(permission: UserPermission): Int =
         when (permission) {
