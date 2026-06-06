@@ -637,7 +637,7 @@ Implementar identidade visual moderna, limpa e premium.
 
 ### Critérios de aceite
 
-- [ ] Notificação dispara no horário correto.
+- [x] Notificação dispara no horário correto.
 - [x] Ação `Abrir` abre detalhe da tarefa.
 - [x] Ação `Concluir` conclui a tarefa.
 - [x] Ação `Adiar` cria novo disparo.
@@ -1267,7 +1267,7 @@ O MVP só estará pronto quando todos os itens abaixo estiverem concluídos:
 - [x] Prioridade funcionando.
 - [x] Lembrete único funcionando.
 - [x] Lembrete recorrente personalizado funcionando.
-- [ ] Notificações locais funcionando.
+- [x] Notificações locais funcionando.
 - [x] Ação de adiar funcionando.
 - [x] Múltiplos lembretes funcionando.
 - [x] Anexar imagem funcionando.
