@@ -336,7 +336,7 @@ fun HomeScreen(vm: TaskFlowViewModel, onNew: () -> Unit, onDetail: (String) -> U
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                     Column {
                         Text("Bom dia, ${currentUser.name}", fontSize = 30.sp, fontWeight = FontWeight.Bold, color = Text)
-                        Text("Sexta, 5 de junho", color = Muted, fontSize = 18.sp)
+                        Text(LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")), color = Muted, fontSize = 18.sp)
                     }
                     Row { IconTile(Icons.Default.Notifications); Spacer(Modifier.width(8.dp)); IconTile(Icons.Default.AutoAwesome, Purple.copy(alpha = .12f), Purple) }
                 }
@@ -557,10 +557,15 @@ fun DetailScreen(vm: TaskFlowViewModel, onBack: () -> Unit, onMaterials: () -> U
             SectionTitle("Proximo lembrete")
             val reminderModifier = if (canEditTask) Modifier.clickable(onClick = onReminder) else Modifier
             TaskFlowCard(reminderModifier.testTag("open-reminder").semantics { contentDescription = "Configurar lembrete" }) {
-                val next = reminders.firstOrNull { it.taskId == task.id }?.let { ReminderEngine.nextOccurrence(it) }
+                val taskReminders = reminders.filter { it.taskId == task.id }
+                val next = taskReminders.mapNotNull { ReminderEngine.nextOccurrence(it) }.minOrNull()
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                     Column { Text("Recorrencia personalizada", fontWeight = FontWeight.Bold, color = Text); Text(next?.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")) ?: "Nenhum lembrete", color = Muted) }
-                    Switch(checked = reminders.any { it.taskId == task.id && it.isActive }, onCheckedChange = {}, enabled = canEditTask)
+                    Switch(
+                        checked = taskReminders.any { it.isActive },
+                        onCheckedChange = { active -> taskReminders.forEach { vm.repo.saveReminder(it.copy(isActive = active)) } },
+                        enabled = canEditTask && taskReminders.isNotEmpty()
+                    )
                 }
             }
             SectionTitle("Descricao")
@@ -572,7 +577,7 @@ fun DetailScreen(vm: TaskFlowViewModel, onBack: () -> Unit, onMaterials: () -> U
                 InfoRow("Participantes", "2 pessoas")
             }
             SectionTitle("Materiais da tarefa")
-            val materialsModifier = if (canEditTask) Modifier.clickable(onClick = onMaterials) else Modifier
+            val materialsModifier = if (canViewTask) Modifier.clickable(onClick = onMaterials) else Modifier
             TaskFlowCard(materialsModifier) {
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     ChipText("${attachments.count { it.taskId == task.id }} anexos")
@@ -1564,7 +1569,7 @@ fun NextReminderCard(title: String, date: LocalDateTime) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             IconBubble(Icons.Default.Event, Purple.copy(.14f), Purple)
             Spacer(Modifier.width(14.dp))
-            Column(Modifier.weight(1f)) { Text("Proximo lembrete", color = Purple, fontWeight = FontWeight.Bold); Text(title, fontSize = 22.sp, fontWeight = FontWeight.Bold, color = Text); Text(date.format(DateTimeFormatter.ofPattern("'amanha' - HH:mm")), color = Muted) }
+            Column(Modifier.weight(1f)) { Text("Proximo lembrete", color = Purple, fontWeight = FontWeight.Bold); Text(title, fontSize = 22.sp, fontWeight = FontWeight.Bold, color = Text); Text(date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy - HH:mm")), color = Muted) }
             Icon(Icons.Default.ChevronRight, null, tint = Text)
         }
     }

@@ -403,24 +403,24 @@ Implementar identidade visual moderna, limpa e premium.
 
 ### Tarefas
 
-- [ ] Exibir saudação do usuário.
-- [ ] Exibir data atual.
-- [ ] Exibir filtros `Hoje`, `Próximas`, `Concluídas`.
-- [ ] Exibir toggle `Lembretes ativos`.
-- [ ] Exibir tarefas do dia.
-- [ ] Exibir prioridades.
-- [ ] Exibir horário.
-- [ ] Exibir lista/espaço.
-- [ ] Exibir card de próximo lembrete.
-- [ ] Exibir botão flutuante de nova tarefa.
+- [x] Exibir saudação do usuário.
+- [x] Exibir data atual.
+- [x] Exibir filtros `Hoje`, `Próximas`, `Concluídas`.
+- [x] Exibir toggle `Lembretes ativos`.
+- [x] Exibir tarefas do dia.
+- [x] Exibir prioridades.
+- [x] Exibir horário.
+- [x] Exibir lista/espaço.
+- [x] Exibir card de próximo lembrete.
+- [x] Exibir botão flutuante de nova tarefa.
 
 ### Critérios de aceite
 
-- [ ] Home carrega sem depender de login real no modo mockado.
-- [ ] Tarefas aparecem com status, horário e prioridade.
-- [ ] Toggle visual funciona.
-- [ ] Botão `+` navega para nova tarefa.
-- [ ] Filtros alteram a lista exibida.
+- [x] Home carrega sem depender de login real no modo mockado.
+- [x] Tarefas aparecem com status, horário e prioridade.
+- [x] Toggle visual funciona.
+- [x] Botão `+` navega para nova tarefa.
+- [x] Filtros alteram a lista exibida.
 
 ---
 
@@ -533,27 +533,27 @@ Implementar identidade visual moderna, limpa e premium.
 
 ### Tarefas
 
-- [ ] Exibir título.
-- [ ] Exibir status.
-- [ ] Exibir prioridade.
-- [ ] Exibir próximo lembrete.
-- [ ] Exibir toggle de lembrete ativo.
-- [ ] Exibir descrição.
-- [ ] Exibir prazo.
-- [ ] Exibir responsável.
-- [ ] Exibir participantes.
-- [ ] Exibir materiais da tarefa.
-- [ ] Exibir anexos principais.
-- [ ] Exibir links principais.
-- [ ] Exibir campos principais.
-- [ ] Exibir botões compartilhar e concluir.
+- [x] Exibir título.
+- [x] Exibir status.
+- [x] Exibir prioridade.
+- [x] Exibir próximo lembrete.
+- [x] Exibir toggle de lembrete ativo.
+- [x] Exibir descrição.
+- [x] Exibir prazo.
+- [x] Exibir responsável.
+- [x] Exibir participantes.
+- [x] Exibir materiais da tarefa.
+- [x] Exibir anexos principais.
+- [x] Exibir links principais.
+- [x] Exibir campos principais.
+- [x] Exibir botões compartilhar e concluir.
 
 ### Critérios de aceite
 
-- [ ] Tela mostra resumo completo da tarefa.
-- [ ] Materiais são acessíveis diretamente.
-- [ ] Lembrete pode ser ativado/desativado.
-- [ ] Botões executam as ações corretas.
+- [x] Tela mostra resumo completo da tarefa.
+- [x] Materiais são acessíveis diretamente.
+- [x] Lembrete pode ser ativado/desativado.
+- [x] Botões executam as ações corretas.
 
 ---
 

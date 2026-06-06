@@ -182,7 +182,11 @@ class LocalTaskFlowRepository(
             val nextTriggerAt = ReminderEngine.nextOccurrence(reminder)
             val value = reminder.copy(nextTriggerAt = nextTriggerAt, updatedAt = now())
             dao.upsertReminders(listOf(value.toEntity()))
-            reminderScheduler.schedule(value, nextTriggerAt)
+            if (value.isActive && nextTriggerAt != null) {
+                reminderScheduler.schedule(value, nextTriggerAt)
+            } else {
+                reminderScheduler.cancel(value.id, value.taskId)
+            }
         }
     }
 

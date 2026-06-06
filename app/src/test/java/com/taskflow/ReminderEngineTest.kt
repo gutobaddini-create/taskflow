@@ -25,6 +25,19 @@ class ReminderEngineTest {
     }
 
     @Test
+    fun inactiveReminderReturnsNull() {
+        val reminder = Reminder(
+            taskId = "task",
+            userId = "user",
+            startDate = LocalDate.of(2026, 6, 10),
+            startTime = LocalTime.of(9, 0),
+            isActive = false
+        )
+
+        assertNull(ReminderEngine.nextOccurrence(reminder, LocalDateTime.of(2026, 6, 5, 8, 0)))
+    }
+
+    @Test
     fun everyTwoWeeksUsesSelectedWeekdays() {
         val reminder = Reminder(
             taskId = "task",
