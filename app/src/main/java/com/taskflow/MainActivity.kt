@@ -75,6 +75,20 @@ private val Blue = Color(0xFF2563FF)
 private val Purple = Color(0xFF7C3AED)
 private val Border = Color(0xFFE5E7EB)
 private val Gradient = Brush.horizontalGradient(listOf(Blue, Purple))
+private val CustomFieldTypeLabels = listOf(
+    CustomFieldType.Text to "Texto",
+    CustomFieldType.Number to "Numero",
+    CustomFieldType.Money to "Moeda",
+    CustomFieldType.Date to "Data",
+    CustomFieldType.Phone to "Telefone",
+    CustomFieldType.Email to "E-mail",
+    CustomFieldType.Url to "URL",
+    CustomFieldType.Location to "Localizacao",
+    CustomFieldType.ProcessNumber to "Processo",
+    CustomFieldType.Document to "Documento"
+)
+
+private fun CustomFieldType.label(): String = CustomFieldTypeLabels.firstOrNull { it.first == this }?.second ?: name
 
 class MainActivity : ComponentActivity() {
     private val pendingInviteToken = mutableStateOf<String?>(null)
@@ -1212,6 +1226,7 @@ fun FieldDialog(initialName: String, initialType: CustomFieldType, initialValue:
     var name by remember(initialName) { mutableStateOf(initialName) }
     var value by remember(initialValue) { mutableStateOf(initialValue) }
     var type by remember(initialType) { mutableStateOf(initialType) }
+    var typeMenuExpanded by remember { mutableStateOf(false) }
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text("Campo complementar", color = Text, fontWeight = FontWeight.Bold) },
@@ -1219,8 +1234,26 @@ fun FieldDialog(initialName: String, initialType: CustomFieldType, initialValue:
             Column {
                 OutlinedTextField(name, { name = it }, label = { Text("Nome") }, singleLine = true, modifier = Modifier.fillMaxWidth())
                 Spacer(Modifier.height(8.dp))
-                Segmented(listOf("Texto", "Numero", "URL"), when (type) { CustomFieldType.Number -> "Numero"; CustomFieldType.Url -> "URL"; else -> "Texto" }) {
-                    type = when (it) { "Numero" -> CustomFieldType.Number; "URL" -> CustomFieldType.Url; else -> CustomFieldType.Text }
+                Box {
+                    OutlinedButton(
+                        onClick = { typeMenuExpanded = true },
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(18.dp)
+                    ) {
+                        Text(type.label(), modifier = Modifier.weight(1f))
+                        Icon(Icons.Default.ArrowDropDown, null)
+                    }
+                    DropdownMenu(expanded = typeMenuExpanded, onDismissRequest = { typeMenuExpanded = false }) {
+                        CustomFieldTypeLabels.forEach { (option, label) ->
+                            DropdownMenuItem(
+                                text = { Text(label) },
+                                onClick = {
+                                    type = option
+                                    typeMenuExpanded = false
+                                }
+                            )
+                        }
+                    }
                 }
                 OutlinedTextField(value, { value = it }, label = { Text("Valor") }, modifier = Modifier.fillMaxWidth().padding(top = 8.dp))
             }
@@ -1432,7 +1465,7 @@ fun FieldRow(field: CustomField, onEdit: () -> Unit, onDelete: () -> Unit) = Tas
         Spacer(Modifier.width(12.dp))
         Column(Modifier.weight(1f)) {
             Text(field.fieldName, fontWeight = FontWeight.Bold, color = Text)
-            Text("${field.fieldType.name} - ${field.fieldValue}", color = Muted, maxLines = 1)
+            Text("${field.fieldType.label()} - ${field.fieldValue}", color = Muted, maxLines = 1)
         }
     }
     Row(Modifier.fillMaxWidth().padding(top = 12.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {

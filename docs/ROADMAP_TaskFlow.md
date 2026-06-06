@@ -733,22 +733,22 @@ Implementar identidade visual moderna, limpa e premium.
 - [x] Criar formulário de campo complementar.
 - [x] Criar campo tipo texto.
 - [x] Criar campo tipo número.
-- [ ] Criar campo tipo moeda.
-- [ ] Criar campo tipo data.
-- [ ] Criar campo tipo telefone.
-- [ ] Criar campo tipo e-mail.
+- [x] Criar campo tipo moeda.
+- [x] Criar campo tipo data.
+- [x] Criar campo tipo telefone.
+- [x] Criar campo tipo e-mail.
 - [x] Criar campo tipo URL.
-- [ ] Criar campo tipo localização.
-- [ ] Criar campo tipo número de processo.
-- [ ] Criar campo tipo documento.
+- [x] Criar campo tipo localização.
+- [x] Criar campo tipo número de processo.
+- [x] Criar campo tipo documento.
 - [x] Editar campo.
 - [x] Excluir campo.
 
 ### Critérios de aceite
 
-- [ ] Campo complementar aparece no detalhe da tarefa.
-- [ ] Campo pode ser editado.
-- [ ] Campo pode ser excluído.
+- [x] Campo complementar aparece no detalhe da tarefa.
+- [x] Campo pode ser editado.
+- [x] Campo pode ser excluído.
 - [x] Campo tem tipo correto.
 
 ---
