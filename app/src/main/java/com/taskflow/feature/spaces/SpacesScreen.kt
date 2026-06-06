@@ -43,6 +43,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.taskflow.core.design.ChipText
+import com.taskflow.core.design.EmptyState
 import com.taskflow.core.design.FeedbackBanner
 import com.taskflow.core.design.FeedbackKind
 import com.taskflow.core.design.InfoRow
@@ -185,10 +186,7 @@ fun SpacesScreen(vm: TaskFlowViewModel, onDetail: (String) -> Unit) {
                 }
                 Spacer(Modifier.height(12.dp))
                 if (selectedSpaceTasks.isEmpty()) {
-                    TaskFlowCard {
-                        Text("Nenhuma tarefa neste espaco.", fontWeight = FontWeight.Bold, color = TaskFlowColors.Text)
-                        Text("Crie uma lista e uma tarefa para preencher este espaco.", color = TaskFlowColors.Muted, modifier = Modifier.padding(top = 4.dp))
-                    }
+                    EmptyState("Nenhuma tarefa neste espaco", "Crie uma lista e uma tarefa para preencher este espaco.")
                     Spacer(Modifier.height(12.dp))
                 }
             }
@@ -202,10 +200,7 @@ fun SpacesScreen(vm: TaskFlowViewModel, onDetail: (String) -> Unit) {
             item {
                 SectionTitle("Tarefas em ${list.name}")
                 if (selectedListTasks.isEmpty()) {
-                    TaskFlowCard {
-                        Text("Nenhuma tarefa nesta lista.", fontWeight = FontWeight.Bold, color = TaskFlowColors.Text)
-                        Text("Crie uma tarefa usando esta lista para ela aparecer aqui.", color = TaskFlowColors.Muted, modifier = Modifier.padding(top = 4.dp))
-                    }
+                    EmptyState("Nenhuma tarefa nesta lista", "Crie uma tarefa usando esta lista para ela aparecer aqui.")
                     Spacer(Modifier.height(12.dp))
                 }
             }

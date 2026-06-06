@@ -1191,7 +1191,7 @@ Implementar identidade visual moderna, limpa e premium.
 - [ ] Ajustar cores dos chips.
 - [x] Ajustar contraste.
 - [x] Ajustar animações.
-- [ ] Ajustar estados vazios.
+- [x] Ajustar estados vazios.
 - [ ] Ajustar feedback de toque.
 - [ ] Ajustar loading de upload.
 - [x] Ajustar erros de formulário.

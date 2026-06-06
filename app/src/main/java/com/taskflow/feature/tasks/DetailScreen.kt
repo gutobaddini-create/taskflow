@@ -40,6 +40,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.taskflow.core.design.ChipText
+import com.taskflow.core.design.EmptyState
 import com.taskflow.core.design.GradientButton
 import com.taskflow.core.design.InfoRow
 import com.taskflow.core.design.PriorityPill
@@ -215,7 +216,7 @@ fun DetailScreen(vm: TaskFlowViewModel, onBack: () -> Unit, onMaterials: () -> U
             TaskFlowCard {
                 val taskComments = comments.filter { it.taskId == task.id }
                 if (taskComments.isEmpty()) {
-                    Text("Nenhum comentario.", color = TaskFlowColors.Muted)
+                    EmptyState("Nenhum comentario", "Use comentarios para registrar decisoes ou contexto.")
                 } else {
                     taskComments.forEach {
                         val isOwnComment = it.authorId == currentUser.id
@@ -268,7 +269,7 @@ fun DetailScreen(vm: TaskFlowViewModel, onBack: () -> Unit, onMaterials: () -> U
             TaskFlowCard {
                 val taskActivity = activity.filter { it.taskId == task.id }.take(6)
                 if (taskActivity.isEmpty()) {
-                    Text("Nenhum evento.", color = TaskFlowColors.Muted)
+                    EmptyState("Nenhum evento", "Alteracoes relevantes aparecerao aqui.")
                 } else {
                     taskActivity.forEach {
                         Text(it.action, color = TaskFlowColors.Text, fontWeight = FontWeight.SemiBold)

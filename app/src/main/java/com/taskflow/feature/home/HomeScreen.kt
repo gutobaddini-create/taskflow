@@ -57,6 +57,7 @@ import com.taskflow.domain.model.Task
 import com.taskflow.domain.usecase.TaskQueries
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import com.taskflow.core.design.EmptyState
 
 @Composable
 fun HomeScreen(vm: TaskFlowViewModel, onNew: () -> Unit, onDetail: (String) -> Unit) {
@@ -141,10 +142,7 @@ fun HomeScreen(vm: TaskFlowViewModel, onNew: () -> Unit, onDetail: (String) -> U
             }
             if (filtered.isEmpty()) {
                 item {
-                    TaskFlowCard {
-                        Text("Nenhuma tarefa encontrada.", fontWeight = FontWeight.Bold, color = TaskFlowColors.Text)
-                        Text("Ajuste a busca ou os filtros.", color = TaskFlowColors.Muted, modifier = Modifier.padding(top = 4.dp))
-                    }
+                    EmptyState("Nenhuma tarefa encontrada", "Ajuste a busca ou os filtros.")
                     Spacer(Modifier.height(14.dp))
                 }
             }

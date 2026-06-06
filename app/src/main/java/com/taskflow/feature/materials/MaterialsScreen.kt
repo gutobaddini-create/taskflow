@@ -82,6 +82,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.FileProvider
 import com.taskflow.core.design.ChipText
+import com.taskflow.core.design.EmptyState
 import com.taskflow.core.design.FeedbackBanner
 import com.taskflow.core.design.FeedbackKind
 import com.taskflow.core.design.GradientButton
@@ -341,48 +342,69 @@ fun MaterialsScreen(vm: TaskFlowViewModel, onBack: () -> Unit) {
             }
             SectionTitle(vm.materialsTab)
             when (vm.materialsTab) {
-                "Anexos" -> attachments.filter { it.taskId == task.id }.forEach {
-                    AttachmentRow(
-                        attachment = it,
-                        canManage = canManageMaterial,
-                        onOpen = { openAttachment(it) },
-                        onShare = { shareAttachment(it) },
-                        onDelete = {
-                            vm.repo.deleteAttachment(it.id)
-                            message = "Anexo removido."
+                "Anexos" -> {
+                    val taskAttachments = attachments.filter { it.taskId == task.id }
+                    if (taskAttachments.isEmpty()) {
+                        EmptyState("Nenhum anexo", "Adicione arquivos, fotos ou documentos vinculados a esta tarefa.")
+                    } else {
+                        taskAttachments.forEach {
+                            AttachmentRow(
+                                attachment = it,
+                                canManage = canManageMaterial,
+                                onOpen = { openAttachment(it) },
+                                onShare = { shareAttachment(it) },
+                                onDelete = {
+                                    vm.repo.deleteAttachment(it.id)
+                                    message = "Anexo removido."
+                                }
+                            )
                         }
-                    )
+                    }
                 }
-                "Links" -> links.filter { it.taskId == task.id }.forEach {
-                    LinkRow(
-                        link = it,
-                        canManage = canManageMaterial,
-                        onOpen = { openLink(it) },
-                        onCopy = { copyLink(it) },
-                        onEdit = { editingLink = it },
-                        onDelete = {
-                            vm.repo.deleteLink(it.id)
-                            message = "Link removido."
+                "Links" -> {
+                    val taskLinks = links.filter { it.taskId == task.id }
+                    if (taskLinks.isEmpty()) {
+                        EmptyState("Nenhum link", "Adicione URLs importantes para consulta rapida.")
+                    } else {
+                        taskLinks.forEach {
+                            LinkRow(
+                                link = it,
+                                canManage = canManageMaterial,
+                                onOpen = { openLink(it) },
+                                onCopy = { copyLink(it) },
+                                onEdit = { editingLink = it },
+                                onDelete = {
+                                    vm.repo.deleteLink(it.id)
+                                    message = "Link removido."
+                                }
+                            )
                         }
-                    )
+                    }
                 }
-                else -> fields.filter { it.taskId == task.id }.forEach {
-                    FieldRow(
-                        field = it,
-                        canManage = canManageMaterial,
-                        onEdit = { editingField = it },
-                        onDelete = {
-                            vm.repo.deleteCustomField(it.id)
-                            message = "Campo removido."
+                else -> {
+                    val taskFields = fields.filter { it.taskId == task.id }
+                    if (taskFields.isEmpty()) {
+                        EmptyState("Nenhum campo", "Adicione informacoes extras como contatos, protocolos ou valores.")
+                    } else {
+                        taskFields.forEach {
+                            FieldRow(
+                                field = it,
+                                canManage = canManageMaterial,
+                                onEdit = { editingField = it },
+                                onDelete = {
+                                    vm.repo.deleteCustomField(it.id)
+                                    message = "Campo removido."
+                                }
+                            )
                         }
-                    )
+                    }
                 }
             }
             SectionTitle("Checklist")
             val taskChecklist = checklist.filter { it.taskId == task.id }
             TaskFlowCard {
                 if (taskChecklist.isEmpty()) {
-                    Text("Nenhum item.", color = com.taskflow.core.design.TaskFlowColors.Muted)
+                    EmptyState("Checklist vazio", "Adicione itens para acompanhar subtarefas.")
                 } else {
                     taskChecklist.forEach { item ->
                         Row(Modifier.fillMaxWidth().padding(vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
