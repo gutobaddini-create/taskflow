@@ -73,6 +73,7 @@ import com.taskflow.feature.people.PeopleScreen
 import com.taskflow.feature.settings.SettingsScreen
 import com.taskflow.feature.sharing.AcceptInviteScreen
 import com.taskflow.feature.sharing.ShareScreen
+import com.taskflow.feature.tasks.NewTaskScreen
 import com.taskflow.domain.model.*
 import java.io.File
 import java.time.Instant
@@ -305,96 +306,6 @@ fun Shell(current: Screen, navigate: (Screen) -> Unit, content: @Composable () -
 }
 
 fun navItems() = listOf(Screen.Home to Icons.Default.CalendarToday, Screen.Spaces to Icons.Default.List, Screen.People to Icons.Default.Groups, Screen.Settings to Icons.Default.Settings)
-
-@Composable
-fun NewTaskScreen(vm: TaskFlowViewModel, onCancel: () -> Unit) {
-    val lists by vm.lists.collectAsState()
-    val users by vm.users.collectAsState()
-    val user = vm.currentUser()
-    var title by remember { mutableStateOf("") }
-    var description by remember { mutableStateOf("") }
-    var priority by remember { mutableStateOf(TaskPriority.Medium) }
-    var selectedListId by remember { mutableStateOf<String?>(null) }
-    var selectedAssigneeId by remember(user.id) { mutableStateOf(user.id) }
-    var invitePermission by remember { mutableStateOf("Sem convite") }
-    var dueDay by remember { mutableStateOf("Hoje") }
-    var dueHour by remember { mutableStateOf("09:00") }
-    var attemptedSave by remember { mutableStateOf(false) }
-    val selectedList = lists.firstOrNull { it.id == selectedListId } ?: lists.firstOrNull()
-    val assigneeOptions = users.ifEmpty { listOf(user) }
-    val selectedAssignee = assigneeOptions.firstOrNull { it.id == selectedAssigneeId } ?: user
-    LaunchedEffect(lists) {
-        if (selectedListId == null && lists.isNotEmpty()) selectedListId = lists.first().id
-    }
-    LazyColumn(Modifier.fillMaxSize().statusBarsPadding().padding(22.dp), contentPadding = PaddingValues(bottom = 36.dp)) {
-        item {
-            TopRow("Cancelar", "Nova tarefa", onCancel)
-            Spacer(Modifier.height(18.dp))
-            OutlinedTextField(title, { title = it }, label = { Text("Titulo da tarefa *") }, modifier = Modifier.fillMaxWidth().testTag("new-task-title").semantics { contentDescription = "Campo titulo da tarefa" }, shape = RoundedCornerShape(18.dp), isError = attemptedSave && title.isBlank(), supportingText = { if (attemptedSave && title.isBlank()) Text("Informe um titulo para salvar.") })
-            OutlinedTextField(description, { description = it }, label = { Text("Descricao") }, modifier = Modifier.fillMaxWidth().padding(top = 10.dp).testTag("new-task-description").semantics { contentDescription = "Campo descricao da tarefa" }, shape = RoundedCornerShape(18.dp), minLines = 3)
-            Spacer(Modifier.height(16.dp))
-            TaskFlowCard {
-                Text("Lista", color = Muted)
-                if (lists.isEmpty()) {
-                    Text("Crie uma lista antes de salvar tarefas.", color = Color(0xFFEF4444), modifier = Modifier.padding(top = 8.dp))
-                } else {
-                    Segmented(lists.map { it.name }, selectedList?.name ?: lists.first().name) { name ->
-                        selectedListId = lists.first { it.name == name }.id
-                    }
-                }
-                Text("Prazo", color = Muted, modifier = Modifier.padding(top = 14.dp))
-                Segmented(listOf("Hoje", "Amanha"), dueDay) { dueDay = it }
-                Spacer(Modifier.height(8.dp))
-                Segmented(listOf("09:00", "11:00", "14:00", "16:30"), dueHour) { dueHour = it }
-                Text("Responsavel", color = Muted, modifier = Modifier.padding(top = 14.dp))
-                Segmented(assigneeOptions.map { it.name }, selectedAssignee.name) { name ->
-                    selectedAssigneeId = assigneeOptions.first { it.name == name }.id
-                }
-                Text("Convite de pessoas", color = Muted, modifier = Modifier.padding(top = 14.dp))
-                Segmented(listOf("Sem convite", "Comentar", "Ver"), invitePermission) { invitePermission = it }
-                Text("O convite local sera criado ao salvar a tarefa.", color = Muted, fontSize = 13.sp, modifier = Modifier.padding(top = 8.dp))
-            }
-            SectionTitle("Lembretes")
-            TaskFlowCard {
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                    Column { Text("Configurar apos salvar", fontWeight = FontWeight.Bold, color = Text); Text("Evita aplicar lembretes em uma tarefa incorreta.", color = Muted) }
-                    Icon(Icons.Default.NotificationsActive, null, tint = Muted)
-                }
-            }
-            SectionTitle("Materiais da tarefa")
-            TaskFlowCard {
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) { ChipText("Anexos"); ChipText("Links"); ChipText("Campos") }
-                Spacer(Modifier.height(14.dp))
-                Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    SmallAction(Icons.Default.AttachFile, "Arquivo")
-                    SmallAction(Icons.Default.PhotoCamera, "Foto")
-                    SmallAction(Icons.Default.Link, "Link")
-                }
-                Text("Materiais ficam disponiveis no detalhe depois que a tarefa existir.", color = Muted, fontSize = 13.sp, modifier = Modifier.padding(top = 10.dp))
-            }
-            SectionTitle("Prioridade")
-            Segmented(TaskPriority.entries.map { it.label }, priority.label) { priority = TaskPriority.entries.first { p -> p.label == it } }
-            Spacer(Modifier.height(24.dp))
-            GradientButton("Salvar", {
-                attemptedSave = true
-                if (title.isNotBlank()) {
-                    val list = selectedList
-                    if (list != null) {
-                        val time = LocalTime.parse(dueHour)
-                        val date = if (dueDay == "Amanha") LocalDate.now().plusDays(1) else LocalDate.now()
-                        val task = Task(spaceId = list.spaceId, listId = list.id, title = title.trim(), description = description, priority = priority, createdBy = user.id, assignedTo = selectedAssignee.id, dueDate = LocalDateTime.of(date, time))
-                        vm.repo.createTask(task)
-                        when (invitePermission) {
-                            "Comentar" -> vm.repo.createInvite(Invite(taskId = task.id, createdBy = user.id, permission = UserPermission.Participant))
-                            "Ver" -> vm.repo.createInvite(Invite(taskId = task.id, createdBy = user.id, permission = UserPermission.Viewer))
-                        }
-                        onCancel()
-                    }
-                }
-            }, Modifier.fillMaxWidth().testTag("save-new-task").semantics { contentDescription = "Salvar nova tarefa" }, enabled = lists.isNotEmpty())
-        }
-    }
-}
 
 @Composable
 fun DetailScreen(vm: TaskFlowViewModel, onBack: () -> Unit, onMaterials: () -> Unit, onShare: () -> Unit, onReminder: () -> Unit) {
