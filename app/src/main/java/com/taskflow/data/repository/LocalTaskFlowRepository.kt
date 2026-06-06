@@ -162,7 +162,8 @@ class LocalTaskFlowRepository(
 
     override fun createList(spaceId: String, name: String) {
         scope.launch(Dispatchers.IO) {
-            dao.upsertLists(listOf(TaskList(spaceId = spaceId, name = name, order = lists.value.size).toEntity()))
+            val nextOrder = (lists.value.filter { it.spaceId == spaceId }.maxOfOrNull { it.order } ?: -1) + 1
+            dao.upsertLists(listOf(TaskList(spaceId = spaceId, name = name, order = nextOrder).toEntity()))
         }
     }
 

@@ -85,7 +85,8 @@ class InMemoryTaskFlowRepository : TaskFlowRepository {
     }
 
     override fun createList(spaceId: String, name: String) {
-        lists.value = lists.value + TaskList(spaceId = spaceId, name = name, order = lists.value.size)
+        val nextOrder = (lists.value.filter { it.spaceId == spaceId }.maxOfOrNull { it.order } ?: -1) + 1
+        lists.value = lists.value + TaskList(spaceId = spaceId, name = name, order = nextOrder)
     }
 
     override fun updateList(list: TaskList) {

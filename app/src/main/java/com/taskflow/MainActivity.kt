@@ -1315,6 +1315,14 @@ fun SpacesScreen(vm: TaskFlowViewModel, onDetail: (String) -> Unit) {
     val selectedSpaceTasks = selectedSpace?.let { space -> tasks.filter { it.spaceId == space.id } } ?: emptyList()
     val selectedList = lists.firstOrNull { it.id == selectedListId }
     val selectedListTasks = selectedList?.let { list -> tasks.filter { it.listId == list.id } } ?: emptyList()
+    fun orderedLists(spaceId: String) = lists.filter { it.spaceId == spaceId }.sortedBy { it.order }
+    fun moveList(list: TaskList, delta: Int) {
+        val siblings = orderedLists(list.spaceId)
+        val index = siblings.indexOfFirst { it.id == list.id }
+        val target = siblings.getOrNull(index + delta) ?: return
+        vm.repo.updateList(list.copy(order = target.order))
+        vm.repo.updateList(target.copy(order = list.order))
+    }
     dialog?.let { state ->
         NameDialog(
             title = state.title,
@@ -1372,7 +1380,9 @@ fun SpacesScreen(vm: TaskFlowViewModel, onDetail: (String) -> Unit) {
                         }, modifier = Modifier.testTag("delete-space-${space.name}").semantics { contentDescription = "Excluir espaco ${space.name}" }) { Icon(Icons.Default.Delete, null, tint = Color(0xFFEF4444)) }
                     }
                 }
-                lists.filter { it.spaceId == space.id }.forEach { list ->
+                orderedLists(space.id).forEach { list ->
+                    val siblings = orderedLists(space.id)
+                    val listIndex = siblings.indexOfFirst { it.id == list.id }
                     Row(Modifier.fillMaxWidth().padding(vertical = 8.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                         Column(Modifier.weight(1f).clip(RoundedCornerShape(14.dp)).clickable {
                             selectedListId = list.id
@@ -1383,6 +1393,16 @@ fun SpacesScreen(vm: TaskFlowViewModel, onDetail: (String) -> Unit) {
                             val selectedSuffix = if (selectedListId == list.id) " - filtrando" else ""
                             Text("$openCount abertas$selectedSuffix", color = Muted, fontSize = 13.sp)
                         }
+                        IconButton(
+                            onClick = { moveList(list, -1) },
+                            enabled = listIndex > 0,
+                            modifier = Modifier.testTag("move-list-up-${list.name}").semantics { contentDescription = "Mover lista ${list.name} para cima" }
+                        ) { Icon(Icons.Default.KeyboardArrowUp, null, tint = if (listIndex > 0) Muted else Border) }
+                        IconButton(
+                            onClick = { moveList(list, 1) },
+                            enabled = listIndex < siblings.lastIndex,
+                            modifier = Modifier.testTag("move-list-down-${list.name}").semantics { contentDescription = "Mover lista ${list.name} para baixo" }
+                        ) { Icon(Icons.Default.KeyboardArrowDown, null, tint = if (listIndex < siblings.lastIndex) Muted else Border) }
                         IconButton(onClick = { dialog = CrudDialogState(CrudKind.EditList, "Renomear lista", list.name, list = list) }, modifier = Modifier.testTag("edit-list-${list.name}").semantics { contentDescription = "Renomear lista ${list.name}" }) { Icon(Icons.Default.Edit, null, tint = Muted) }
                         IconButton(onClick = {
                             if (tasks.any { it.listId == list.id }) message = "Exclua ou mova as tarefas antes de remover esta lista." else vm.repo.deleteList(list.id)
@@ -1395,7 +1415,7 @@ fun SpacesScreen(vm: TaskFlowViewModel, onDetail: (String) -> Unit) {
         selectedSpace?.let { space ->
             item {
                 SectionTitle("Tarefas em ${space.name}")
-                val spaceLists = lists.filter { it.spaceId == space.id }
+                val spaceLists = orderedLists(space.id)
                 TaskFlowCard {
                     val ownerName = users.firstOrNull { it.id == space.ownerId }?.name ?: "Usuario local"
                     InfoRow("Proprietario", ownerName)

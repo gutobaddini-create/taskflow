@@ -453,7 +453,7 @@ Implementar identidade visual moderna, limpa e premium.
 - [x] Criar lista.
 - [x] Editar lista.
 - [x] Excluir lista.
-- [ ] Ordenar listas.
+- [x] Ordenar listas.
 - [x] Exibir quantidade de tarefas por lista.
 
 ### Critérios de aceite
