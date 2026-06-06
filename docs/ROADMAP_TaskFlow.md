@@ -1019,6 +1019,10 @@ Implementar identidade visual moderna, limpa e premium.
 - [ ] Tarefa sincroniza quando internet volta.
 - [x] App indica pendência de sincronização.
 
+### Evidência técnica local
+
+- [x] Coordenador de sincronização observa conectividade, preserva fila offline, preserva fila sem Firebase configurado e drena operações quando uma fonte remota configurada aplica a operação.
+
 ---
 
 # 20. Fase 16 — Permissões e Segurança

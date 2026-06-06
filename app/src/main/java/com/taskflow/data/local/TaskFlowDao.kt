@@ -48,6 +48,9 @@ interface TaskFlowDao {
     @Query("SELECT * FROM pending_operations ORDER BY createdAt")
     fun pendingOperations(): Flow<List<PendingOperationEntity>>
 
+    @Query("SELECT * FROM pending_operations ORDER BY createdAt")
+    suspend fun pendingOperationsSnapshot(): List<PendingOperationEntity>
+
     @Query("SELECT COUNT(*) FROM tasks")
     suspend fun taskCount(): Int
 
@@ -149,4 +152,7 @@ interface TaskFlowDao {
 
     @Query("DELETE FROM invites WHERE token = :token")
     suspend fun deleteInviteByToken(token: String)
+
+    @Query("DELETE FROM pending_operations WHERE id = :operationId")
+    suspend fun deletePendingOperation(operationId: String)
 }

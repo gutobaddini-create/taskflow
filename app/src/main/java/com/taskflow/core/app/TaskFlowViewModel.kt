@@ -9,6 +9,10 @@ import androidx.lifecycle.viewModelScope
 import com.taskflow.data.local.TaskFlowDatabase
 import com.taskflow.data.local.TaskFlowPreferences
 import com.taskflow.data.local.TaskFlowUserPreferences
+import com.taskflow.data.remote.AndroidConnectivityMonitor
+import com.taskflow.data.remote.FirebaseTaskFlowDataSource
+import com.taskflow.data.remote.RoomPendingOperationQueue
+import com.taskflow.data.remote.SyncCoordinator
 import com.taskflow.data.repository.LocalTaskFlowRepository
 import com.taskflow.domain.model.Task
 import com.taskflow.domain.model.User
@@ -17,8 +21,14 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class TaskFlowViewModel(application: Application) : AndroidViewModel(application) {
-    val repo = LocalTaskFlowRepository(TaskFlowDatabase.get(application).dao(), application, viewModelScope)
+    private val dao = TaskFlowDatabase.get(application).dao()
+    val repo = LocalTaskFlowRepository(dao, application, viewModelScope)
     private val preferencesStore = TaskFlowPreferences(application)
+    private val syncCoordinator = SyncCoordinator(
+        queue = RoomPendingOperationQueue(dao),
+        remote = FirebaseTaskFlowDataSource(),
+        connectivity = AndroidConnectivityMonitor(application)
+    )
     val users = repo.users
     val spaces = repo.spaces
     val lists = repo.lists
@@ -42,6 +52,7 @@ class TaskFlowViewModel(application: Application) : AndroidViewModel(application
     var materialsTab by mutableStateOf("Anexos")
 
     init {
+        syncCoordinator.start(viewModelScope)
         viewModelScope.launch {
             preferencesStore.values.collect { prefs ->
                 _preferences.value = prefs
