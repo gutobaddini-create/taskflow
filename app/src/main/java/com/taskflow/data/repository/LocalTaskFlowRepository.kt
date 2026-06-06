@@ -39,6 +39,7 @@ class LocalTaskFlowRepository(
     override val comments = MutableStateFlow(emptyList<Comment>())
     override val invites = MutableStateFlow(emptyList<Invite>())
     override val activity = MutableStateFlow(emptyList<ActivityLog>())
+    override val pendingOperations = MutableStateFlow(emptyList<PendingOperation>())
 
     init {
         collectRoomFlows()
@@ -58,6 +59,11 @@ class LocalTaskFlowRepository(
         scope.launch { dao.comments().map { rows -> rows.map { it.toDomain() } }.collect(comments::emit) }
         scope.launch { dao.invites().map { rows -> rows.map { it.toDomain() } }.collect(invites::emit) }
         scope.launch { dao.activity().map { rows -> rows.map { it.toDomain() } }.collect(activity::emit) }
+        scope.launch { dao.pendingOperations().map { rows -> rows.map { it.toDomain() } }.collect(pendingOperations::emit) }
+    }
+
+    private suspend fun enqueue(entity: PendingEntityType, entityId: String, operation: PendingOperationType) {
+        dao.upsertPendingOperations(listOf(PendingOperation(entity = entity, entityId = entityId, operation = operation).toEntity()))
     }
 
     private suspend fun seedIfNeeded() {
@@ -102,6 +108,7 @@ class LocalTaskFlowRepository(
             val validList = lists.value.any { it.id == task.listId && it.spaceId == task.spaceId }
             if (!validList) return@launch
             dao.upsertTasks(listOf(task.toEntity()))
+            enqueue(PendingEntityType.Task, task.id, PendingOperationType.Create)
             dao.upsertActivity(listOf(ActivityLog(taskId = task.id, userId = task.createdBy, action = "Tarefa criada").toEntity()))
         }
     }
@@ -110,6 +117,7 @@ class LocalTaskFlowRepository(
         scope.launch(Dispatchers.IO) {
             val previous = dao.taskById(task.id)?.toDomain()
             dao.upsertTasks(listOf(task.copy(updatedAt = now()).toEntity()))
+            enqueue(PendingEntityType.Task, task.id, PendingOperationType.Update)
             val events = mutableListOf(ActivityLog(taskId = task.id, userId = task.createdBy, action = "Tarefa atualizada"))
             if (previous != null) {
                 if (previous.status != task.status) events += ActivityLog(taskId = task.id, userId = task.createdBy, action = "Status alterado: ${task.status.label}")
@@ -197,6 +205,7 @@ class LocalTaskFlowRepository(
         scope.launch(Dispatchers.IO) {
             val safeAttachment = AttachmentSecurity.withoutPublicPermanentUrls(attachment)
             dao.upsertAttachments(listOf(safeAttachment.toEntity()))
+            enqueue(PendingEntityType.Attachment, safeAttachment.id, PendingOperationType.Create)
             logActivity(safeAttachment.taskId, safeAttachment.uploadedBy, "Anexo adicionado: ${safeAttachment.fileName}")
         }
     }
@@ -212,6 +221,7 @@ class LocalTaskFlowRepository(
     override fun addLink(link: TaskLink) {
         scope.launch(Dispatchers.IO) {
             dao.upsertLinks(listOf(link.toEntity()))
+            enqueue(PendingEntityType.Link, link.id, PendingOperationType.Create)
             logActivity(link.taskId, link.createdBy, "Link adicionado: ${link.title}")
         }
     }
@@ -219,6 +229,7 @@ class LocalTaskFlowRepository(
     override fun updateLink(link: TaskLink) {
         scope.launch(Dispatchers.IO) {
             dao.upsertLinks(listOf(link.copy(updatedAt = now()).toEntity()))
+            enqueue(PendingEntityType.Link, link.id, PendingOperationType.Update)
             logActivity(link.taskId, link.createdBy, "Link atualizado: ${link.title}")
         }
     }
@@ -234,6 +245,7 @@ class LocalTaskFlowRepository(
     override fun addCustomField(field: CustomField) {
         scope.launch(Dispatchers.IO) {
             dao.upsertCustomFields(listOf(field.toEntity()))
+            enqueue(PendingEntityType.CustomField, field.id, PendingOperationType.Create)
             logActivity(field.taskId, field.createdBy, "Campo alterado: ${field.fieldName}")
         }
     }
@@ -241,6 +253,7 @@ class LocalTaskFlowRepository(
     override fun updateCustomField(field: CustomField) {
         scope.launch(Dispatchers.IO) {
             dao.upsertCustomFields(listOf(field.copy(updatedAt = now()).toEntity()))
+            enqueue(PendingEntityType.CustomField, field.id, PendingOperationType.Update)
             logActivity(field.taskId, field.createdBy, "Campo alterado: ${field.fieldName}")
         }
     }

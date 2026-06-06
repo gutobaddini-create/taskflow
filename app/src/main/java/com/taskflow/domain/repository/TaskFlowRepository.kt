@@ -16,6 +16,7 @@ interface TaskFlowRepository {
     val comments: StateFlow<List<Comment>>
     val invites: StateFlow<List<Invite>>
     val activity: StateFlow<List<ActivityLog>>
+    val pendingOperations: StateFlow<List<PendingOperation>>
 
     fun createTask(task: Task)
     fun updateTask(task: Task)

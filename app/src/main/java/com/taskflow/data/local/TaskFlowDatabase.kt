@@ -4,6 +4,8 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 
 @Database(
     entities = [
@@ -18,9 +20,10 @@ import androidx.room.RoomDatabase
         ChecklistItemEntity::class,
         CommentEntity::class,
         ActivityLogEntity::class,
-        InviteEntity::class
+        InviteEntity::class,
+        PendingOperationEntity::class
     ],
-    version = 1,
+    version = 2,
     exportSchema = true
 )
 abstract class TaskFlowDatabase : RoomDatabase() {
@@ -34,7 +37,26 @@ abstract class TaskFlowDatabase : RoomDatabase() {
                 context.applicationContext,
                 TaskFlowDatabase::class.java,
                 LocalPersistencePlan.databaseName
-            ).build().also { instance = it }
+            ).addMigrations(MIGRATION_1_2).build().also { instance = it }
+        }
+
+        private val MIGRATION_1_2 = object : Migration(1, 2) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    """
+                    CREATE TABLE IF NOT EXISTS `pending_operations` (
+                        `id` TEXT NOT NULL,
+                        `entity` TEXT NOT NULL,
+                        `entityId` TEXT NOT NULL,
+                        `operation` TEXT NOT NULL,
+                        `createdAt` INTEGER NOT NULL,
+                        `attempts` INTEGER NOT NULL,
+                        `lastError` TEXT,
+                        PRIMARY KEY(`id`)
+                    )
+                    """.trimIndent()
+                )
+            }
         }
     }
 }

@@ -133,3 +133,6 @@ fun ActivityLogEntity.toDomain() = ActivityLog(id, taskId, userId, action, creat
 
 fun Invite.toEntity() = InviteEntity(id, taskId, createdBy, permission.name, token, acceptedBy, createdAt, expiresAt)
 fun InviteEntity.toDomain() = Invite(id, taskId, createdBy, UserPermission.valueOf(permission), token, acceptedBy, createdAt, expiresAt)
+
+fun PendingOperation.toEntity() = PendingOperationEntity(id, entity.name, entityId, operation.name, createdAt, attempts, lastError)
+fun PendingOperationEntity.toDomain() = PendingOperation(id, PendingEntityType.valueOf(entity), entityId, PendingOperationType.valueOf(operation), createdAt, attempts, lastError)

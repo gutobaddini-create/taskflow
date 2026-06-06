@@ -161,3 +161,14 @@ data class InviteEntity(
     val createdAt: Long,
     val expiresAt: Long?
 )
+
+@Entity(tableName = "pending_operations")
+data class PendingOperationEntity(
+    @PrimaryKey val id: String,
+    val entity: String,
+    val entityId: String,
+    val operation: String,
+    val createdAt: Long,
+    val attempts: Int,
+    val lastError: String?
+)

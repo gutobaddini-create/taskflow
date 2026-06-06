@@ -144,6 +144,7 @@ class TaskFlowViewModel(application: Application) : AndroidViewModel(application
     val comments = repo.comments
     val invites = repo.invites
     val activity = repo.activity
+    val pendingOperations = repo.pendingOperations
     private val _preferences = MutableStateFlow(TaskFlowUserPreferences())
     val preferences: StateFlow<TaskFlowUserPreferences> = _preferences
     var remindersVisible by mutableStateOf(true)
@@ -1607,6 +1608,7 @@ fun PeopleScreen(vm: TaskFlowViewModel) {
 @Composable
 fun SettingsScreen(vm: TaskFlowViewModel, onLogout: () -> Unit) {
     val preferences by vm.preferences.collectAsState()
+    val pendingOperations by vm.pendingOperations.collectAsState()
     LazyColumn(Modifier.fillMaxSize().statusBarsPadding().padding(24.dp), contentPadding = PaddingValues(bottom = 120.dp)) {
         item {
             Text("Ajustes", fontSize = 30.sp, fontWeight = FontWeight.Bold, color = Text)
@@ -1621,6 +1623,7 @@ fun SettingsScreen(vm: TaskFlowViewModel, onLogout: () -> Unit) {
                 Segmented(listOf("Claro", "Escuro futuro"), preferences.theme) { vm.setTheme(it) }
                 InfoRow("Filtro inicial", preferences.homeFilter)
                 InfoRow("Backups e sincronizacao", "Local-first")
+                InfoRow("Pendencias de sincronizacao", if (pendingOperations.isEmpty()) "Nenhuma" else "${pendingOperations.size} operacoes aguardando Firebase")
             }
             SectionTitle("Conta")
             TaskFlowCard {

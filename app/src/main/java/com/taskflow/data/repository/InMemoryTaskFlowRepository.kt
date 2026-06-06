@@ -44,17 +44,24 @@ class InMemoryTaskFlowRepository : TaskFlowRepository {
     override val comments = MutableStateFlow(listOf(Comment(taskId = seedTasks.first().id, authorId = manuel.id, text = "Cliente pediu envio ate 14h.")))
     override val invites = MutableStateFlow(emptyList<Invite>())
     override val activity = MutableStateFlow(seedTasks.map { ActivityLog(taskId = it.id, userId = manuel.id, action = "Tarefa criada") })
+    override val pendingOperations = MutableStateFlow(emptyList<PendingOperation>())
+
+    private fun enqueue(entity: PendingEntityType, entityId: String, operation: PendingOperationType) {
+        pendingOperations.value = pendingOperations.value + PendingOperation(entity = entity, entityId = entityId, operation = operation)
+    }
 
     override fun createTask(task: Task) {
         if (lists.value.none { it.id == task.listId && it.spaceId == task.spaceId }) return
         tasks.value = tasks.value + task
         activity.value = activity.value + ActivityLog(taskId = task.id, userId = task.createdBy, action = "Tarefa criada")
+        enqueue(PendingEntityType.Task, task.id, PendingOperationType.Create)
     }
 
     override fun updateTask(task: Task) {
         val previous = tasks.value.firstOrNull { it.id == task.id }
         tasks.value = tasks.value.map { if (it.id == task.id) task.copy(updatedAt = now()) else it }
         activity.value = activity.value + ActivityLog(taskId = task.id, userId = task.createdBy, action = "Tarefa atualizada")
+        enqueue(PendingEntityType.Task, task.id, PendingOperationType.Update)
         if (previous != null) {
             if (previous.status != task.status) activity.value = activity.value + ActivityLog(taskId = task.id, userId = task.createdBy, action = "Status alterado: ${task.status.label}")
             if (previous.dueDate != task.dueDate) activity.value = activity.value + ActivityLog(taskId = task.id, userId = task.createdBy, action = "Prazo alterado")
@@ -106,6 +113,7 @@ class InMemoryTaskFlowRepository : TaskFlowRepository {
         val safeAttachment = AttachmentSecurity.withoutPublicPermanentUrls(attachment)
         attachments.value = attachments.value + safeAttachment
         activity.value = activity.value + ActivityLog(taskId = safeAttachment.taskId, userId = safeAttachment.uploadedBy, action = "Anexo adicionado: ${safeAttachment.fileName}")
+        enqueue(PendingEntityType.Attachment, safeAttachment.id, PendingOperationType.Create)
     }
     override fun deleteAttachment(attachmentId: String) {
         val attachment = attachments.value.firstOrNull { it.id == attachmentId } ?: return
@@ -115,10 +123,12 @@ class InMemoryTaskFlowRepository : TaskFlowRepository {
     override fun addLink(link: TaskLink) {
         links.value = links.value + link
         activity.value = activity.value + ActivityLog(taskId = link.taskId, userId = link.createdBy, action = "Link adicionado: ${link.title}")
+        enqueue(PendingEntityType.Link, link.id, PendingOperationType.Create)
     }
     override fun updateLink(link: TaskLink) {
         links.value = links.value.map { if (it.id == link.id) link.copy(updatedAt = now()) else it }
         activity.value = activity.value + ActivityLog(taskId = link.taskId, userId = link.createdBy, action = "Link atualizado: ${link.title}")
+        enqueue(PendingEntityType.Link, link.id, PendingOperationType.Update)
     }
     override fun deleteLink(linkId: String) {
         val link = links.value.firstOrNull { it.id == linkId } ?: return
@@ -128,10 +138,12 @@ class InMemoryTaskFlowRepository : TaskFlowRepository {
     override fun addCustomField(field: CustomField) {
         customFields.value = customFields.value + field
         activity.value = activity.value + ActivityLog(taskId = field.taskId, userId = field.createdBy, action = "Campo alterado: ${field.fieldName}")
+        enqueue(PendingEntityType.CustomField, field.id, PendingOperationType.Create)
     }
     override fun updateCustomField(field: CustomField) {
         customFields.value = customFields.value.map { if (it.id == field.id) field.copy(updatedAt = now()) else it }
         activity.value = activity.value + ActivityLog(taskId = field.taskId, userId = field.createdBy, action = "Campo alterado: ${field.fieldName}")
+        enqueue(PendingEntityType.CustomField, field.id, PendingOperationType.Update)
     }
     override fun deleteCustomField(fieldId: String) {
         val field = customFields.value.firstOrNull { it.id == fieldId } ?: return

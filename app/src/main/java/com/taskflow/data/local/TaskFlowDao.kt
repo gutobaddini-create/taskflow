@@ -45,6 +45,9 @@ interface TaskFlowDao {
     @Query("SELECT * FROM activity_log ORDER BY createdAt DESC")
     fun activity(): Flow<List<ActivityLogEntity>>
 
+    @Query("SELECT * FROM pending_operations ORDER BY createdAt")
+    fun pendingOperations(): Flow<List<PendingOperationEntity>>
+
     @Query("SELECT COUNT(*) FROM tasks")
     suspend fun taskCount(): Int
 
@@ -83,6 +86,9 @@ interface TaskFlowDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun upsertInvites(values: List<InviteEntity>)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsertPendingOperations(values: List<PendingOperationEntity>)
 
     @Update
     suspend fun updateTask(task: TaskEntity)

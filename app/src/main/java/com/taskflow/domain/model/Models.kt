@@ -17,6 +17,8 @@ enum class AttachmentSource { Camera, Gallery, FilePicker, Shared }
 enum class AttachmentType { Image, Pdf, Document, Spreadsheet, Text, Other }
 enum class CustomFieldType { Text, Number, Money, Date, Phone, Email, Url, Location, ProcessNumber, Document }
 enum class UserPermission(val label: String) { Owner("Editar"), Responsible("Comentar"), Participant("Comentar"), Viewer("Ver") }
+enum class PendingOperationType { Create, Update, Delete }
+enum class PendingEntityType { Task, Attachment, Link, CustomField }
 
 data class User(val id: String = uuid(), val name: String, val email: String, val photoUrl: String? = null, val createdAt: Long = now(), val notificationPermissionStatus: String = "unknown")
 data class Space(val id: String = uuid(), val name: String, val ownerId: String, val members: List<String> = emptyList(), val createdAt: Long = now(), val updatedAt: Long = now())
@@ -71,6 +73,7 @@ data class ChecklistItem(val id: String = uuid(), val taskId: String, val title:
 data class Comment(val id: String = uuid(), val taskId: String, val authorId: String, val text: String, val createdAt: Long = now(), val updatedAt: Long = now())
 data class ActivityLog(val id: String = uuid(), val taskId: String, val userId: String, val action: String, val createdAt: Long = now())
 data class Invite(val id: String = uuid(), val taskId: String, val createdBy: String, val permission: UserPermission, val token: String = uuid(), val acceptedBy: String? = null, val createdAt: Long = now(), val expiresAt: Long? = null)
+data class PendingOperation(val id: String = uuid(), val entity: PendingEntityType, val entityId: String, val operation: PendingOperationType, val createdAt: Long = now(), val attempts: Int = 0, val lastError: String? = null)
 
 fun uuid(): String = UUID.randomUUID().toString()
 fun now(): Long = System.currentTimeMillis()

@@ -1003,21 +1003,21 @@ Implementar identidade visual moderna, limpa e premium.
 
 ### Tarefas
 
-- [ ] Definir fonte local como primeira leitura.
-- [ ] Criar fila de operações pendentes.
-- [ ] Sincronizar criação de tarefa.
-- [ ] Sincronizar edição de tarefa.
+- [x] Definir fonte local como primeira leitura.
+- [x] Criar fila de operações pendentes.
+- [x] Sincronizar criação de tarefa.
+- [x] Sincronizar edição de tarefa.
 - [ ] Sincronizar anexos pendentes.
-- [ ] Sincronizar links.
-- [ ] Sincronizar campos complementares.
+- [x] Sincronizar links.
+- [x] Sincronizar campos complementares.
 - [ ] Resolver conflitos simples.
 
 ### Critérios de aceite
 
-- [ ] Usuário cria tarefa offline.
-- [ ] Tarefa aparece imediatamente.
+- [x] Usuário cria tarefa offline.
+- [x] Tarefa aparece imediatamente.
 - [ ] Tarefa sincroniza quando internet volta.
-- [ ] App indica pendência de sincronização.
+- [x] App indica pendência de sincronização.
 
 ---
 
