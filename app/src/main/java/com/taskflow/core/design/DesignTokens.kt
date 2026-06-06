@@ -71,6 +71,7 @@ object DesignTokens {
     val screenPadding = 24.dp
     val screenBottomPadding = 36.dp
     val navigationBottomPadding = 120.dp
+    val floatingActionBottomPadding = 156.dp
     val cardPadding = 18.dp
     val itemGap = 12.dp
     val controlHeight = 54.dp

@@ -10,17 +10,12 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -30,11 +25,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.taskflow.core.app.TaskFlowViewModel
+import com.taskflow.core.design.BottomNavigationBar
+import com.taskflow.core.design.NavigationItem
+import com.taskflow.core.design.TaskFlowColors
 import com.taskflow.core.design.TaskFlowTheme
 import com.taskflow.core.notifications.ReminderReceiver
 import com.taskflow.feature.auth.OnboardingScreen
@@ -48,8 +44,6 @@ import com.taskflow.feature.sharing.ShareScreen
 import com.taskflow.feature.spaces.SpacesScreen
 import com.taskflow.feature.tasks.DetailScreen
 import com.taskflow.feature.tasks.NewTaskScreen
-
-private val OffWhite = Color(0xFFF7F8FC)
 
 class MainActivity : ComponentActivity() {
     private val pendingInviteToken = mutableStateOf<String?>(null)
@@ -117,7 +111,7 @@ fun TaskFlowRoot(
         }
     }
     TaskFlowTheme {
-        Surface(Modifier.fillMaxSize(), color = OffWhite) {
+        Surface(Modifier.fillMaxSize(), color = TaskFlowColors.OffWhite) {
             when (screen) {
                 Screen.Onboarding -> OnboardingScreen(vm) { screen = Screen.Home }
                 Screen.Home -> Shell(screen, { screen = it }) { HomeScreen(vm, { screen = Screen.NewTask }, { vm.selectedTaskId = it; screen = Screen.Detail }) }
@@ -139,14 +133,17 @@ fun TaskFlowRoot(
 fun Shell(current: Screen, navigate: (Screen) -> Unit, content: @Composable () -> Unit) {
     Box(Modifier.fillMaxSize()) {
         content()
-        NavigationBar(
-            Modifier.align(Alignment.BottomCenter).padding(horizontal = 18.dp, vertical = 14.dp).clip(RoundedCornerShape(26.dp)),
-            containerColor = Color.White
-        ) {
-            navItems().forEach { (screen, icon) ->
-                NavigationBarItem(selected = current == screen, onClick = { navigate(screen) }, icon = { Icon(icon, null) }, label = { Text(screen.label) })
-            }
-        }
+        val navigationItems = navItems().map { (screen, icon) -> NavigationItem(screen.label, screen.label, icon) }
+        BottomNavigationBar(
+            items = navigationItems,
+            selectedRoute = current.label,
+            onSelect = { selected ->
+                navItems().firstOrNull { (screen, _) -> screen.label == selected }?.let { (screen, _) ->
+                    navigate(screen)
+                }
+            },
+            modifier = Modifier.align(Alignment.BottomCenter).padding(horizontal = 18.dp, vertical = 14.dp)
+        )
     }
 }
 

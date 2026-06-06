@@ -661,21 +661,21 @@ A interface deve respeitar:
 
 A interface será considerada aderente ao design quando:
 
-- [ ] Usa fundo claro/off-white.
-- [ ] Usa cards brancos arredondados.
-- [ ] Usa gradiente azul/roxo nos botões principais.
-- [ ] Usa segmented controls nos filtros e seleções principais.
-- [ ] Usa toggles modernos em lembretes.
-- [ ] Usa chips para status, prioridade e contadores.
-- [ ] Usa bottom navigation com quatro itens.
-- [ ] Usa floating action button na Home.
+- [x] Usa fundo claro/off-white.
+- [x] Usa cards brancos arredondados.
+- [x] Usa gradiente azul/roxo nos botões principais.
+- [x] Usa segmented controls nos filtros e seleções principais.
+- [x] Usa toggles modernos em lembretes.
+- [x] Usa chips para status, prioridade e contadores.
+- [x] Usa bottom navigation com quatro itens.
+- [x] Usa floating action button na Home.
 - [ ] A tela Home se parece com `mockup_de_tela_de_tarefas_diário.png`.
 - [ ] A tela Nova tarefa se parece com `tela_de_criação_de_tarefa.png`.
 - [ ] A tela Lembrete personalizado se parece com `configurações_de_lembrete_personalizado.png`.
 - [ ] A tela Materiais da tarefa se parece com `interface_moderna_de_materiais_da_tarefa.png`.
 - [ ] A tela Detalhe da tarefa se parece com `detalhe_da_tarefa_em_app_moderno.png`.
 - [ ] A tela Compartilhar se parece com `tela_de_compartilhamento_de_convite.png`.
-- [ ] A interface mantém espaçamentos generosos.
-- [ ] Os textos são legíveis.
-- [ ] As ações principais são óbvias.
+- [x] A interface mantém espaçamentos generosos.
+- [x] Os textos são legíveis.
+- [x] As ações principais são óbvias.
 - [ ] O app parece moderno, limpo e premium.
