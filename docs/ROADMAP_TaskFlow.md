@@ -714,8 +714,8 @@ Implementar identidade visual moderna, limpa e premium.
 - [x] Salvar link.
 - [x] Abrir link.
 - [x] Copiar link.
-- [ ] Editar link.
-- [ ] Excluir link.
+- [x] Editar link.
+- [x] Excluir link.
 
 ### Critérios de aceite
 
@@ -741,15 +741,15 @@ Implementar identidade visual moderna, limpa e premium.
 - [ ] Criar campo tipo localização.
 - [ ] Criar campo tipo número de processo.
 - [ ] Criar campo tipo documento.
-- [ ] Editar campo.
-- [ ] Excluir campo.
+- [x] Editar campo.
+- [x] Excluir campo.
 
 ### Critérios de aceite
 
 - [ ] Campo complementar aparece no detalhe da tarefa.
 - [ ] Campo pode ser editado.
 - [ ] Campo pode ser excluído.
-- [ ] Campo tem tipo correto.
+- [x] Campo tem tipo correto.
 
 ---
 
@@ -761,8 +761,8 @@ Implementar identidade visual moderna, limpa e premium.
 - [x] Adicionar item.
 - [x] Marcar item como concluído.
 - [x] Desmarcar item.
-- [ ] Editar item.
-- [ ] Excluir item.
+- [x] Editar item.
+- [x] Excluir item.
 - [x] Mostrar progresso do checklist.
 
 ### Critérios de aceite

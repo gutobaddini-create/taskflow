@@ -200,10 +200,40 @@ class LocalTaskFlowRepository(
         }
     }
 
+    override fun updateLink(link: TaskLink) {
+        scope.launch(Dispatchers.IO) {
+            dao.upsertLinks(listOf(link.copy(updatedAt = now()).toEntity()))
+            logActivity(link.taskId, link.createdBy, "Link atualizado: ${link.title}")
+        }
+    }
+
+    override fun deleteLink(linkId: String) {
+        scope.launch(Dispatchers.IO) {
+            val link = dao.linkById(linkId)?.toDomain() ?: return@launch
+            dao.deleteLink(linkId)
+            logActivity(link.taskId, users.value.firstOrNull()?.id ?: link.createdBy, "Link removido: ${link.title}")
+        }
+    }
+
     override fun addCustomField(field: CustomField) {
         scope.launch(Dispatchers.IO) {
             dao.upsertCustomFields(listOf(field.toEntity()))
             logActivity(field.taskId, field.createdBy, "Campo alterado: ${field.fieldName}")
+        }
+    }
+
+    override fun updateCustomField(field: CustomField) {
+        scope.launch(Dispatchers.IO) {
+            dao.upsertCustomFields(listOf(field.copy(updatedAt = now()).toEntity()))
+            logActivity(field.taskId, field.createdBy, "Campo alterado: ${field.fieldName}")
+        }
+    }
+
+    override fun deleteCustomField(fieldId: String) {
+        scope.launch(Dispatchers.IO) {
+            val field = dao.customFieldById(fieldId)?.toDomain() ?: return@launch
+            dao.deleteCustomField(fieldId)
+            logActivity(field.taskId, users.value.firstOrNull()?.id ?: field.createdBy, "Campo removido: ${field.fieldName}")
         }
     }
 
@@ -214,12 +244,27 @@ class LocalTaskFlowRepository(
         }
     }
 
+    override fun updateChecklistItem(item: ChecklistItem) {
+        scope.launch(Dispatchers.IO) {
+            dao.upsertChecklistItems(listOf(item.toEntity()))
+            logActivity(item.taskId, users.value.firstOrNull()?.id ?: "local", "Checklist atualizado: ${item.title}")
+        }
+    }
+
     override fun toggleChecklistItem(itemId: String) {
         scope.launch(Dispatchers.IO) {
             val item = dao.checklistItemById(itemId)?.toDomain() ?: return@launch
             val updated = item.copy(isDone = !item.isDone)
             dao.upsertChecklistItems(listOf(updated.toEntity()))
             logActivity(item.taskId, users.value.firstOrNull()?.id ?: "local", if (updated.isDone) "Checklist concluido: ${item.title}" else "Checklist reaberto: ${item.title}")
+        }
+    }
+
+    override fun deleteChecklistItem(itemId: String) {
+        scope.launch(Dispatchers.IO) {
+            val item = dao.checklistItemById(itemId)?.toDomain() ?: return@launch
+            dao.deleteChecklistItem(itemId)
+            logActivity(item.taskId, users.value.firstOrNull()?.id ?: "local", "Checklist removido: ${item.title}")
         }
     }
 

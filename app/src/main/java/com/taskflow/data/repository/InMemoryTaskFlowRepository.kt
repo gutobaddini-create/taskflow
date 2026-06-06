@@ -105,17 +105,44 @@ class InMemoryTaskFlowRepository : TaskFlowRepository {
         links.value = links.value + link
         activity.value = activity.value + ActivityLog(taskId = link.taskId, userId = link.createdBy, action = "Link adicionado: ${link.title}")
     }
+    override fun updateLink(link: TaskLink) {
+        links.value = links.value.map { if (it.id == link.id) link.copy(updatedAt = now()) else it }
+        activity.value = activity.value + ActivityLog(taskId = link.taskId, userId = link.createdBy, action = "Link atualizado: ${link.title}")
+    }
+    override fun deleteLink(linkId: String) {
+        val link = links.value.firstOrNull { it.id == linkId } ?: return
+        links.value = links.value.filterNot { it.id == linkId }
+        activity.value = activity.value + ActivityLog(taskId = link.taskId, userId = users.value.first().id, action = "Link removido: ${link.title}")
+    }
     override fun addCustomField(field: CustomField) {
         customFields.value = customFields.value + field
         activity.value = activity.value + ActivityLog(taskId = field.taskId, userId = field.createdBy, action = "Campo alterado: ${field.fieldName}")
+    }
+    override fun updateCustomField(field: CustomField) {
+        customFields.value = customFields.value.map { if (it.id == field.id) field.copy(updatedAt = now()) else it }
+        activity.value = activity.value + ActivityLog(taskId = field.taskId, userId = field.createdBy, action = "Campo alterado: ${field.fieldName}")
+    }
+    override fun deleteCustomField(fieldId: String) {
+        val field = customFields.value.firstOrNull { it.id == fieldId } ?: return
+        customFields.value = customFields.value.filterNot { it.id == fieldId }
+        activity.value = activity.value + ActivityLog(taskId = field.taskId, userId = users.value.first().id, action = "Campo removido: ${field.fieldName}")
     }
     override fun addChecklistItem(item: ChecklistItem) {
         checklist.value = checklist.value + item
         activity.value = activity.value + ActivityLog(taskId = item.taskId, userId = users.value.first().id, action = "Checklist adicionado: ${item.title}")
     }
+    override fun updateChecklistItem(item: ChecklistItem) {
+        checklist.value = checklist.value.map { if (it.id == item.id) item else it }
+        activity.value = activity.value + ActivityLog(taskId = item.taskId, userId = users.value.first().id, action = "Checklist atualizado: ${item.title}")
+    }
     override fun toggleChecklistItem(itemId: String) {
         checklist.value = checklist.value.map { if (it.id == itemId) it.copy(isDone = !it.isDone) else it }
         checklist.value.firstOrNull { it.id == itemId }?.let { activity.value = activity.value + ActivityLog(taskId = it.taskId, userId = users.value.first().id, action = if (it.isDone) "Checklist concluido: ${it.title}" else "Checklist reaberto: ${it.title}") }
+    }
+    override fun deleteChecklistItem(itemId: String) {
+        val item = checklist.value.firstOrNull { it.id == itemId } ?: return
+        checklist.value = checklist.value.filterNot { it.id == itemId }
+        activity.value = activity.value + ActivityLog(taskId = item.taskId, userId = users.value.first().id, action = "Checklist removido: ${item.title}")
     }
     override fun addComment(comment: Comment) {
         comments.value = comments.value + comment

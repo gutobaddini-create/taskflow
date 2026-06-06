@@ -99,6 +99,12 @@ interface TaskFlowDao {
     @Query("SELECT * FROM attachments WHERE id = :attachmentId LIMIT 1")
     suspend fun attachmentById(attachmentId: String): AttachmentEntity?
 
+    @Query("SELECT * FROM task_links WHERE id = :linkId LIMIT 1")
+    suspend fun linkById(linkId: String): TaskLinkEntity?
+
+    @Query("SELECT * FROM custom_fields WHERE id = :fieldId LIMIT 1")
+    suspend fun customFieldById(fieldId: String): CustomFieldEntity?
+
     @Query("SELECT * FROM invites WHERE token = :token LIMIT 1")
     suspend fun inviteByToken(token: String): InviteEntity?
 
@@ -119,6 +125,15 @@ interface TaskFlowDao {
 
     @Query("DELETE FROM task_lists WHERE id = :listId")
     suspend fun deleteList(listId: String)
+
+    @Query("DELETE FROM task_links WHERE id = :linkId")
+    suspend fun deleteLink(linkId: String)
+
+    @Query("DELETE FROM custom_fields WHERE id = :fieldId")
+    suspend fun deleteCustomField(fieldId: String)
+
+    @Query("DELETE FROM checklist_items WHERE id = :itemId")
+    suspend fun deleteChecklistItem(itemId: String)
 
     @Query("DELETE FROM invites WHERE token = :token")
     suspend fun deleteInviteByToken(token: String)

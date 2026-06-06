@@ -602,6 +602,9 @@ fun MaterialsScreen(vm: TaskFlowViewModel, onBack: () -> Unit) {
     var linkDialog by remember { mutableStateOf(false) }
     var fieldDialog by remember { mutableStateOf(false) }
     var checklistDialog by remember { mutableStateOf(false) }
+    var editingLink by remember { mutableStateOf<TaskLink?>(null) }
+    var editingField by remember { mutableStateOf<CustomField?>(null) }
+    var editingChecklist by remember { mutableStateOf<ChecklistItem?>(null) }
     var message by remember { mutableStateOf<String?>(null) }
     var cameraUri by remember { mutableStateOf<Uri?>(null) }
     if (task == null) {
@@ -684,35 +687,60 @@ fun MaterialsScreen(vm: TaskFlowViewModel, onBack: () -> Unit) {
         clipboard.setPrimaryClip(ClipData.newPlainText(link.title, link.url))
         message = "Link copiado."
     }
-    if (linkDialog) {
+    if (linkDialog || editingLink != null) {
+        val current = editingLink
         LinkDialog(
-            onDismiss = { linkDialog = false },
+            initialTitle = current?.title ?: "Link de referencia",
+            initialUrl = current?.url ?: "https://taskflow.local/referencia",
+            initialDescription = current?.description ?: "",
+            initialCategory = current?.category ?: "Geral",
+            onDismiss = { linkDialog = false; editingLink = null },
             onSave = { title, url, description, category ->
                 if (!isValidUrl(url)) {
                     message = "URL invalida."
                 } else {
-                    vm.repo.addLink(TaskLink(taskId = task.id, createdBy = vm.currentUser().id, title = title, url = url, description = description, category = category))
+                    if (current == null) {
+                        vm.repo.addLink(TaskLink(taskId = task.id, createdBy = vm.currentUser().id, title = title, url = url, description = description, category = category))
+                    } else {
+                        vm.repo.updateLink(current.copy(title = title, url = url, description = description, category = category))
+                    }
                     linkDialog = false
-                    message = "Link salvo."
+                    editingLink = null
+                    message = if (current == null) "Link salvo." else "Link atualizado."
                 }
             }
         )
     }
-    if (fieldDialog) {
+    if (fieldDialog || editingField != null) {
+        val current = editingField
         FieldDialog(
-            onDismiss = { fieldDialog = false },
+            initialName = current?.fieldName ?: "Contato",
+            initialType = current?.fieldType ?: CustomFieldType.Phone,
+            initialValue = current?.fieldValue ?: "(11) 99999-0000",
+            onDismiss = { fieldDialog = false; editingField = null },
             onSave = { name, type, value ->
-                vm.repo.addCustomField(CustomField(taskId = task.id, createdBy = vm.currentUser().id, fieldName = name, fieldType = type, fieldValue = value))
+                if (current == null) {
+                    vm.repo.addCustomField(CustomField(taskId = task.id, createdBy = vm.currentUser().id, fieldName = name, fieldType = type, fieldValue = value))
+                } else {
+                    vm.repo.updateCustomField(current.copy(fieldName = name, fieldType = type, fieldValue = value))
+                }
                 fieldDialog = false
-                message = "Campo salvo."
+                editingField = null
+                message = if (current == null) "Campo salvo." else "Campo atualizado."
             }
         )
     }
-    if (checklistDialog) {
-        NameDialog("Novo item", "", { checklistDialog = false }) { value ->
-            vm.repo.addChecklistItem(ChecklistItem(taskId = task.id, title = value))
+    if (checklistDialog || editingChecklist != null) {
+        val current = editingChecklist
+        NameDialog(if (current == null) "Novo item" else "Editar item", current?.title ?: "", { checklistDialog = false; editingChecklist = null }) { value ->
+            if (current == null) {
+                vm.repo.addChecklistItem(ChecklistItem(taskId = task.id, title = value))
+            } else {
+                vm.repo.updateChecklistItem(current.copy(title = value))
+            }
             checklistDialog = false
-            message = "Item adicionado."
+            editingChecklist = null
+            message = if (current == null) "Item adicionado." else "Item atualizado."
         }
     }
     LazyColumn(Modifier.fillMaxSize().statusBarsPadding().padding(22.dp), contentPadding = PaddingValues(bottom = 30.dp)) {
@@ -763,10 +791,24 @@ fun MaterialsScreen(vm: TaskFlowViewModel, onBack: () -> Unit) {
                     LinkRow(
                         link = it,
                         onOpen = { openLink(it) },
-                        onCopy = { copyLink(it) }
+                        onCopy = { copyLink(it) },
+                        onEdit = { editingLink = it },
+                        onDelete = {
+                            vm.repo.deleteLink(it.id)
+                            message = "Link removido."
+                        }
                     )
                 }
-                else -> fields.filter { it.taskId == task.id }.forEach { MaterialRow(Icons.Default.EditNote, it.fieldName, it.fieldValue) }
+                else -> fields.filter { it.taskId == task.id }.forEach {
+                    FieldRow(
+                        field = it,
+                        onEdit = { editingField = it },
+                        onDelete = {
+                            vm.repo.deleteCustomField(it.id)
+                            message = "Campo removido."
+                        }
+                    )
+                }
             }
             SectionTitle("Checklist")
             val taskChecklist = checklist.filter { it.taskId == task.id }
@@ -778,6 +820,8 @@ fun MaterialsScreen(vm: TaskFlowViewModel, onBack: () -> Unit) {
                         Row(Modifier.fillMaxWidth().padding(vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
                             Checkbox(item.isDone, { vm.repo.toggleChecklistItem(item.id) })
                             Text(item.title, color = Text, modifier = Modifier.weight(1f))
+                            IconButton({ editingChecklist = item }) { Icon(Icons.Default.Edit, null, tint = Muted) }
+                            IconButton({ vm.repo.deleteChecklistItem(item.id); message = "Item removido." }) { Icon(Icons.Default.DeleteOutline, null, tint = Muted) }
                         }
                     }
                     val done = taskChecklist.count { it.isDone }
@@ -1064,11 +1108,11 @@ fun NameDialog(title: String, initialValue: String, onDismiss: () -> Unit, onCon
 }
 
 @Composable
-fun LinkDialog(onDismiss: () -> Unit, onSave: (String, String, String, String) -> Unit) {
-    var title by remember { mutableStateOf("Link de referencia") }
-    var url by remember { mutableStateOf("https://taskflow.local/referencia") }
-    var description by remember { mutableStateOf("") }
-    var category by remember { mutableStateOf("Geral") }
+fun LinkDialog(initialTitle: String, initialUrl: String, initialDescription: String, initialCategory: String, onDismiss: () -> Unit, onSave: (String, String, String, String) -> Unit) {
+    var title by remember(initialTitle) { mutableStateOf(initialTitle) }
+    var url by remember(initialUrl) { mutableStateOf(initialUrl) }
+    var description by remember(initialDescription) { mutableStateOf(initialDescription) }
+    var category by remember(initialCategory) { mutableStateOf(initialCategory) }
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text("Novo link", color = Text, fontWeight = FontWeight.Bold) },
@@ -1086,10 +1130,10 @@ fun LinkDialog(onDismiss: () -> Unit, onSave: (String, String, String, String) -
 }
 
 @Composable
-fun FieldDialog(onDismiss: () -> Unit, onSave: (String, CustomFieldType, String) -> Unit) {
-    var name by remember { mutableStateOf("Contato") }
-    var value by remember { mutableStateOf("(11) 99999-0000") }
-    var type by remember { mutableStateOf(CustomFieldType.Phone) }
+fun FieldDialog(initialName: String, initialType: CustomFieldType, initialValue: String, onDismiss: () -> Unit, onSave: (String, CustomFieldType, String) -> Unit) {
+    var name by remember(initialName) { mutableStateOf(initialName) }
+    var value by remember(initialValue) { mutableStateOf(initialValue) }
+    var type by remember(initialType) { mutableStateOf(initialType) }
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text("Campo complementar", color = Text, fontWeight = FontWeight.Bold) },
@@ -1265,7 +1309,7 @@ fun AttachmentRow(attachment: Attachment, onOpen: () -> Unit, onShare: () -> Uni
     }
 }
 @Composable
-fun LinkRow(link: TaskLink, onOpen: () -> Unit, onCopy: () -> Unit) = TaskFlowCard(Modifier.padding(bottom = 10.dp)) {
+fun LinkRow(link: TaskLink, onOpen: () -> Unit, onCopy: () -> Unit, onEdit: () -> Unit, onDelete: () -> Unit) = TaskFlowCard(Modifier.padding(bottom = 10.dp)) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         IconBubble(Icons.Default.Link, Purple.copy(.10f), Purple)
         Spacer(Modifier.width(12.dp))
@@ -1277,6 +1321,25 @@ fun LinkRow(link: TaskLink, onOpen: () -> Unit, onCopy: () -> Unit) = TaskFlowCa
     Row(Modifier.fillMaxWidth().padding(top = 12.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         SmallAction(Icons.Default.OpenInBrowser, "Abrir", Modifier.weight(1f), onOpen)
         SmallAction(Icons.Default.ContentCopy, "Copiar", Modifier.weight(1f), onCopy)
+    }
+    Row(Modifier.fillMaxWidth().padding(top = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        SmallAction(Icons.Default.Edit, "Editar", Modifier.weight(1f), onEdit)
+        SmallAction(Icons.Default.DeleteOutline, "Excluir", Modifier.weight(1f), onDelete)
+    }
+}
+@Composable
+fun FieldRow(field: CustomField, onEdit: () -> Unit, onDelete: () -> Unit) = TaskFlowCard(Modifier.padding(bottom = 10.dp)) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        IconBubble(Icons.Default.EditNote, Purple.copy(.10f), Purple)
+        Spacer(Modifier.width(12.dp))
+        Column(Modifier.weight(1f)) {
+            Text(field.fieldName, fontWeight = FontWeight.Bold, color = Text)
+            Text("${field.fieldType.name} - ${field.fieldValue}", color = Muted, maxLines = 1)
+        }
+    }
+    Row(Modifier.fillMaxWidth().padding(top = 12.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        SmallAction(Icons.Default.Edit, "Editar", Modifier.weight(1f), onEdit)
+        SmallAction(Icons.Default.DeleteOutline, "Excluir", Modifier.weight(1f), onDelete)
     }
 }
 fun priorityColor(priority: TaskPriority) = when (priority) { TaskPriority.High -> Color(0xFFEF4444); TaskPriority.Medium -> Blue; TaskPriority.Low -> Color(0xFF22C55E) }
