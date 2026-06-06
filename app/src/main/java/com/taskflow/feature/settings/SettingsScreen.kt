@@ -22,9 +22,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.taskflow.InfoRow
-import com.taskflow.SectionTitle
-import com.taskflow.Segmented
+import com.taskflow.core.design.InfoRow
+import com.taskflow.core.design.SectionTitle
+import com.taskflow.core.design.Segmented
 import com.taskflow.TaskFlowViewModel
 import com.taskflow.core.design.TaskFlowCard
 import com.taskflow.core.design.TaskFlowColors

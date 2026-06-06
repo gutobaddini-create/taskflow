@@ -1,4 +1,4 @@
-﻿package com.taskflow.feature.tasks
+package com.taskflow.feature.tasks
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -39,16 +39,16 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.taskflow.ChipText
-import com.taskflow.GradientButton
-import com.taskflow.InfoRow
-import com.taskflow.PriorityPill
-import com.taskflow.SectionTitle
-import com.taskflow.Segmented
-import com.taskflow.StatusPill
-import com.taskflow.TaskFlowCard
+import com.taskflow.core.design.ChipText
+import com.taskflow.core.design.GradientButton
+import com.taskflow.core.design.InfoRow
+import com.taskflow.core.design.PriorityPill
+import com.taskflow.core.design.SectionTitle
+import com.taskflow.core.design.Segmented
+import com.taskflow.core.design.StatusPill
+import com.taskflow.core.design.TaskFlowCard
 import com.taskflow.TaskFlowViewModel
-import com.taskflow.TopRow
+import com.taskflow.core.design.TopRow
 import com.taskflow.core.design.LoadingFullScreen
 import com.taskflow.core.design.TaskFlowColors
 import com.taskflow.core.notifications.ReminderEngine

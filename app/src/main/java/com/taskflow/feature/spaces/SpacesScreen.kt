@@ -42,11 +42,11 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.taskflow.ChipText
-import com.taskflow.InfoRow
-import com.taskflow.SectionTitle
-import com.taskflow.TaskCard
-import com.taskflow.TaskFlowCard
+import com.taskflow.core.design.ChipText
+import com.taskflow.core.design.InfoRow
+import com.taskflow.core.design.SectionTitle
+import com.taskflow.core.design.TaskCard
+import com.taskflow.core.design.TaskFlowCard
 import com.taskflow.TaskFlowViewModel
 import com.taskflow.core.design.NameDialog
 import com.taskflow.core.design.TaskFlowColors

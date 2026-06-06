@@ -259,7 +259,7 @@ fun TaskCard(title: String, subtitle: String, priorityColor: Color, modifier: Mo
 fun ReminderCard(title: String, dateLabel: String, modifier: Modifier = Modifier) {
     TaskFlowCard(modifier) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            IconBubble(Icons.Default.Schedule, TaskFlowColors.Purple.copy(alpha = .12f), TaskFlowColors.Purple)
+            DesignIconBubble(Icons.Default.Schedule, TaskFlowColors.Purple.copy(alpha = .12f), TaskFlowColors.Purple)
             Spacer(Modifier.width(DesignTokens.itemGap))
             Column(Modifier.weight(1f)) {
                 Text("Proximo lembrete", color = TaskFlowColors.Purple, fontWeight = FontWeight.Bold)
@@ -274,7 +274,7 @@ fun ReminderCard(title: String, dateLabel: String, modifier: Modifier = Modifier
 fun AttachmentCard(title: String, subtitle: String, modifier: Modifier = Modifier) {
     TaskFlowCard(modifier) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            IconBubble(Icons.Default.Inbox, TaskFlowColors.Purple.copy(alpha = .12f), TaskFlowColors.Purple)
+            DesignIconBubble(Icons.Default.Inbox, TaskFlowColors.Purple.copy(alpha = .12f), TaskFlowColors.Purple)
             Spacer(Modifier.width(DesignTokens.itemGap))
             Column(Modifier.weight(1f)) {
                 Text(title, fontWeight = FontWeight.Bold, color = TaskFlowColors.Text)
@@ -403,7 +403,7 @@ fun ErrorState(title: String, message: String, modifier: Modifier = Modifier) {
 @Composable
 private fun StateMessage(icon: ImageVector, title: String, message: String, modifier: Modifier = Modifier, iconColor: Color = TaskFlowColors.Muted) {
     Column(modifier.fillMaxWidth().padding(DesignTokens.screenPadding), horizontalAlignment = Alignment.CenterHorizontally) {
-        IconBubble(icon, iconColor.copy(alpha = .10f), iconColor)
+        DesignIconBubble(icon, iconColor.copy(alpha = .10f), iconColor)
         Spacer(Modifier.height(12.dp))
         Text(title, style = MaterialTheme.typography.titleMedium)
         Text(message, style = MaterialTheme.typography.bodyMedium)
@@ -411,7 +411,7 @@ private fun StateMessage(icon: ImageVector, title: String, message: String, modi
 }
 
 @Composable
-private fun IconBubble(icon: ImageVector, bg: Color, tint: Color) {
+private fun DesignIconBubble(icon: ImageVector, bg: Color, tint: Color) {
     Box(Modifier.size(42.dp).clip(CircleShape).background(bg), contentAlignment = Alignment.Center) {
         Icon(icon, null, tint = tint)
     }

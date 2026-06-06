@@ -18,9 +18,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.taskflow.GradientButton
-import com.taskflow.InfoRow
-import com.taskflow.TaskFlowCard
+import com.taskflow.core.design.GradientButton
+import com.taskflow.core.design.InfoRow
+import com.taskflow.core.design.TaskFlowCard
 import com.taskflow.TaskFlowViewModel
 import com.taskflow.core.design.TaskFlowColors
 import com.taskflow.domain.model.now
