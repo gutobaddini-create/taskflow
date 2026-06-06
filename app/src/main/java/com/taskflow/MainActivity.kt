@@ -1568,6 +1568,14 @@ fun AttachmentRow(attachment: Attachment, onOpen: () -> Unit, onShare: () -> Uni
             Text(attachment.fileName, fontWeight = FontWeight.Bold, color = Text)
             Text("${attachment.fileType.name} - ${attachment.fileSize / 1024} KB", color = Muted, maxLines = 1)
         }
+        ItemActionMenu(
+            contentDescription = "Menu do anexo ${attachment.fileName}",
+            actions = listOf(
+                ItemAction("Abrir", Icons.Default.OpenInNew, onOpen),
+                ItemAction("Compartilhar", Icons.Default.IosShare, onShare),
+                ItemAction("Excluir", Icons.Default.DeleteOutline, onDelete)
+            )
+        )
     }
     Row(Modifier.fillMaxWidth().padding(top = 12.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         SmallAction(Icons.Default.OpenInNew, "Abrir", Modifier.weight(1f), onOpen)
@@ -1621,6 +1629,15 @@ fun LinkRow(link: TaskLink, onOpen: () -> Unit, onCopy: () -> Unit, onEdit: () -
             Text(link.title, fontWeight = FontWeight.Bold, color = Text)
             Text(link.url, color = Muted, maxLines = 1)
         }
+        ItemActionMenu(
+            contentDescription = "Menu do link ${link.title}",
+            actions = listOf(
+                ItemAction("Abrir", Icons.Default.OpenInBrowser, onOpen),
+                ItemAction("Copiar", Icons.Default.ContentCopy, onCopy),
+                ItemAction("Editar", Icons.Default.Edit, onEdit),
+                ItemAction("Excluir", Icons.Default.DeleteOutline, onDelete)
+            )
+        )
     }
     Row(Modifier.fillMaxWidth().padding(top = 12.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         SmallAction(Icons.Default.OpenInBrowser, "Abrir", Modifier.weight(1f), onOpen)
@@ -1640,10 +1657,44 @@ fun FieldRow(field: CustomField, onEdit: () -> Unit, onDelete: () -> Unit) = Tas
             Text(field.fieldName, fontWeight = FontWeight.Bold, color = Text)
             Text("${field.fieldType.label()} - ${field.fieldValue}", color = Muted, maxLines = 1)
         }
+        ItemActionMenu(
+            contentDescription = "Menu do campo ${field.fieldName}",
+            actions = listOf(
+                ItemAction("Editar", Icons.Default.Edit, onEdit),
+                ItemAction("Excluir", Icons.Default.DeleteOutline, onDelete)
+            )
+        )
     }
     Row(Modifier.fillMaxWidth().padding(top = 12.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         SmallAction(Icons.Default.Edit, "Editar", Modifier.weight(1f), onEdit)
         SmallAction(Icons.Default.DeleteOutline, "Excluir", Modifier.weight(1f), onDelete)
+    }
+}
+
+data class ItemAction(val label: String, val icon: ImageVector, val onClick: () -> Unit)
+
+@Composable
+fun ItemActionMenu(contentDescription: String, actions: List<ItemAction>) {
+    var expanded by remember { mutableStateOf(false) }
+    Box {
+        IconButton(
+            onClick = { expanded = true },
+            modifier = Modifier.semantics { this.contentDescription = contentDescription }
+        ) {
+            Icon(Icons.Default.MoreVert, null, tint = Muted)
+        }
+        DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+            actions.forEach { action ->
+                DropdownMenuItem(
+                    text = { Text(action.label) },
+                    leadingIcon = { Icon(action.icon, null, tint = Muted) },
+                    onClick = {
+                        expanded = false
+                        action.onClick()
+                    }
+                )
+            }
+        }
     }
 }
 fun priorityColor(priority: TaskPriority) = when (priority) { TaskPriority.High -> Color(0xFFEF4444); TaskPriority.Medium -> Blue; TaskPriority.Low -> Color(0xFF22C55E) }

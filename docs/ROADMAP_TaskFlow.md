@@ -660,7 +660,7 @@ Implementar identidade visual moderna, limpa e premium.
 - [x] Listar anexos recentes.
 - [x] Listar links.
 - [x] Listar campos complementares.
-- [ ] Exibir menu de ações por item.
+- [x] Exibir menu de ações por item.
 
 ### Critérios de aceite
 
