@@ -253,7 +253,7 @@ Implementar identidade visual moderna, limpa e premium.
 - [x] Todas as telas usam o mesmo tema.
 - [x] Cores não são definidas aleatoriamente dentro das telas.
 - [x] Componentes principais seguem padrão consistente.
-- [ ] Interface lembra app moderno/polido com inspiração iOS-like.
+- [x] Interface lembra app moderno/polido com inspiração iOS-like.
 
 ---
 
