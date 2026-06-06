@@ -1193,7 +1193,7 @@ Implementar identidade visual moderna, limpa e premium.
 - [x] Ajustar animações.
 - [x] Ajustar estados vazios.
 - [ ] Ajustar feedback de toque.
-- [ ] Ajustar loading de upload.
+- [x] Ajustar loading de upload.
 - [x] Ajustar erros de formulário.
 
 ### Critérios de aceite

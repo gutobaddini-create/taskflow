@@ -53,6 +53,7 @@ import androidx.compose.material.icons.filled.OpenInBrowser
 import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -66,6 +67,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -108,6 +110,8 @@ import com.taskflow.domain.model.CustomField
 import com.taskflow.domain.model.CustomFieldType
 import com.taskflow.domain.model.TaskLink
 import java.io.File
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 private val CustomFieldTypeLabels = listOf(
     CustomFieldType.Text to "Texto",
     CustomFieldType.Number to "Numero",
@@ -142,6 +146,8 @@ fun MaterialsScreen(vm: TaskFlowViewModel, onBack: () -> Unit) {
     var editingChecklist by remember { mutableStateOf<ChecklistItem?>(null) }
     var message by remember { mutableStateOf<String?>(null) }
     var cameraUri by remember { mutableStateOf<Uri?>(null) }
+    var isAddingAttachment by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
     if (task == null) {
         LoadingFullScreen("Carregando materiais...")
         return
@@ -165,26 +171,40 @@ fun MaterialsScreen(vm: TaskFlowViewModel, onBack: () -> Unit) {
         return
     }
     fun addUriAttachment(uri: Uri, source: AttachmentSource) {
-        val metadata = context.attachmentMetadata(uri)
-        if (!isAllowedAttachment(metadata.name, metadata.sizeBytes)) {
-            message = "Arquivo invalido ou maior que 20 MB."
+        if (isAddingAttachment) {
+            message = "Aguarde o anexo atual terminar."
             return
         }
-        vm.repo.addAttachment(
-            Attachment(
-                taskId = task.id,
-                uploadedBy = vm.currentUser().id,
-                fileName = metadata.name,
-                originalFileName = metadata.name,
-                fileType = attachmentType(metadata.name),
-                mimeType = metadata.mimeType,
-                fileSize = metadata.sizeBytes,
-                storagePath = uri.toString(),
-                source = source
+        scope.launch {
+            isAddingAttachment = true
+            val result = runCatching {
+                val metadata = context.attachmentMetadata(uri)
+                if (!isAllowedAttachment(metadata.name, metadata.sizeBytes)) {
+                    error("Arquivo invalido ou maior que 20 MB.")
+                }
+                vm.repo.addAttachment(
+                    Attachment(
+                        taskId = task.id,
+                        uploadedBy = vm.currentUser().id,
+                        fileName = metadata.name,
+                        originalFileName = metadata.name,
+                        fileType = attachmentType(metadata.name),
+                        mimeType = metadata.mimeType,
+                        fileSize = metadata.sizeBytes,
+                        storagePath = uri.toString(),
+                        source = source
+                    )
+                )
+            }
+            delay(300)
+            message = result.fold(
+                onSuccess = { "Anexo adicionado." },
+                onFailure = { it.message ?: "Nao foi possivel adicionar o anexo." }
             )
-        )
-        message = "Anexo adicionado."
+            isAddingAttachment = false
+        }
     }
+
     val filePicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         uri?.let {
             context.contentResolver.takePersistableUriPermission(it, Intent.FLAG_GRANT_READ_URI_PERMISSION)
@@ -206,6 +226,30 @@ fun MaterialsScreen(vm: TaskFlowViewModel, onBack: () -> Unit) {
     }
     val cameraPermissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
         if (granted) openCamera() else message = "Permissao de camera negada."
+    }
+    fun openFilePicker(mimeTypes: Array<String>) {
+        when {
+            !canManageMaterial -> message = "Sem permissao para alterar materiais."
+            isAddingAttachment -> message = "Aguarde o anexo atual terminar."
+            else -> filePicker.launch(mimeTypes)
+        }
+    }
+
+    fun openImagePicker() {
+        when {
+            !canManageMaterial -> message = "Sem permissao para alterar materiais."
+            isAddingAttachment -> message = "Aguarde o anexo atual terminar."
+            else -> photoPicker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+        }
+    }
+
+    fun requestCamera() {
+        when {
+            !canManageMaterial -> message = "Sem permissao para alterar materiais."
+            isAddingAttachment -> message = "Aguarde o anexo atual terminar."
+            context.checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED -> openCamera()
+            else -> cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+        }
     }
     fun openAttachment(attachment: Attachment) {
         val uri = runCatching { Uri.parse(attachment.storagePath) }.getOrNull()
@@ -308,31 +352,26 @@ fun MaterialsScreen(vm: TaskFlowViewModel, onBack: () -> Unit) {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                     SmallAction(Icons.Default.AttachFile, "Arquivo", Modifier.weight(1f)) {
-                        if (canManageMaterial) filePicker.launch(arrayOf("application/pdf", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "application/vnd.ms-excel", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "text/plain")) else message = "Sem permissao para alterar materiais."
+                        openFilePicker(arrayOf("application/pdf", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "application/vnd.ms-excel", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "text/plain"))
                     }
                     SmallAction(Icons.Default.PhotoCamera, "Foto", Modifier.weight(1f)) {
-                        if (!canManageMaterial) {
-                            message = "Sem permissao para alterar materiais."
-                        } else if (context.checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
-                            openCamera()
-                        } else {
-                            cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
-                        }
+                        requestCamera()
                     }
                 }
                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                     SmallAction(Icons.Default.Image, "Imagem", Modifier.weight(1f)) {
-                        if (canManageMaterial) photoPicker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) else message = "Sem permissao para alterar materiais."
+                        openImagePicker()
                     }
                     SmallAction(Icons.Default.Link, "Link", Modifier.weight(1f)) {
                         if (canManageMaterial) linkDialog = true else message = "Sem permissao para alterar materiais."
                     }
                 }
             }
+            AttachmentUploadProgress(isAddingAttachment)
             FeedbackBanner(message, materialFeedbackKind(message), Modifier.padding(top = 10.dp))
             Spacer(Modifier.height(16.dp))
             TaskFlowCard(Modifier.border(1.dp, com.taskflow.core.design.TaskFlowColors.Purple.copy(.35f), RoundedCornerShape(22.dp)).clickable {
-                if (canManageMaterial) filePicker.launch(arrayOf("*/*")) else message = "Sem permissao para alterar materiais."
+                openFilePicker(arrayOf("*/*"))
             }) {
                 Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
                     Icon(Icons.Default.CloudUpload, null, tint = com.taskflow.core.design.TaskFlowColors.Purple, modifier = Modifier.size(42.dp))
@@ -516,6 +555,25 @@ fun FieldDialog(initialName: String, initialType: CustomFieldType, initialValue:
         confirmButton = { TextButton({ if (name.isNotBlank() && value.isNotBlank()) onSave(name.trim(), type, value.trim()) }) { Text("Salvar") } },
         dismissButton = { TextButton(onDismiss) { Text("Cancelar") } }
     )
+}
+
+@Composable
+private fun AttachmentUploadProgress(isVisible: Boolean) {
+    if (!isVisible) return
+    TaskFlowCard(Modifier.padding(top = 10.dp)) {
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            CircularProgressIndicator(
+                modifier = Modifier.size(22.dp),
+                strokeWidth = 2.dp,
+                color = com.taskflow.core.design.TaskFlowColors.Purple
+            )
+            Spacer(Modifier.width(12.dp))
+            Column(Modifier.weight(1f)) {
+                Text("Preparando anexo", fontWeight = FontWeight.Bold, color = com.taskflow.core.design.TaskFlowColors.Text)
+                Text("Validando tipo, tamanho e metadados locais.", color = com.taskflow.core.design.TaskFlowColors.Muted, fontSize = 13.sp)
+            }
+        }
+    }
 }
 
 @Composable
