@@ -33,6 +33,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.taskflow.core.design.ChipText
+import com.taskflow.core.design.ChipTone
 import com.taskflow.core.design.FeedbackBanner
 import com.taskflow.core.design.FeedbackKind
 import com.taskflow.core.design.GradientButton
@@ -140,8 +141,8 @@ fun ShareScreen(vm: TaskFlowViewModel, onBack: () -> Unit) {
                 Text("Prazo: ${task.dueDate?.format(DateTimeFormatter.ofPattern("dd/MM HH:mm")) ?: "sem prazo"}", color = TaskFlowColors.Muted)
                 Text("Status: ${task.status.label}", color = TaskFlowColors.Muted)
                 Row(Modifier.padding(top = 10.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    ChipText("${attachments.count { it.taskId == task.id }} anexos")
-                    ChipText("${links.count { it.taskId == task.id }} links")
+                    ChipText("${attachments.count { it.taskId == task.id }} anexos", tone = ChipTone.Blue)
+                    ChipText("${links.count { it.taskId == task.id }} links", tone = ChipTone.Success)
                 }
                 Text("taskflow://invite/${task.shareToken}", color = TaskFlowColors.Purple, modifier = Modifier.padding(top = 12.dp))
             }

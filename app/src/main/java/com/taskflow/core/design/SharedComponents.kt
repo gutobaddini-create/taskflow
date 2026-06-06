@@ -109,18 +109,30 @@ fun SectionTitle(text: String) =
     Text(text, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = TaskFlowColors.Text, modifier = Modifier.padding(top = 22.dp, bottom = 10.dp))
 
 @Composable
-fun ChipText(text: String, active: Boolean = true, modifier: Modifier = Modifier) =
+fun ChipText(text: String, active: Boolean = true, modifier: Modifier = Modifier, tone: ChipTone = ChipTone.Purple) {
+    val color = if (active) chipToneColor(tone) else TaskFlowColors.Muted
     Text(
         text,
-        color = if (active) TaskFlowColors.Purple else TaskFlowColors.Muted,
+        color = color,
         fontWeight = FontWeight.SemiBold,
         maxLines = 1,
         overflow = TextOverflow.Ellipsis,
         modifier = modifier
             .clip(RoundedCornerShape(50))
-            .background(if (active) TaskFlowColors.Purple.copy(.10f) else TaskFlowColors.Border.copy(.45f))
+            .background(if (active) color.copy(.10f) else TaskFlowColors.Border.copy(.45f))
             .padding(horizontal = 12.dp, vertical = 8.dp)
     )
+}
+
+enum class ChipTone { Purple, Blue, Success, Warning, Danger }
+
+private fun chipToneColor(tone: ChipTone) = when (tone) {
+    ChipTone.Purple -> TaskFlowColors.Purple
+    ChipTone.Blue -> TaskFlowColors.Blue
+    ChipTone.Success -> TaskFlowColors.Success
+    ChipTone.Warning -> TaskFlowColors.Warning
+    ChipTone.Danger -> TaskFlowColors.Danger
+}
 
 @Composable
 fun PriorityPill(priority: TaskPriority) =

@@ -37,6 +37,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.taskflow.core.design.ChipText
+import com.taskflow.core.design.ChipTone
 import com.taskflow.core.design.GradientButton
 import com.taskflow.core.design.SectionTitle
 import com.taskflow.core.design.Segmented
@@ -114,9 +115,9 @@ fun NewTaskScreen(vm: TaskFlowViewModel, onCancel: () -> Unit) {
             SectionTitle("Materiais da tarefa")
             TaskFlowCard {
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    ChipText("Anexos")
-                    ChipText("Links")
-                    ChipText("Campos")
+                    ChipText("Anexos", tone = ChipTone.Blue)
+                    ChipText("Links", tone = ChipTone.Success)
+                    ChipText("Campos", tone = ChipTone.Warning)
                 }
                 Spacer(Modifier.height(14.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {

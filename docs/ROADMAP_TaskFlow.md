@@ -1188,7 +1188,7 @@ Implementar identidade visual moderna, limpa e premium.
 - [ ] Ajustar espaçamentos.
 - [ ] Ajustar alinhamentos.
 - [ ] Ajustar tamanhos de fonte.
-- [ ] Ajustar cores dos chips.
+- [x] Ajustar cores dos chips.
 - [x] Ajustar contraste.
 - [x] Ajustar animações.
 - [x] Ajustar estados vazios.

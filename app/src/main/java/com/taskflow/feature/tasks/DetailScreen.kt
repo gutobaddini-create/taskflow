@@ -40,6 +40,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.taskflow.core.design.ChipText
+import com.taskflow.core.design.ChipTone
 import com.taskflow.core.design.EmptyState
 import com.taskflow.core.design.GradientButton
 import com.taskflow.core.design.InfoRow
@@ -204,9 +205,9 @@ fun DetailScreen(vm: TaskFlowViewModel, onBack: () -> Unit, onMaterials: () -> U
             val materialsModifier = if (canViewTask) Modifier.clickable(onClick = onMaterials) else Modifier
             TaskFlowCard(materialsModifier) {
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    ChipText("${attachments.count { it.taskId == task.id }} anexos")
-                    ChipText("${links.count { it.taskId == task.id }} link")
-                    ChipText("${fields.count { it.taskId == task.id }} campos")
+                    ChipText("${attachments.count { it.taskId == task.id }} anexos", tone = ChipTone.Blue)
+                    ChipText("${links.count { it.taskId == task.id }} link", tone = ChipTone.Success)
+                    ChipText("${fields.count { it.taskId == task.id }} campos", tone = ChipTone.Warning)
                 }
                 Spacer(Modifier.height(12.dp))
                 Text(attachments.firstOrNull { it.taskId == task.id }?.fileName ?: "Nenhum anexo", color = TaskFlowColors.Text)
