@@ -98,6 +98,8 @@ class LocalTaskFlowRepository(
 
     override fun createTask(task: Task) {
         scope.launch(Dispatchers.IO) {
+            val validList = lists.value.any { it.id == task.listId && it.spaceId == task.spaceId }
+            if (!validList) return@launch
             dao.upsertTasks(listOf(task.toEntity()))
             dao.upsertActivity(listOf(ActivityLog(taskId = task.id, userId = task.createdBy, action = "Tarefa criada").toEntity()))
         }

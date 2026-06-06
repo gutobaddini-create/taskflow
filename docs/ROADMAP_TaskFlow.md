@@ -459,7 +459,7 @@ Implementar identidade visual moderna, limpa e premium.
 ### Critérios de aceite
 
 - [x] Listas filtram as tarefas corretamente.
-- [ ] Não é possível criar tarefa sem lista válida.
+- [x] Não é possível criar tarefa sem lista válida.
 
 ---
 

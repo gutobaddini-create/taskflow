@@ -45,6 +45,7 @@ class InMemoryTaskFlowRepository : TaskFlowRepository {
     override val activity = MutableStateFlow(seedTasks.map { ActivityLog(taskId = it.id, userId = manuel.id, action = "Tarefa criada") })
 
     override fun createTask(task: Task) {
+        if (lists.value.none { it.id == task.listId && it.spaceId == task.spaceId }) return
         tasks.value = tasks.value + task
         activity.value = activity.value + ActivityLog(taskId = task.id, userId = task.createdBy, action = "Tarefa criada")
     }
