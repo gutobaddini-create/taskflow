@@ -95,6 +95,11 @@ class InMemoryTaskFlowRepository : TaskFlowRepository {
         attachments.value = attachments.value + attachment
         activity.value = activity.value + ActivityLog(taskId = attachment.taskId, userId = attachment.uploadedBy, action = "Anexo adicionado: ${attachment.fileName}")
     }
+    override fun deleteAttachment(attachmentId: String) {
+        val attachment = attachments.value.firstOrNull { it.id == attachmentId } ?: return
+        attachments.value = attachments.value.filterNot { it.id == attachmentId }
+        activity.value = activity.value + ActivityLog(taskId = attachment.taskId, userId = users.value.first().id, action = "Anexo removido: ${attachment.fileName}")
+    }
     override fun addLink(link: TaskLink) {
         links.value = links.value + link
         activity.value = activity.value + ActivityLog(taskId = link.taskId, userId = link.createdBy, action = "Link adicionado: ${link.title}")

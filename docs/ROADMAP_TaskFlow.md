@@ -687,7 +687,7 @@ Implementar identidade visual moderna, limpa e premium.
 - [x] Exibir tipo.
 - [ ] Exibir miniatura quando imagem.
 - [ ] Abrir anexo.
-- [ ] Excluir anexo.
+- [x] Excluir anexo.
 - [ ] Compartilhar anexo.
 
 ### Critérios de aceite
@@ -697,7 +697,7 @@ Implementar identidade visual moderna, limpa e premium.
 - [ ] Usuário consegue anexar PDF.
 - [ ] Arquivo aparece na tarefa.
 - [ ] Arquivo pode ser aberto.
-- [ ] Arquivo pode ser removido por usuário autorizado.
+- [x] Arquivo pode ser removido por usuário autorizado.
 
 ---
 
@@ -712,8 +712,8 @@ Implementar identidade visual moderna, limpa e premium.
 - [x] Campo categoria.
 - [x] Validar URL.
 - [x] Salvar link.
-- [ ] Abrir link.
-- [ ] Copiar link.
+- [x] Abrir link.
+- [x] Copiar link.
 - [ ] Editar link.
 - [ ] Excluir link.
 
@@ -759,8 +759,8 @@ Implementar identidade visual moderna, limpa e premium.
 
 - [x] Criar checklist dentro da tarefa.
 - [x] Adicionar item.
-- [ ] Marcar item como concluído.
-- [ ] Desmarcar item.
+- [x] Marcar item como concluído.
+- [x] Desmarcar item.
 - [ ] Editar item.
 - [ ] Excluir item.
 - [x] Mostrar progresso do checklist.
@@ -852,7 +852,7 @@ Implementar identidade visual moderna, limpa e premium.
 - [ ] Registrar alteração de prazo.
 - [ ] Registrar alteração de responsável.
 - [x] Registrar anexo adicionado.
-- [ ] Registrar anexo removido.
+- [x] Registrar anexo removido.
 - [x] Registrar link adicionado.
 - [x] Registrar campo alterado.
 - [x] Registrar tarefa concluída.

@@ -184,6 +184,14 @@ class LocalTaskFlowRepository(
         }
     }
 
+    override fun deleteAttachment(attachmentId: String) {
+        scope.launch(Dispatchers.IO) {
+            val attachment = dao.attachmentById(attachmentId)?.toDomain() ?: return@launch
+            dao.upsertAttachments(listOf(attachment.copy(isDeleted = true, updatedAt = now()).toEntity()))
+            logActivity(attachment.taskId, users.value.firstOrNull()?.id ?: attachment.uploadedBy, "Anexo removido: ${attachment.fileName}")
+        }
+    }
+
     override fun addLink(link: TaskLink) {
         scope.launch(Dispatchers.IO) {
             dao.upsertLinks(listOf(link.toEntity()))

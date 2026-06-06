@@ -29,6 +29,7 @@ interface TaskFlowRepository {
     fun deleteList(listId: String)
     fun saveReminder(reminder: Reminder)
     fun addAttachment(attachment: Attachment)
+    fun deleteAttachment(attachmentId: String)
     fun addLink(link: TaskLink)
     fun addCustomField(field: CustomField)
     fun addChecklistItem(item: ChecklistItem)

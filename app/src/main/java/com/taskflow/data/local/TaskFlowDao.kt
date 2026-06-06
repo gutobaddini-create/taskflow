@@ -96,6 +96,9 @@ interface TaskFlowDao {
     @Query("SELECT * FROM reminders WHERE taskId = :taskId")
     suspend fun remindersByTaskId(taskId: String): List<ReminderEntity>
 
+    @Query("SELECT * FROM attachments WHERE id = :attachmentId LIMIT 1")
+    suspend fun attachmentById(attachmentId: String): AttachmentEntity?
+
     @Query("SELECT * FROM invites WHERE token = :token LIMIT 1")
     suspend fun inviteByToken(token: String): InviteEntity?
 

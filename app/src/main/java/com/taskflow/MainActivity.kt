@@ -646,6 +646,42 @@ fun MaterialsScreen(vm: TaskFlowViewModel, onBack: () -> Unit) {
     val cameraPermissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
         if (granted) openCamera() else message = "Permissao de camera negada."
     }
+    fun openAttachment(attachment: Attachment) {
+        val uri = runCatching { Uri.parse(attachment.storagePath) }.getOrNull()
+        if (uri == null || uri.scheme !in setOf("content", "file")) {
+            message = "Anexo de exemplo sem arquivo local para abrir."
+            return
+        }
+        val intent = Intent(Intent.ACTION_VIEW).apply {
+            setDataAndType(uri, attachment.mimeType)
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
+        runCatching { context.startActivity(intent) }
+            .onFailure { message = "Nenhum app disponivel para abrir este anexo." }
+    }
+    fun shareAttachment(attachment: Attachment) {
+        val uri = runCatching { Uri.parse(attachment.storagePath) }.getOrNull()
+        if (uri == null || uri.scheme !in setOf("content", "file")) {
+            message = "Anexo de exemplo sem arquivo local para compartilhar."
+            return
+        }
+        val intent = Intent(Intent.ACTION_SEND).apply {
+            type = attachment.mimeType
+            putExtra(Intent.EXTRA_STREAM, uri)
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
+        runCatching { context.startActivity(Intent.createChooser(intent, "Compartilhar anexo")) }
+            .onFailure { message = "Nao foi possivel compartilhar o anexo." }
+    }
+    fun openLink(link: TaskLink) {
+        runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(link.url))) }
+            .onFailure { message = "Nao foi possivel abrir o link." }
+    }
+    fun copyLink(link: TaskLink) {
+        val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        clipboard.setPrimaryClip(ClipData.newPlainText(link.title, link.url))
+        message = "Link copiado."
+    }
     if (linkDialog) {
         LinkDialog(
             onDismiss = { linkDialog = false },
@@ -710,8 +746,24 @@ fun MaterialsScreen(vm: TaskFlowViewModel, onBack: () -> Unit) {
             }
             SectionTitle(vm.materialsTab)
             when (vm.materialsTab) {
-                "Anexos" -> attachments.filter { it.taskId == task.id }.forEach { MaterialRow(Icons.Default.Description, it.fileName, "${it.fileType.name} - ${it.fileSize / 1024} KB") }
-                "Links" -> links.filter { it.taskId == task.id }.forEach { MaterialRow(Icons.Default.Link, it.title, it.url) }
+                "Anexos" -> attachments.filter { it.taskId == task.id }.forEach {
+                    AttachmentRow(
+                        attachment = it,
+                        onOpen = { openAttachment(it) },
+                        onShare = { shareAttachment(it) },
+                        onDelete = {
+                            vm.repo.deleteAttachment(it.id)
+                            message = "Anexo removido."
+                        }
+                    )
+                }
+                "Links" -> links.filter { it.taskId == task.id }.forEach {
+                    LinkRow(
+                        link = it,
+                        onOpen = { openLink(it) },
+                        onCopy = { copyLink(it) }
+                    )
+                }
                 else -> fields.filter { it.taskId == task.id }.forEach { MaterialRow(Icons.Default.EditNote, it.fieldName, it.fieldValue) }
             }
             SectionTitle("Checklist")
@@ -1194,6 +1246,37 @@ fun TopRow(action: String, title: String, onAction: () -> Unit) = Row(Modifier.f
 fun InfoRow(label: String, value: String) = Row(Modifier.fillMaxWidth().padding(vertical = 7.dp), horizontalArrangement = Arrangement.SpaceBetween) { Text(label, color = Muted); Text(value, color = Text, fontWeight = FontWeight.SemiBold) }
 @Composable
 fun MaterialRow(icon: ImageVector, title: String, subtitle: String) = TaskFlowCard(Modifier.padding(bottom = 10.dp)) { Row(verticalAlignment = Alignment.CenterVertically) { IconBubble(icon, Purple.copy(.10f), Purple); Spacer(Modifier.width(12.dp)); Column(Modifier.weight(1f)) { Text(title, fontWeight = FontWeight.Bold, color = Text); Text(subtitle, color = Muted, maxLines = 1) }; Icon(Icons.Default.MoreVert, null, tint = Muted) } }
+@Composable
+fun AttachmentRow(attachment: Attachment, onOpen: () -> Unit, onShare: () -> Unit, onDelete: () -> Unit) = TaskFlowCard(Modifier.padding(bottom = 10.dp)) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        IconBubble(if (attachment.fileType == AttachmentType.Image) Icons.Default.Image else Icons.Default.Description, Purple.copy(.10f), Purple)
+        Spacer(Modifier.width(12.dp))
+        Column(Modifier.weight(1f)) {
+            Text(attachment.fileName, fontWeight = FontWeight.Bold, color = Text)
+            Text("${attachment.fileType.name} - ${attachment.fileSize / 1024} KB", color = Muted, maxLines = 1)
+        }
+    }
+    Row(Modifier.fillMaxWidth().padding(top = 12.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        SmallAction(Icons.Default.OpenInNew, "Abrir", Modifier.weight(1f), onOpen)
+        SmallAction(Icons.Default.IosShare, "Compart.", Modifier.weight(1f), onShare)
+        SmallAction(Icons.Default.DeleteOutline, "Excluir", Modifier.weight(1f), onDelete)
+    }
+}
+@Composable
+fun LinkRow(link: TaskLink, onOpen: () -> Unit, onCopy: () -> Unit) = TaskFlowCard(Modifier.padding(bottom = 10.dp)) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        IconBubble(Icons.Default.Link, Purple.copy(.10f), Purple)
+        Spacer(Modifier.width(12.dp))
+        Column(Modifier.weight(1f)) {
+            Text(link.title, fontWeight = FontWeight.Bold, color = Text)
+            Text(link.url, color = Muted, maxLines = 1)
+        }
+    }
+    Row(Modifier.fillMaxWidth().padding(top = 12.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        SmallAction(Icons.Default.OpenInBrowser, "Abrir", Modifier.weight(1f), onOpen)
+        SmallAction(Icons.Default.ContentCopy, "Copiar", Modifier.weight(1f), onCopy)
+    }
+}
 fun priorityColor(priority: TaskPriority) = when (priority) { TaskPriority.High -> Color(0xFFEF4444); TaskPriority.Medium -> Blue; TaskPriority.Low -> Color(0xFF22C55E) }
 fun formatTimestamp(value: Long): String = Instant.ofEpochMilli(value).atZone(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))
 
