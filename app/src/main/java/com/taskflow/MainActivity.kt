@@ -67,6 +67,7 @@ import com.taskflow.core.utils.attachmentType
 import com.taskflow.core.utils.isAllowedAttachment
 import com.taskflow.core.utils.isValidUrl
 import com.taskflow.core.utils.TaskSearch
+import com.taskflow.feature.settings.SettingsScreen
 import com.taskflow.domain.model.*
 import java.io.File
 import java.time.Instant
@@ -1661,49 +1662,6 @@ fun PeopleScreen(vm: TaskFlowViewModel) {
         items(invites.ifEmpty { listOf(Invite(taskId = "demo", createdBy = "demo", permission = UserPermission.Participant)) }) {
             TaskFlowCard { InfoRow("Permissao", it.permission.label); InfoRow("Token", it.token.take(8)); InfoRow("Status", if (it.acceptedBy == null) "Pendente" else "Aceito") }
             Spacer(Modifier.height(12.dp))
-        }
-    }
-}
-
-@Composable
-fun SettingsScreen(vm: TaskFlowViewModel, onLogout: () -> Unit) {
-    val preferences by vm.preferences.collectAsState()
-    val pendingOperations by vm.pendingOperations.collectAsState()
-    LazyColumn(Modifier.fillMaxSize().statusBarsPadding().padding(24.dp), contentPadding = PaddingValues(bottom = 120.dp)) {
-        item {
-            Text("Ajustes", fontSize = 30.sp, fontWeight = FontWeight.Bold, color = Text)
-            Spacer(Modifier.height(16.dp))
-            TaskFlowCard {
-                InfoRow("Meu perfil", "Manuel")
-                Row(Modifier.fillMaxWidth().padding(vertical = 7.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                    Text("Notificacoes", color = Muted)
-                    Switch(checked = preferences.notificationsEnabled, onCheckedChange = vm::setNotificationsEnabled)
-                }
-                Text("Tema", color = Muted, modifier = Modifier.padding(top = 10.dp))
-                Segmented(listOf("Claro", "Escuro futuro"), preferences.theme) { vm.setTheme(it) }
-                InfoRow("Filtro inicial", preferences.homeFilter)
-                InfoRow("Backups e sincronizacao", "Local-first")
-                InfoRow("Pendencias de sincronizacao", if (pendingOperations.isEmpty()) "Nenhuma" else "${pendingOperations.size} operacoes aguardando Firebase")
-            }
-            SectionTitle("Conta")
-            TaskFlowCard {
-                InfoRow("E-mail", vm.currentUser().email)
-                InfoRow("Sessao", if (preferences.currentUserId.isBlank()) "Local" else "Usuario local")
-                InfoRow("Sincronizacao Firebase", "Preparada para credenciais")
-            }
-            SectionTitle("Privacidade")
-            TaskFlowCard {
-                InfoRow("Dados", "Persistencia local Room/DataStore")
-                InfoRow("Compartilhamento", "Tokens locais por convite")
-                InfoRow("Galeria", "Photo Picker sem acesso amplo")
-            }
-            SectionTitle("Ajuda")
-            TaskFlowCard {
-                InfoRow("Suporte", "Disponivel")
-                InfoRow("Versao", "MVP local")
-                InfoRow("Diagnostico", "Logcat sem dados sensiveis")
-            }
-            TextButton(onClick = onLogout, modifier = Modifier.fillMaxWidth()) { Text("Sair da conta", color = Color(0xFFEF4444)) }
         }
     }
 }
