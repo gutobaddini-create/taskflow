@@ -601,13 +601,13 @@ Implementar identidade visual moderna, limpa e premium.
 - [x] Chips de aviso antecipado.
 - [x] Segmented control `Não repetir`, `Simples`, `Personalizada`.
 - [x] Controle `Repetir a cada`.
-- [ ] Seletor de unidade: dias, semanas, meses, anos.
-- [ ] Seletor de dias da semana.
-- [ ] Opções de fim da repetição.
+- [x] Seletor de unidade: dias, semanas, meses, anos.
+- [x] Seletor de dias da semana.
+- [x] Opções de fim da repetição.
 - [x] Campo para data final.
-- [ ] Campo para X repetições.
-- [ ] Opção mensal em data fixa.
-- [ ] Opção regra mensal.
+- [x] Campo para X repetições.
+- [x] Opção mensal em data fixa.
+- [x] Opção regra mensal.
 - [x] Botão salvar lembrete.
 
 ### Critérios de aceite
@@ -616,7 +616,7 @@ Implementar identidade visual moderna, limpa e premium.
 - [x] Usuário consegue escolher segunda e quinta.
 - [x] Usuário consegue definir fim em 31/12/2026.
 - [x] Usuário consegue salvar e voltar para tarefa.
-- [ ] Resumo do lembrete aparece na tela da tarefa.
+- [x] Resumo do lembrete aparece na tela da tarefa.
 
 ---
 
@@ -1266,7 +1266,7 @@ O MVP só estará pronto quando todos os itens abaixo estiverem concluídos:
 - [ ] Status funcionando.
 - [ ] Prioridade funcionando.
 - [ ] Lembrete único funcionando.
-- [ ] Lembrete recorrente personalizado funcionando.
+- [x] Lembrete recorrente personalizado funcionando.
 - [ ] Notificações locais funcionando.
 - [ ] Ação de adiar funcionando.
 - [ ] Múltiplos lembretes funcionando.

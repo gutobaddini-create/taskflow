@@ -630,8 +630,15 @@ fun ReminderScreen(vm: TaskFlowViewModel, onSave: () -> Unit) {
     }
     var enabled by remember { mutableStateOf(true) }
     var interval by remember { mutableIntStateOf(2) }
-    var unit by remember { mutableStateOf("semanas") }
+    var repeatMode by remember { mutableStateOf("Personalizada") }
+    var unit by remember { mutableStateOf(RecurrenceUnit.Weeks) }
+    var selectedWeekDays by remember { mutableStateOf(setOf(WeekDay.Monday, WeekDay.Thursday)) }
+    var monthlyMode by remember { mutableStateOf("Data fixa") }
+    var selectedMonthDay by remember { mutableStateOf("10") }
+    var monthlyRule by remember { mutableStateOf(MonthlyRule.LastBusinessDay) }
+    var endMode by remember { mutableStateOf("Em uma data") }
     var endDate by remember { mutableStateOf("31/12/2026") }
+    var maxOccurrences by remember { mutableStateOf("5") }
     LazyColumn(Modifier.fillMaxSize().statusBarsPadding().padding(22.dp), contentPadding = PaddingValues(bottom = 30.dp)) {
         item {
             TopRow("<", "Lembrete personalizado", onSave)
@@ -642,7 +649,7 @@ fun ReminderScreen(vm: TaskFlowViewModel, onSave: () -> Unit) {
             SectionTitle("Avisar antes")
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) { listOf("5 min", "15 min", "30 min", "1 h").forEach { ChipText(it) } }
             SectionTitle("Repeticao")
-            Segmented(listOf("Nao repetir", "Simples", "Personalizada"), "Personalizada") {}
+            Segmented(listOf("Nao repetir", "Simples", "Personalizada"), repeatMode) { repeatMode = it }
             TaskFlowCard {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text("Repetir a cada", color = Muted)
@@ -650,17 +657,111 @@ fun ReminderScreen(vm: TaskFlowViewModel, onSave: () -> Unit) {
                     IconButton({ if (interval > 1) interval-- }) { Icon(Icons.Default.Remove, null) }
                     Text("$interval", fontSize = 22.sp, fontWeight = FontWeight.Bold)
                     IconButton({ interval++ }) { Icon(Icons.Default.Add, null) }
-                    Text(unit, color = Muted)
                 }
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) { listOf("seg", "ter", "qua", "qui", "sex").forEach { ChipText(it, active = it in listOf("seg", "qui")) } }
+                ReminderChoiceRow(
+                    listOf(
+                        RecurrenceUnit.Days to "dias",
+                        RecurrenceUnit.Weeks to "semanas",
+                        RecurrenceUnit.Months to "meses",
+                        RecurrenceUnit.Years to "anos"
+                    ),
+                    unit
+                ) { unit = it }
+                if (unit == RecurrenceUnit.Weeks) {
+                    ReminderChoiceRow(
+                        WeekDay.entries.map { it to it.short },
+                        selected = null,
+                        onSelect = { day ->
+                            selectedWeekDays = if (day in selectedWeekDays) selectedWeekDays - day else selectedWeekDays + day
+                        },
+                        isSelected = { it in selectedWeekDays }
+                    )
+                    Text("Dias selecionados: ${selectedWeekDays.sortedBy { it.value }.joinToString { it.short }}", color = Muted, modifier = Modifier.padding(top = 8.dp))
+                }
+                if (unit == RecurrenceUnit.Months) {
+                    ReminderChoiceRow(listOf("Data fixa" to "data", "Regra mensal" to "regra"), monthlyMode) { monthlyMode = it }
+                    if (monthlyMode == "Data fixa") {
+                        OutlinedTextField(selectedMonthDay, { selectedMonthDay = it.filter(Char::isDigit).take(2) }, label = { Text("Dia do mes") }, shape = RoundedCornerShape(18.dp), modifier = Modifier.fillMaxWidth())
+                    } else {
+                        ReminderChoiceRow(
+                            listOf(
+                                MonthlyRule.FirstBusinessDay to "1o util",
+                                MonthlyRule.LastBusinessDay to "ultimo util",
+                                MonthlyRule.LastDay to "ultimo dia",
+                                MonthlyRule.FirstMonday to "1a seg",
+                                MonthlyRule.LastFriday to "ultima sex"
+                            ),
+                            monthlyRule
+                        ) { monthlyRule = it }
+                    }
+                }
             }
             SectionTitle("Fim da repeticao")
-            TaskFlowCard { InfoRow("Termino", "Em uma data"); OutlinedTextField(endDate, { endDate = it }, label = { Text("Data final") }, shape = RoundedCornerShape(18.dp), modifier = Modifier.fillMaxWidth()) }
+            TaskFlowCard {
+                ReminderChoiceRow(listOf("Nunca" to "nunca", "Em uma data" to "data", "Apos repeticoes" to "repeticoes"), endMode) { endMode = it }
+                if (endMode == "Em uma data") {
+                    OutlinedTextField(endDate, { endDate = it }, label = { Text("Data final") }, shape = RoundedCornerShape(18.dp), modifier = Modifier.fillMaxWidth())
+                }
+                if (endMode == "Apos repeticoes") {
+                    OutlinedTextField(maxOccurrences, { maxOccurrences = it.filter(Char::isDigit).take(3) }, label = { Text("Quantidade de repeticoes") }, shape = RoundedCornerShape(18.dp), modifier = Modifier.fillMaxWidth())
+                }
+            }
             Spacer(Modifier.height(24.dp))
             GradientButton("Salvar lembrete", {
-                vm.repo.saveReminder(Reminder(taskId = task.id, userId = vm.currentUser().id, type = ReminderType.Recurring, recurrenceType = RecurrenceType.Custom, recurrenceInterval = interval, recurrenceUnit = RecurrenceUnit.Weeks, selectedWeekDays = listOf(WeekDay.Monday, WeekDay.Thursday), endType = ReminderEndType.OnDate, endDate = LocalDate.of(2026, 12, 31), isActive = enabled))
+                val recurrenceType = when (repeatMode) {
+                    "Nao repetir" -> RecurrenceType.None
+                    "Simples" -> when (unit) {
+                        RecurrenceUnit.Days -> RecurrenceType.Daily
+                        RecurrenceUnit.Weeks -> RecurrenceType.Weekly
+                        RecurrenceUnit.Months -> RecurrenceType.Monthly
+                        RecurrenceUnit.Years -> RecurrenceType.Yearly
+                    }
+                    else -> RecurrenceType.Custom
+                }
+                val parsedEndDate = runCatching { LocalDate.parse(endDate, DateTimeFormatter.ofPattern("dd/MM/yyyy")) }.getOrNull()
+                vm.repo.saveReminder(
+                    Reminder(
+                        taskId = task.id,
+                        userId = vm.currentUser().id,
+                        type = if (recurrenceType == RecurrenceType.None) ReminderType.OneTime else ReminderType.Recurring,
+                        startDate = LocalDate.of(2026, 6, 10),
+                        startTime = LocalTime.of(9, 0),
+                        recurrenceType = recurrenceType,
+                        recurrenceInterval = interval,
+                        recurrenceUnit = unit,
+                        selectedWeekDays = selectedWeekDays.ifEmpty { setOf(WeekDay.Monday) }.toList(),
+                        selectedMonthDay = if (unit == RecurrenceUnit.Months && monthlyMode == "Data fixa") selectedMonthDay.toIntOrNull()?.coerceIn(1, 31) else null,
+                        monthlyRule = if (unit == RecurrenceUnit.Months && monthlyMode == "Regra mensal") monthlyRule else MonthlyRule.None,
+                        endType = when (endMode) {
+                            "Em uma data" -> ReminderEndType.OnDate
+                            "Apos repeticoes" -> ReminderEndType.AfterOccurrences
+                            else -> ReminderEndType.Never
+                        },
+                        endDate = if (endMode == "Em uma data") parsedEndDate ?: LocalDate.of(2026, 12, 31) else null,
+                        maxOccurrences = if (endMode == "Apos repeticoes") maxOccurrences.toIntOrNull() else null,
+                        isActive = enabled
+                    )
+                )
                 onSave()
             }, Modifier.fillMaxWidth(), enabled = enabled)
+        }
+    }
+}
+
+@Composable
+fun <T> ReminderChoiceRow(
+    options: List<Pair<T, String>>,
+    selected: T?,
+    isSelected: (T) -> Boolean = { selected == it },
+    onSelect: (T) -> Unit
+) {
+    Column(Modifier.fillMaxWidth().padding(top = 12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        options.chunked(3).forEach { rowOptions ->
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                rowOptions.forEach { (value, label) ->
+                    ChipText(label, active = isSelected(value), modifier = Modifier.clickable { onSelect(value) })
+                }
+            }
         }
     }
 }
@@ -1419,7 +1520,7 @@ fun IconBubble(icon: ImageVector, bg: Color = Blue.copy(.12f), tint: Color = Blu
 @Composable
 fun SectionTitle(text: String) = Text(text, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Text, modifier = Modifier.padding(top = 22.dp, bottom = 10.dp))
 @Composable
-fun ChipText(text: String, active: Boolean = true) = Text(text, color = if (active) Purple else Muted, fontWeight = FontWeight.SemiBold, modifier = Modifier.clip(RoundedCornerShape(50)).background(if (active) Purple.copy(.10f) else Border.copy(.45f)).padding(horizontal = 12.dp, vertical = 8.dp))
+fun ChipText(text: String, active: Boolean = true, modifier: Modifier = Modifier) = Text(text, color = if (active) Purple else Muted, fontWeight = FontWeight.SemiBold, modifier = modifier.clip(RoundedCornerShape(50)).background(if (active) Purple.copy(.10f) else Border.copy(.45f)).padding(horizontal = 12.dp, vertical = 8.dp))
 @Composable
 fun PriorityPill(priority: TaskPriority) = Text(priority.label, color = priorityColor(priority), modifier = Modifier.clip(RoundedCornerShape(50)).background(priorityColor(priority).copy(.12f)).padding(horizontal = 12.dp, vertical = 8.dp))
 @Composable
