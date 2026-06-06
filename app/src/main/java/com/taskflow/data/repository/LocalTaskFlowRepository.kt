@@ -227,4 +227,24 @@ class LocalTaskFlowRepository(
             logActivity(invite.taskId, invite.createdBy, "Convite criado: ${invite.permission.label}")
         }
     }
+
+    override fun acceptInvite(token: String, userId: String) {
+        scope.launch(Dispatchers.IO) {
+            val invite = dao.inviteByToken(token)?.toDomain() ?: return@launch
+            val task = dao.taskById(invite.taskId)?.toDomain() ?: return@launch
+            dao.upsertInvites(listOf(invite.copy(acceptedBy = userId).toEntity()))
+            if (userId !in task.participants) {
+                dao.updateTask(task.copy(participants = task.participants + userId, updatedAt = now()).toEntity())
+            }
+            logActivity(invite.taskId, userId, "Convite aceito: ${invite.permission.label}")
+        }
+    }
+
+    override fun declineInvite(token: String) {
+        scope.launch(Dispatchers.IO) {
+            val invite = dao.inviteByToken(token)?.toDomain()
+            dao.deleteInviteByToken(token)
+            invite?.let { logActivity(it.taskId, users.value.firstOrNull()?.id ?: "local", "Convite recusado") }
+        }
+    }
 }

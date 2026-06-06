@@ -124,7 +124,7 @@ O TaskFlow deve funcionar como uma lista de tarefas moderna e colaborativa, pare
 - [x] Photo Picker para imagens.
 - [x] CameraX ou intent de câmera para fotos.
 - [x] Storage Access Framework para arquivos.
-- [ ] Android Sharesheet para compartilhamento.
+- [x] Android Sharesheet para compartilhamento.
 
 ---
 
@@ -784,7 +784,7 @@ Implementar identidade visual moderna, limpa e premium.
 - [x] Gerar texto de convite.
 - [x] Incluir resumo da tarefa.
 - [x] Incluir prazo.
-- [ ] Incluir status.
+- [x] Incluir status.
 - [x] Incluir quantidade de anexos.
 - [x] Incluir quantidade de links.
 - [x] Incluir link de convite.
@@ -798,7 +798,7 @@ Implementar identidade visual moderna, limpa e premium.
 - [x] Compartilhar abre seletor nativo Android.
 - [x] Mensagem contém informações corretas.
 - [x] Link de convite é gerado.
-- [ ] Permissão escolhida é salva no convite.
+- [x] Permissão escolhida é salva no convite.
 
 ---
 
@@ -806,17 +806,17 @@ Implementar identidade visual moderna, limpa e premium.
 
 ### Tarefas
 
-- [ ] Abrir link de convite.
-- [ ] Validar token.
-- [ ] Exibir resumo da tarefa.
-- [ ] Botão aceitar.
-- [ ] Botão recusar.
-- [ ] Adicionar usuário como participante.
-- [ ] Aplicar permissão correta.
+- [x] Abrir link de convite.
+- [x] Validar token.
+- [x] Exibir resumo da tarefa.
+- [x] Botão aceitar.
+- [x] Botão recusar.
+- [x] Adicionar usuário como participante.
+- [x] Aplicar permissão correta.
 
 ### Critérios de aceite
 
-- [ ] Convite válido permite entrar na tarefa.
+- [x] Convite válido permite entrar na tarefa.
 - [ ] Convite expirado mostra mensagem adequada.
 - [ ] Usuário sem permissão não edita tarefa.
 
@@ -1166,7 +1166,7 @@ Implementar identidade visual moderna, limpa e premium.
 - [x] Compartilhar tarefa por WhatsApp.
 - [x] Compartilhar tarefa por e-mail.
 - [x] Copiar link de convite.
-- [ ] Aceitar convite.
+- [x] Aceitar convite.
 - [ ] Alterar status.
 - [ ] Concluir tarefa.
 - [ ] Adiar lembrete.

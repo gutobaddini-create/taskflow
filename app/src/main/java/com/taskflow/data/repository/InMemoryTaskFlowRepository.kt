@@ -119,4 +119,15 @@ class InMemoryTaskFlowRepository : TaskFlowRepository {
         invites.value = invites.value + invite
         activity.value = activity.value + ActivityLog(taskId = invite.taskId, userId = invite.createdBy, action = "Convite criado: ${invite.permission.label}")
     }
+    override fun acceptInvite(token: String, userId: String) {
+        val invite = invites.value.firstOrNull { it.token == token } ?: return
+        invites.value = invites.value.map { if (it.token == token) it.copy(acceptedBy = userId) else it }
+        tasks.value = tasks.value.map { if (it.id == invite.taskId && userId !in it.participants) it.copy(participants = it.participants + userId, updatedAt = now()) else it }
+        activity.value = activity.value + ActivityLog(taskId = invite.taskId, userId = userId, action = "Convite aceito: ${invite.permission.label}")
+    }
+    override fun declineInvite(token: String) {
+        val invite = invites.value.firstOrNull { it.token == token }
+        invites.value = invites.value.filterNot { it.token == token }
+        invite?.let { activity.value = activity.value + ActivityLog(taskId = it.taskId, userId = users.value.first().id, action = "Convite recusado") }
+    }
 }

@@ -96,6 +96,9 @@ interface TaskFlowDao {
     @Query("SELECT * FROM reminders WHERE taskId = :taskId")
     suspend fun remindersByTaskId(taskId: String): List<ReminderEntity>
 
+    @Query("SELECT * FROM invites WHERE token = :token LIMIT 1")
+    suspend fun inviteByToken(token: String): InviteEntity?
+
     @Query("SELECT COUNT(*) FROM tasks WHERE spaceId = :spaceId")
     suspend fun taskCountBySpace(spaceId: String): Int
 
@@ -113,4 +116,7 @@ interface TaskFlowDao {
 
     @Query("DELETE FROM task_lists WHERE id = :listId")
     suspend fun deleteList(listId: String)
+
+    @Query("DELETE FROM invites WHERE token = :token")
+    suspend fun deleteInviteByToken(token: String)
 }
