@@ -779,25 +779,25 @@ Implementar identidade visual moderna, limpa e premium.
 
 ### Tarefas
 
-- [ ] Criar tela de compartilhamento.
-- [ ] Criar permissões `Editar`, `Comentar`, `Ver`.
-- [ ] Gerar texto de convite.
-- [ ] Incluir resumo da tarefa.
-- [ ] Incluir prazo.
+- [x] Criar tela de compartilhamento.
+- [x] Criar permissões `Editar`, `Comentar`, `Ver`.
+- [x] Gerar texto de convite.
+- [x] Incluir resumo da tarefa.
+- [x] Incluir prazo.
 - [ ] Incluir status.
-- [ ] Incluir quantidade de anexos.
-- [ ] Incluir quantidade de links.
-- [ ] Incluir link de convite.
-- [ ] Compartilhar via Android Sharesheet.
-- [ ] Opção WhatsApp.
-- [ ] Opção e-mail.
-- [ ] Opção copiar link.
+- [x] Incluir quantidade de anexos.
+- [x] Incluir quantidade de links.
+- [x] Incluir link de convite.
+- [x] Compartilhar via Android Sharesheet.
+- [x] Opção WhatsApp.
+- [x] Opção e-mail.
+- [x] Opção copiar link.
 
 ### Critérios de aceite
 
-- [ ] Compartilhar abre seletor nativo Android.
-- [ ] Mensagem contém informações corretas.
-- [ ] Link de convite é gerado.
+- [x] Compartilhar abre seletor nativo Android.
+- [x] Mensagem contém informações corretas.
+- [x] Link de convite é gerado.
 - [ ] Permissão escolhida é salva no convite.
 
 ---
@@ -1163,9 +1163,9 @@ Implementar identidade visual moderna, limpa e premium.
 - [ ] Criar tarefa com foto.
 - [ ] Criar tarefa com link.
 - [ ] Criar tarefa com campo complementar.
-- [ ] Compartilhar tarefa por WhatsApp.
-- [ ] Compartilhar tarefa por e-mail.
-- [ ] Copiar link de convite.
+- [x] Compartilhar tarefa por WhatsApp.
+- [x] Compartilhar tarefa por e-mail.
+- [x] Copiar link de convite.
 - [ ] Aceitar convite.
 - [ ] Alterar status.
 - [ ] Concluir tarefa.

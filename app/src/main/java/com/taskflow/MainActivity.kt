@@ -3,6 +3,9 @@ package com.taskflow
 import android.Manifest
 import android.os.Bundle
 import android.app.Application
+import android.content.ActivityNotFoundException
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -635,13 +638,66 @@ fun MaterialsScreen(vm: TaskFlowViewModel, onBack: () -> Unit) {
 
 @Composable
 fun ShareScreen(vm: TaskFlowViewModel, onBack: () -> Unit) {
+    val context = LocalContext.current
     val task = vm.selectedTask()
     val attachments by vm.attachments.collectAsState()
     val links by vm.links.collectAsState()
+    val invites by vm.invites.collectAsState()
     var permission by remember { mutableStateOf("Editar") }
+    var message by remember { mutableStateOf<String?>(null) }
     if (task == null) {
         LoadingFullScreen("Carregando convite...")
         return
+    }
+    fun selectedPermission() = when (permission) {
+        "Editar" -> UserPermission.Owner
+        "Ver" -> UserPermission.Viewer
+        else -> UserPermission.Participant
+    }
+    fun buildInviteText(invite: Invite): String {
+        val due = task.dueDate?.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")) ?: "sem prazo"
+        return "Voce foi convidado para participar da tarefa \"${task.title}\" no TaskFlow.\nPrazo: $due\nPermissao: ${invite.permission.label}\nLink: taskflow://invite/${invite.token}"
+    }
+    fun createInviteAndText(): Pair<Invite, String> {
+        val invite = Invite(taskId = task.id, createdBy = vm.currentUser().id, permission = selectedPermission())
+        vm.repo.createInvite(invite)
+        return invite to buildInviteText(invite)
+    }
+    fun sendShare(packageName: String? = null) {
+        val (_, text) = createInviteAndText()
+        val send = Intent(Intent.ACTION_SEND).apply {
+            type = "text/plain"
+            putExtra(Intent.EXTRA_SUBJECT, "Convite TaskFlow: ${task.title}")
+            putExtra(Intent.EXTRA_TEXT, text)
+            packageName?.let(::setPackage)
+        }
+        try {
+            context.startActivity(Intent.createChooser(send, "Compartilhar tarefa"))
+            message = "Convite gerado."
+        } catch (_: ActivityNotFoundException) {
+            context.startActivity(Intent.createChooser(send.apply { setPackage(null) }, "Compartilhar tarefa"))
+            message = "App especifico indisponivel; usando seletor."
+        }
+    }
+    fun sendEmail() {
+        val (_, text) = createInviteAndText()
+        val email = Intent(Intent.ACTION_SENDTO).apply {
+            data = Uri.parse("mailto:")
+            putExtra(Intent.EXTRA_SUBJECT, "Convite TaskFlow: ${task.title}")
+            putExtra(Intent.EXTRA_TEXT, text)
+        }
+        try {
+            context.startActivity(email)
+            message = "Convite por e-mail gerado."
+        } catch (_: ActivityNotFoundException) {
+            sendShare()
+        }
+    }
+    fun copyInvite() {
+        val (_, text) = createInviteAndText()
+        val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        clipboard.setPrimaryClip(ClipData.newPlainText("Convite TaskFlow", text))
+        message = "Link copiado."
     }
     LazyColumn(Modifier.fillMaxSize().statusBarsPadding().padding(22.dp), contentPadding = PaddingValues(bottom = 30.dp)) {
         item {
@@ -651,10 +707,11 @@ fun ShareScreen(vm: TaskFlowViewModel, onBack: () -> Unit) {
             Segmented(listOf("Editar", "Comentar", "Ver"), permission) { permission = it }
             SectionTitle("Compartilhar por")
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                SmallAction(Icons.Default.Chat, "WhatsApp")
-                SmallAction(Icons.Default.Email, "E-mail")
-                SmallAction(Icons.Default.ContentCopy, "Copiar")
+                SmallAction(Icons.Default.Chat, "WhatsApp") { sendShare("com.whatsapp") }
+                SmallAction(Icons.Default.Email, "E-mail") { sendEmail() }
+                SmallAction(Icons.Default.ContentCopy, "Copiar") { copyInvite() }
             }
+            message?.let { Text(it, color = Purple, modifier = Modifier.padding(top = 10.dp)) }
             SectionTitle("Previa da mensagem")
             TaskFlowCard {
                 Text("Voce foi convidado para participar desta tarefa:", color = Muted)
@@ -666,11 +723,21 @@ fun ShareScreen(vm: TaskFlowViewModel, onBack: () -> Unit) {
                 }
                 Text("taskflow://invite/${task.shareToken}", color = Purple, modifier = Modifier.padding(top = 12.dp))
             }
+            val taskInvites = invites.filter { it.taskId == task.id }
+            if (taskInvites.isNotEmpty()) {
+                SectionTitle("Convites locais")
+                taskInvites.take(3).forEach {
+                    TaskFlowCard(Modifier.padding(bottom = 10.dp)) {
+                        InfoRow("Permissao", it.permission.label)
+                        InfoRow("Token", it.token.take(8))
+                        InfoRow("Status", if (it.acceptedBy == null) "Pendente" else "Aceito")
+                    }
+                }
+            }
             Spacer(Modifier.height(24.dp))
             GradientButton("Enviar convite", {
-                val p = when (permission) { "Ver" -> UserPermission.Viewer else -> UserPermission.Participant }
-                vm.repo.createInvite(Invite(taskId = task.id, createdBy = vm.currentUser().id, permission = p))
-                onBack()
+                createInviteAndText()
+                message = "Convite salvo."
             }, Modifier.fillMaxWidth())
         }
     }
