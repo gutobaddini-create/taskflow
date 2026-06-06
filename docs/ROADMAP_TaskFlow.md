@@ -1179,6 +1179,21 @@ Implementar identidade visual moderna, limpa e premium.
 
 ---
 
+## 23.3 Testes instrumentados Android
+
+### Tarefas
+
+- [x] Testar notificação local disparada por `AlarmManager`.
+- [x] Testar ação `Adiar` da notificação.
+- [x] Testar ação `Concluir` da notificação.
+
+### Critérios de aceite
+
+- [x] `connectedDebugAndroidTest` executa a suíte de notificações no emulador.
+- [x] Relatório Android Test registra 3 testes, 0 falhas e 0 erros.
+
+---
+
 # 24. Fase 20 — Polimento Visual
 
 ## 24.1 Refinamento de UI
