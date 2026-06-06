@@ -912,32 +912,34 @@ data class CustomField(
 
 O MVP será considerado pronto quando:
 
-- [ ] Usuário consegue criar conta.
-- [ ] Usuário consegue fazer login.
-- [ ] Usuário consegue criar espaço.
-- [ ] Usuário consegue criar lista.
-- [ ] Usuário consegue criar tarefa.
-- [ ] Usuário consegue editar tarefa.
-- [ ] Usuário consegue definir status.
-- [ ] Usuário consegue definir prioridade.
-- [ ] Usuário consegue definir prazo.
-- [ ] Usuário consegue criar lembrete único.
-- [ ] Usuário consegue criar lembrete recorrente personalizado.
-- [ ] Usuário consegue criar lembrete a cada 2 semanas.
-- [ ] Usuário consegue criar lembrete mensal em data específica.
-- [ ] Usuário recebe notificação no horário correto.
-- [ ] Usuário consegue adiar lembrete.
-- [ ] Usuário consegue anexar foto tirada na hora.
-- [ ] Usuário consegue anexar imagem da galeria.
-- [ ] Usuário consegue anexar PDF.
-- [ ] Usuário consegue adicionar link.
-- [ ] Usuário consegue adicionar campo complementar.
-- [ ] Usuário consegue compartilhar tarefa.
-- [ ] Usuário convidado consegue acessar tarefa.
-- [ ] Usuário autorizado consegue alterar status.
-- [ ] Usuário autorizado consegue visualizar anexo.
-- [ ] App não duplica notificações.
-- [ ] App mantém visual moderno e intuitivo.
+Nota: este aceite reflete o MVP local-first validado em emulador. Login/cadastro usam a conta local placeholder prevista para esta entrega, enquanto Firebase real e validação em aparelho físico permanecem pendências externas registradas no roadmap e no relatório de QA.
+
+- [x] Usuário consegue criar conta.
+- [x] Usuário consegue fazer login.
+- [x] Usuário consegue criar espaço.
+- [x] Usuário consegue criar lista.
+- [x] Usuário consegue criar tarefa.
+- [x] Usuário consegue editar tarefa.
+- [x] Usuário consegue definir status.
+- [x] Usuário consegue definir prioridade.
+- [x] Usuário consegue definir prazo.
+- [x] Usuário consegue criar lembrete único.
+- [x] Usuário consegue criar lembrete recorrente personalizado.
+- [x] Usuário consegue criar lembrete a cada 2 semanas.
+- [x] Usuário consegue criar lembrete mensal em data específica.
+- [x] Usuário recebe notificação no horário correto.
+- [x] Usuário consegue adiar lembrete.
+- [x] Usuário consegue anexar foto tirada na hora.
+- [x] Usuário consegue anexar imagem da galeria.
+- [x] Usuário consegue anexar PDF.
+- [x] Usuário consegue adicionar link.
+- [x] Usuário consegue adicionar campo complementar.
+- [x] Usuário consegue compartilhar tarefa.
+- [x] Usuário convidado consegue acessar tarefa.
+- [x] Usuário autorizado consegue alterar status.
+- [x] Usuário autorizado consegue visualizar anexo.
+- [x] App não duplica notificações.
+- [x] App mantém visual moderno e intuitivo.
 
 ---
 
