@@ -8,6 +8,10 @@ import java.time.LocalTime
 import java.time.YearMonth
 
 object ReminderEngine {
+    fun afterSnooze(reminder: Reminder, snoozedAt: LocalDateTime = LocalDateTime.now(), minutes: Long = 10): Reminder {
+        return reminder.copy(nextTriggerAt = snoozedAt.plusMinutes(minutes), isActive = true, updatedAt = now())
+    }
+
     fun afterDelivery(reminder: Reminder, deliveredAt: LocalDateTime = LocalDateTime.now()): Reminder {
         val delivered = reminder.copy(occurrencesCompleted = reminder.occurrencesCompleted + 1)
         if (delivered.type == ReminderType.OneTime || delivered.recurrenceType == RecurrenceType.None) {

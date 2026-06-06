@@ -208,6 +208,22 @@ class ReminderEngineTest {
     }
 
     @Test
+    fun snoozeKeepsReminderActiveAndMovesNextTrigger() {
+        val snoozed = ReminderEngine.afterSnooze(
+            Reminder(
+                taskId = "task",
+                userId = "user",
+                nextTriggerAt = LocalDateTime.of(2026, 6, 10, 9, 0)
+            ),
+            LocalDateTime.of(2026, 6, 10, 9, 5),
+            minutes = 10
+        )
+
+        assertTrue(snoozed.isActive)
+        assertEquals(LocalDateTime.of(2026, 6, 10, 9, 15), snoozed.nextTriggerAt)
+    }
+
+    @Test
     fun occurrenceLimitDeactivatesAfterFinalDelivery() {
         val delivered = ReminderEngine.afterDelivery(
             Reminder(

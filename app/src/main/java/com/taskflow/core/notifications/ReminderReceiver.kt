@@ -26,7 +26,7 @@ class ReminderReceiver : BroadcastReceiver() {
         val taskId = intent.getStringExtra(EXTRA_TASK_ID) ?: return
         when (intent.action) {
             ACTION_COMPLETE -> completeTask(context, taskId)
-            ACTION_SNOOZE -> ReminderScheduler(context).snooze(reminderId, taskId)
+            ACTION_SNOOZE -> snoozeReminder(context, reminderId, taskId)
             else -> showReminder(context, reminderId, taskId, intent.getBooleanExtra(EXTRA_SNOOZED, false))
         }
     }
@@ -80,6 +80,22 @@ class ReminderReceiver : BroadcastReceiver() {
         }
     }
 
+    private fun snoozeReminder(context: Context, reminderId: String, taskId: String) {
+        val pendingResult = goAsync()
+        CoroutineScope(Dispatchers.IO).launch {
+            val dao = TaskFlowDatabase.get(context).dao()
+            val reminder = dao.reminderById(reminderId)?.toDomain()
+            val task = dao.taskById(taskId)?.toDomain()
+            if (reminder != null && task != null && reminder.isActive && !task.isCompleted) {
+                val updated = ReminderEngine.afterSnooze(reminder, LocalDateTime.now(), SNOOZE_MINUTES)
+                dao.upsertReminders(listOf(updated.toEntity()))
+                dao.upsertActivity(listOf(ActivityLog(taskId = taskId, userId = task.createdBy, action = "Lembrete adiado por ${SNOOZE_MINUTES} minutos").toEntity()))
+                ReminderScheduler(context).snooze(reminderId, taskId, SNOOZE_MINUTES)
+            }
+            pendingResult.finish()
+        }
+    }
+
     private fun openPendingIntent(context: Context, taskId: String): PendingIntent {
         val intent = Intent(context, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
@@ -104,6 +120,7 @@ class ReminderReceiver : BroadcastReceiver() {
         const val EXTRA_REMINDER_ID = "reminder_id"
         const val EXTRA_TASK_ID = "task_id"
         const val EXTRA_SNOOZED = "snoozed"
+        const val SNOOZE_MINUTES = 10L
 
         fun intent(context: Context, action: String, reminderId: String, taskId: String): Intent {
             return Intent(context, ReminderReceiver::class.java).apply {
