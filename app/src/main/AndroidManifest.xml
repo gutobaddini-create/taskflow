@@ -7,7 +7,7 @@
 
     <application
         android:name=".TaskFlowApp"
-        android:allowBackup="true"
+        android:allowBackup="false"
         android:icon="@drawable/ic_taskflow"
         android:label="TaskFlow"
         android:roundIcon="@drawable/ic_taskflow"

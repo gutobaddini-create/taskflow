@@ -22,7 +22,7 @@ npm run verify:local-mvp
 
 Result: passed.
 
-Latest run: 2026-06-06 23:06 UTC.
+Latest run: 2026-06-06 23:13 UTC.
 
 Covered by the command:
 
@@ -38,13 +38,18 @@ Covered by the command:
 
 The release manifest writer was also executed successfully with both Windows PowerShell and PowerShell Core (`pwsh`) to cover the local Windows workflow and the Ubuntu GitHub Actions workflow.
 
+Release privacy note:
+
+- Android automatic backup is disabled in the manifest for the local-first MVP, avoiding implicit backup/restore of local tasks, invites, preferences, and metadata.
+- The processed release manifest was checked after build and contains `android:allowBackup="false"`.
+
 Artifacts verified:
 
 | Artifact | Size |
 | --- | ---: |
 | `app/build/outputs/apk/debug/app-debug.apk` | 18,397,193 bytes |
 | `app/build/outputs/apk/release/app-release.apk` | 11,911,970 bytes |
-| `app/build/outputs/bundle/release/app-release.aab` | 11,534,305 bytes |
+| `app/build/outputs/bundle/release/app-release.aab` | 11,534,310 bytes |
 
 Release integrity manifest:
 

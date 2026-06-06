@@ -1331,6 +1331,14 @@ Use esta seção para registrar decisões importantes.
 - Motivo: Preparar a troca do repositório remoto sem quebrar builds locais nem exigir credenciais ausentes.
 - Impacto: A integração Firebase futura tem pontos de entrada explícitos para Auth, sync de operações pendentes, upload/delete de anexos e registro FCM.
 
+## 28.4 Backup Android
+
+- Data: 2026-06-06
+- Tema: Privacidade local-first
+- Decisão: Desativar `android:allowBackup` no manifest.
+- Motivo: O MVP guarda tarefas, convites, preferências e metadados locais; backup automático não deve exportar ou restaurar esses dados sem uma política explícita de produção.
+- Impacto: O app prioriza privacidade local e evita cópia automática de dados até que uma estratégia de backup/restore segura seja definida.
+
 ---
 
 # 29. Bloqueios Atuais
