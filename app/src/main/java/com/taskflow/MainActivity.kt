@@ -67,6 +67,7 @@ import com.taskflow.core.utils.attachmentType
 import com.taskflow.core.utils.isAllowedAttachment
 import com.taskflow.core.utils.isValidUrl
 import com.taskflow.core.utils.TaskSearch
+import com.taskflow.feature.auth.OnboardingScreen
 import com.taskflow.feature.settings.SettingsScreen
 import com.taskflow.domain.model.*
 import java.io.File
@@ -300,40 +301,6 @@ fun Shell(current: Screen, navigate: (Screen) -> Unit, content: @Composable () -
 }
 
 fun navItems() = listOf(Screen.Home to Icons.Default.CalendarToday, Screen.Spaces to Icons.Default.List, Screen.People to Icons.Default.Groups, Screen.Settings to Icons.Default.Settings)
-
-@Composable
-fun OnboardingScreen(vm: TaskFlowViewModel, onStart: () -> Unit) {
-    val users by vm.users.collectAsState()
-    var mode by remember { mutableStateOf("Criar conta") }
-    var name by remember(users) { mutableStateOf(users.firstOrNull()?.name ?: "Ana") }
-    var email by remember(users) { mutableStateOf(users.firstOrNull()?.email ?: "ana@taskflow.local") }
-    var message by remember { mutableStateOf("") }
-
-    Column(Modifier.fillMaxSize().padding(28.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
-        Icon(Icons.Default.NotificationsActive, null, tint = Purple, modifier = Modifier.size(86.dp))
-        Spacer(Modifier.height(26.dp))
-        Text("TaskFlow", fontSize = 38.sp, fontWeight = FontWeight.Bold, color = Text)
-        Text("Organize tarefas, lembretes e materiais em um fluxo unico.", color = Muted, modifier = Modifier.padding(top = 12.dp), lineHeight = 22.sp)
-        Spacer(Modifier.height(36.dp))
-        Segmented(listOf("Criar conta", "Entrar"), mode) { mode = it; message = "" }
-        Spacer(Modifier.height(16.dp))
-        if (mode == "Criar conta") {
-            OutlinedTextField(value = name, onValueChange = { name = it }, label = { Text("Nome") }, modifier = Modifier.fillMaxWidth(), singleLine = true)
-            Spacer(Modifier.height(10.dp))
-        }
-        OutlinedTextField(value = email, onValueChange = { email = it }, label = { Text("E-mail local") }, modifier = Modifier.fillMaxWidth(), singleLine = true)
-        if (message.isNotBlank()) Text(message, color = Purple, modifier = Modifier.padding(top = 12.dp))
-        Spacer(Modifier.height(24.dp))
-        GradientButton("Comecar", {
-            val ok = if (mode == "Criar conta") vm.registerLocal(name, email) else vm.loginLocal(email)
-            if (ok) onStart() else message = if (mode == "Criar conta") "Informe nome e e-mail validos." else "Usuario local nao encontrado."
-        }, Modifier.fillMaxWidth())
-        TextButton(onClick = {
-            mode = if (mode == "Criar conta") "Entrar" else "Criar conta"
-            message = ""
-        }) { Text(if (mode == "Criar conta") "Ja tenho uma conta" else "Criar nova conta local") }
-    }
-}
 
 @Composable
 fun HomeScreen(vm: TaskFlowViewModel, onNew: () -> Unit, onDetail: (String) -> Unit) {
