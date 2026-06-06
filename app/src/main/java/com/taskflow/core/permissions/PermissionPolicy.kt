@@ -3,6 +3,7 @@ package com.taskflow.core.permissions
 import com.taskflow.domain.model.Invite
 import com.taskflow.domain.model.Task
 import com.taskflow.domain.model.UserPermission
+import com.taskflow.domain.model.now
 
 object PermissionPolicy {
     val notificationPermission = "android.permission.POST_NOTIFICATIONS"
@@ -10,9 +11,12 @@ object PermissionPolicy {
 
     fun acceptedPermission(taskId: String, userId: String, invites: List<Invite>): UserPermission? =
         invites
-            .filter { it.taskId == taskId && it.acceptedBy == userId }
+            .filter { it.taskId == taskId && it.acceptedBy == userId && isInviteActive(it) }
             .maxByOrNull { permissionRank(it.permission) }
             ?.permission
+
+    fun isInviteActive(invite: Invite, referenceTime: Long = now()): Boolean =
+        invite.expiresAt?.let { it > referenceTime } != false
 
     fun canViewTask(task: Task, userId: String, permission: UserPermission?): Boolean =
         task.createdBy == userId ||

@@ -1283,7 +1283,7 @@ O MVP só estará pronto quando todos os itens abaixo estiverem concluídos:
 - [ ] Firebase Authentication funcionando.
 - [ ] Firestore funcionando.
 - [ ] Firebase Storage funcionando.
-- [ ] Permissões funcionando.
+- [x] Permissões funcionando.
 - [ ] Regras de segurança básicas funcionando.
 - [x] Persistência local funcionando.
 - [ ] App testado em aparelho físico.

@@ -4,6 +4,7 @@ import com.taskflow.core.permissions.PermissionPolicy
 import com.taskflow.domain.model.Invite
 import com.taskflow.domain.model.Task
 import com.taskflow.domain.model.UserPermission
+import com.taskflow.domain.model.now
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -51,6 +52,14 @@ class PermissionPolicyTest {
         assertFalse(PermissionPolicy.canViewTask(task, "ana", null))
         assertFalse(PermissionPolicy.canViewMaterial(task, "ana", null))
         assertFalse(PermissionPolicy.canManageMaterial(task, "ana", null))
+    }
+
+    @Test
+    fun expiredInviteDoesNotGrantPermission() {
+        val expired = Invite(taskId = task.id, createdBy = "manuel", permission = UserPermission.Owner, acceptedBy = "ana", expiresAt = now() - 1)
+
+        assertFalse(PermissionPolicy.isInviteActive(expired))
+        assertEquals(null, PermissionPolicy.acceptedPermission(task.id, "ana", listOf(expired)))
     }
 
     @Test

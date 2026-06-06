@@ -2,6 +2,7 @@ package com.taskflow.data.repository
 
 import com.taskflow.domain.model.*
 import com.taskflow.domain.repository.TaskFlowRepository
+import com.taskflow.core.permissions.PermissionPolicy
 import com.taskflow.core.security.AttachmentSecurity
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -191,6 +192,7 @@ class InMemoryTaskFlowRepository : TaskFlowRepository {
     }
     override fun acceptInvite(token: String, userId: String) {
         val invite = invites.value.firstOrNull { it.token == token } ?: return
+        if (!PermissionPolicy.isInviteActive(invite)) return
         invites.value = invites.value.map { if (it.token == token) it.copy(acceptedBy = userId) else it }
         tasks.value = tasks.value.map { if (it.id == invite.taskId && userId !in it.participants) it.copy(participants = it.participants + userId, updatedAt = now()) else it }
         activity.value = activity.value + ActivityLog(taskId = invite.taskId, userId = userId, action = "Convite aceito: ${invite.permission.label}")

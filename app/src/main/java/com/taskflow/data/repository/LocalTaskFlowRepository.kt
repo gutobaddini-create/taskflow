@@ -3,6 +3,7 @@ package com.taskflow.data.repository
 import android.content.Context
 import com.taskflow.core.notifications.ReminderEngine
 import com.taskflow.core.notifications.ReminderScheduler
+import com.taskflow.core.permissions.PermissionPolicy
 import com.taskflow.core.security.AttachmentSecurity
 import com.taskflow.data.local.TaskFlowDao
 import com.taskflow.data.mapper.*
@@ -336,6 +337,7 @@ class LocalTaskFlowRepository(
     override fun acceptInvite(token: String, userId: String) {
         scope.launch(Dispatchers.IO) {
             val invite = dao.inviteByToken(token)?.toDomain() ?: return@launch
+            if (!PermissionPolicy.isInviteActive(invite)) return@launch
             val task = dao.taskById(invite.taskId)?.toDomain() ?: return@launch
             dao.upsertInvites(listOf(invite.copy(acceptedBy = userId).toEntity()))
             if (userId !in task.participants) {
