@@ -99,6 +99,7 @@ Para concluir Firebase real, sera necessario fornecer:
 
 - Debug APK: `app/build/outputs/apk/debug/app-debug.apk`
 - Release APK: `app/build/outputs/apk/release/app-release.apk`
+- Release AAB: `app/build/outputs/bundle/release/app-release.aab`
 
 O release atual usa uma assinatura local de desenvolvimento (`~/.android/debug.keystore`) para permitir validacao. Para distribuicao real, gere e guarde uma keystore de producao.
 
@@ -108,6 +109,7 @@ Comandos executados com sucesso neste workspace:
 
 - `.\gradlew.bat --no-daemon --max-workers=1 :app:testDebugUnitTest --console=plain`
 - `.\gradlew.bat --no-daemon --max-workers=1 :app:assembleDebug :app:compileDebugAndroidTestKotlin --console=plain`
+- `.\gradlew.bat --no-daemon --max-workers=1 :app:bundleRelease --console=plain --stacktrace`
 - `npm run test:firebase-rules`
 - Instalacao e abertura do APK debug no emulador `TaskFlow_API35`, sem crash/ANR do pacote `com.taskflow` no log filtrado.
 

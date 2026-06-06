@@ -1349,5 +1349,5 @@ Use esta seção para listar bloqueios.
 Quando este documento for entregue ao agente construtor, a primeira tarefa recomendada é:
 
 ```text
-Comece pela Fase 0 — Setup Inicial. Crie o projeto Android nativo em Kotlin com Jetpack Compose, configure a arquitetura inicial, crie a estrutura de pacotes definida neste ROADMAP.md e entregue uma tela inicial provisória compilando sem erros. Só avance para a Fase 1 após cumprir todos os critérios de aceite da Fase 0.
+Forneça um repositório GitHub remoto, um projeto Firebase com google-services.json e um aparelho Android físico desbloqueado. Em seguida, integrar Firebase Auth/Firestore/Storage/FCM, publicar/validar regras no projeto real, rodar QA físico do release e atualizar os itens pendentes das Fases 14, 15, 19 e 21 somente após evidência de teste.
 ```
