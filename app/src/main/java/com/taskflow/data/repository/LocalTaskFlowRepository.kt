@@ -48,19 +48,19 @@ class LocalTaskFlowRepository(
     }
 
     private fun collectRoomFlows() {
-        scope.launch { dao.users().map { rows -> rows.map { it.toDomain() } }.collect(users::emit) }
-        scope.launch { dao.spaces().map { rows -> rows.map { it.toDomain() } }.collect(spaces::emit) }
-        scope.launch { dao.lists().map { rows -> rows.map { it.toDomain() } }.collect(lists::emit) }
-        scope.launch { dao.tasks().map { rows -> rows.map { it.toDomain() } }.collect(tasks::emit) }
-        scope.launch { dao.reminders().map { rows -> rows.map { it.toDomain() } }.collect(reminders::emit) }
-        scope.launch { dao.attachments().map { rows -> rows.map { it.toDomain() } }.collect(attachments::emit) }
-        scope.launch { dao.links().map { rows -> rows.map { it.toDomain() } }.collect(links::emit) }
-        scope.launch { dao.customFields().map { rows -> rows.map { it.toDomain() } }.collect(customFields::emit) }
-        scope.launch { dao.checklist().map { rows -> rows.map { it.toDomain() } }.collect(checklist::emit) }
-        scope.launch { dao.comments().map { rows -> rows.map { it.toDomain() } }.collect(comments::emit) }
-        scope.launch { dao.invites().map { rows -> rows.map { it.toDomain() } }.collect(invites::emit) }
-        scope.launch { dao.activity().map { rows -> rows.map { it.toDomain() } }.collect(activity::emit) }
-        scope.launch { dao.pendingOperations().map { rows -> rows.map { it.toDomain() } }.collect(pendingOperations::emit) }
+        scope.launch(Dispatchers.IO) { dao.users().map { rows -> rows.map { it.toDomain() } }.collect(users::emit) }
+        scope.launch(Dispatchers.IO) { dao.spaces().map { rows -> rows.map { it.toDomain() } }.collect(spaces::emit) }
+        scope.launch(Dispatchers.IO) { dao.lists().map { rows -> rows.map { it.toDomain() } }.collect(lists::emit) }
+        scope.launch(Dispatchers.IO) { dao.tasks().map { rows -> rows.map { it.toDomain() } }.collect(tasks::emit) }
+        scope.launch(Dispatchers.IO) { dao.reminders().map { rows -> rows.map { it.toDomain() } }.collect(reminders::emit) }
+        scope.launch(Dispatchers.IO) { dao.attachments().map { rows -> rows.map { it.toDomain() } }.collect(attachments::emit) }
+        scope.launch(Dispatchers.IO) { dao.links().map { rows -> rows.map { it.toDomain() } }.collect(links::emit) }
+        scope.launch(Dispatchers.IO) { dao.customFields().map { rows -> rows.map { it.toDomain() } }.collect(customFields::emit) }
+        scope.launch(Dispatchers.IO) { dao.checklist().map { rows -> rows.map { it.toDomain() } }.collect(checklist::emit) }
+        scope.launch(Dispatchers.IO) { dao.comments().map { rows -> rows.map { it.toDomain() } }.collect(comments::emit) }
+        scope.launch(Dispatchers.IO) { dao.invites().map { rows -> rows.map { it.toDomain() } }.collect(invites::emit) }
+        scope.launch(Dispatchers.IO) { dao.activity().map { rows -> rows.map { it.toDomain() } }.collect(activity::emit) }
+        scope.launch(Dispatchers.IO) { dao.pendingOperations().map { rows -> rows.map { it.toDomain() } }.collect(pendingOperations::emit) }
     }
 
     private suspend fun enqueue(entity: PendingEntityType, entityId: String, operation: PendingOperationType) {
