@@ -38,7 +38,7 @@ Artifacts verified:
 | --- | ---: |
 | `app/build/outputs/apk/debug/app-debug.apk` | 18,397,193 bytes |
 | `app/build/outputs/apk/release/app-release.apk` | 11,911,970 bytes |
-| `app/build/outputs/bundle/release/app-release.aab` | 11,534,273 bytes |
+| `app/build/outputs/bundle/release/app-release.aab` | 11,534,309 bytes |
 
 Previous full verification also passed with Firebase rules enabled through:
 
@@ -76,10 +76,34 @@ Captured screenshots:
 - `docs/qa/screenshots/splash-cold-start-emulator-2026-06-06.png`
 - `docs/qa/screenshots/home-emulator-ready-2026-06-06.png`
 - `docs/qa/screenshots/home-after-login-emulator-2026-06-06.png`
+- `docs/qa/screenshots/release-onboarding-emulator-2026-06-06.png`
+- `docs/qa/screenshots/release-home-emulator-2026-06-06.png`
 
 Observation:
 
 - The debug cold start on the emulator took about 20 seconds before the first Compose screen was displayed. No crash or ANR was observed. This should be rechecked on release build and physical hardware before public distribution.
+
+## Release Emulator QA
+
+Commands executed:
+
+```powershell
+.\gradlew.bat --no-daemon --max-workers=1 :app:assembleRelease :app:bundleRelease --console=plain
+$adb='C:\TaskFlowAndroidSdk\platform-tools\adb.exe'
+& $adb -s emulator-5554 install -r app\build\outputs\apk\release\app-release.apk
+& $adb -s emulator-5554 shell monkey -p com.taskflow -c android.intent.category.LAUNCHER 1
+```
+
+Result: passed.
+
+Observed evidence:
+
+- Release APK installed successfully on `emulator-5554`.
+- Release build opened `com.taskflow/.MainActivity`.
+- Local onboarding/account screen rendered.
+- Home screen rendered after tapping `Comecar`.
+- App process remained alive after navigation.
+- Crash buffer was empty before and after onboarding/home navigation.
 
 ## Current External Blockers
 
