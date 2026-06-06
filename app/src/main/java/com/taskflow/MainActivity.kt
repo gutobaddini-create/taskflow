@@ -251,10 +251,12 @@ fun HomeScreen(vm: TaskFlowViewModel, onNew: () -> Unit, onDetail: (String) -> U
     var priorityFilter by remember { mutableStateOf("Todas") }
     var responsibleFilter by remember { mutableStateOf("Todos") }
     var materialFilter by remember { mutableStateOf("Todos") }
+    val now = LocalDateTime.now()
     val filteredByTab = when (vm.homeFilter) {
         "Concluidas" -> tasks.filter { it.isCompleted }
-        "Proximas" -> tasks.filter { !it.isCompleted && (it.dueDate?.isAfter(LocalDateTime.now()) ?: true) }
-        else -> tasks.filter { !it.isCompleted }
+        "Atrasadas" -> tasks.filter { !it.isCompleted && it.dueDate?.isBefore(now) == true }
+        "Proximas" -> tasks.filter { !it.isCompleted && (it.dueDate?.isAfter(now) ?: true) }
+        else -> tasks.filter { !it.isCompleted && (it.dueDate?.toLocalDate() == LocalDate.now() || it.dueDate == null) }
     }
     fun matchesSearch(task: Task): Boolean {
         val query = searchQuery.trim().lowercase()
@@ -288,7 +290,7 @@ fun HomeScreen(vm: TaskFlowViewModel, onNew: () -> Unit, onDetail: (String) -> U
                     Row { IconTile(Icons.Default.Notifications); Spacer(Modifier.width(8.dp)); IconTile(Icons.Default.AutoAwesome, Purple.copy(alpha = .12f), Purple) }
                 }
                 Spacer(Modifier.height(24.dp))
-                Segmented(listOf("Hoje", "Proximas", "Concluidas"), vm.homeFilter) { vm.updateHomeFilter(it) }
+                Segmented(listOf("Hoje", "Proximas", "Atrasadas", "Concluidas"), vm.homeFilter) { vm.updateHomeFilter(it) }
                 Spacer(Modifier.height(12.dp))
                 OutlinedTextField(searchQuery, { searchQuery = it }, label = { Text("Buscar tarefas") }, leadingIcon = { Icon(Icons.Default.Search, null) }, singleLine = true, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(18.dp))
                 Spacer(Modifier.height(12.dp))

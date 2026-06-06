@@ -1089,7 +1089,7 @@ Implementar identidade visual moderna, limpa e premium.
 
 - [x] Filtrar por hoje.
 - [x] Filtrar por próximas.
-- [ ] Filtrar por atrasadas.
+- [x] Filtrar por atrasadas.
 - [x] Filtrar por concluídas.
 - [x] Filtrar por responsável.
 - [x] Filtrar por prioridade.
@@ -1100,7 +1100,7 @@ Implementar identidade visual moderna, limpa e premium.
 ### Critérios de aceite
 
 - [x] Filtros funcionam isolados.
-- [ ] Filtros combinados funcionam quando aplicável.
+- [x] Filtros combinados funcionam quando aplicável.
 
 ---
 

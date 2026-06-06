@@ -15,6 +15,7 @@ class InMemoryTaskFlowRepository : TaskFlowRepository {
 
     private val seedTasks = listOf(
         Task(spaceId = trabalho.id, listId = prazos.id, title = "Enviar proposta", description = "Revisar anexos e enviar proposta ao cliente.", priority = TaskPriority.High, status = TaskStatus.InProgress, createdBy = manuel.id, assignedTo = manuel.id, dueDate = LocalDateTime.now().withHour(9).withMinute(0)),
+        Task(spaceId = trabalho.id, listId = prazos.id, title = "Enviar comprovante atrasado", description = "Regularizar pendencia enviada pelo financeiro.", priority = TaskPriority.High, status = TaskStatus.Waiting, createdBy = manuel.id, assignedTo = manuel.id, dueDate = LocalDateTime.now().minusDays(1).withHour(17).withMinute(0)),
         Task(spaceId = pessoal.id, listId = compras.id, title = "Comprar material", description = "Separar lista e comprovante.", priority = TaskPriority.Medium, createdBy = manuel.id, assignedTo = manuel.id, dueDate = LocalDateTime.now().withHour(11).withMinute(0)),
         Task(spaceId = trabalho.id, listId = prazos.id, title = "Preparar apresentacao", description = "Levar documentos e revisar roteiro.", priority = TaskPriority.Medium, createdBy = manuel.id, assignedTo = manuel.id, dueDate = LocalDateTime.now().withHour(14).withMinute(0)),
         Task(spaceId = pessoal.id, listId = compras.id, title = "Ler relatorio", description = "Anotar pontos principais.", priority = TaskPriority.Low, createdBy = manuel.id, assignedTo = manuel.id, dueDate = LocalDateTime.now().withHour(16).withMinute(30))
