@@ -31,6 +31,7 @@ Covered by the command:
 - `:app:assembleRelease`
 - `:app:bundleRelease`
 - artifact existence checks
+- release manifest generation with SHA-256 checksums
 
 Artifacts verified:
 
@@ -38,7 +39,11 @@ Artifacts verified:
 | --- | ---: |
 | `app/build/outputs/apk/debug/app-debug.apk` | 18,397,193 bytes |
 | `app/build/outputs/apk/release/app-release.apk` | 11,911,970 bytes |
-| `app/build/outputs/bundle/release/app-release.aab` | 11,534,309 bytes |
+| `app/build/outputs/bundle/release/app-release.aab` | 11,534,312 bytes |
+
+Release integrity manifest:
+
+- `docs/qa/release-manifest.json`
 
 Previous full verification also passed with Firebase rules enabled through:
 

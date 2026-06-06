@@ -59,5 +59,9 @@ Assert-File "app\build\outputs\apk\debug\app-debug.apk"
 Assert-File "app\build\outputs\apk\release\app-release.apk"
 Assert-File "app\build\outputs\bundle\release\app-release.aab"
 
+Invoke-Step "Release artifact manifest" {
+    powershell -NoProfile -ExecutionPolicy Bypass -File tools\qa\write-release-manifest.ps1
+}
+
 Write-Host ""
 Write-Host "TaskFlow local MVP verification completed."

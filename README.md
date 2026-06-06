@@ -51,6 +51,7 @@ npm run verify:local-mvp
 ```
 
 O mesmo fluxo esta preparado para GitHub Actions em `.github/workflows/android-ci.yml`.
+O comando tambem atualiza `docs/qa/release-manifest.json` com tamanho e SHA-256 dos APK/AAB.
 
 Comandos individuais:
 
@@ -59,6 +60,7 @@ Comandos individuais:
 .\gradlew.bat --no-daemon --max-workers=1 :app:assembleDebug --console=plain
 .\gradlew.bat --no-daemon --max-workers=1 :app:assembleRelease --console=plain
 .\gradlew.bat --no-daemon --max-workers=1 :app:compileDebugAndroidTestKotlin --console=plain
+npm run release:manifest
 ```
 
 Teste instrumentado de notificacoes no emulador:
@@ -110,6 +112,7 @@ Para concluir Firebase real, sera necessario fornecer:
 - Debug APK: `app/build/outputs/apk/debug/app-debug.apk`
 - Release APK: `app/build/outputs/apk/release/app-release.apk`
 - Release AAB: `app/build/outputs/bundle/release/app-release.aab`
+- Manifesto de release: `docs/qa/release-manifest.json`
 
 O release atual usa uma assinatura local de desenvolvimento (`~/.android/debug.keystore`) para permitir validacao. Para distribuicao real, gere e guarde uma keystore de producao.
 
