@@ -1073,12 +1073,12 @@ Implementar identidade visual moderna, limpa e premium.
 - [x] Buscar por nome de anexo.
 - [x] Buscar por link.
 - [x] Buscar por campo complementar.
-- [ ] Buscar por tag/categoria.
+- [x] Buscar por tag/categoria.
 
 ### Critérios de aceite
 
 - [x] Busca retorna tarefas corretas.
-- [ ] Busca não trava com lista grande.
+- [x] Busca não trava com lista grande.
 - [x] Busca mostra estado vazio quando não encontra nada.
 
 ---

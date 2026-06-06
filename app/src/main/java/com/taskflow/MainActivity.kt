@@ -63,6 +63,7 @@ import com.taskflow.core.permissions.PermissionPolicy
 import com.taskflow.core.utils.attachmentType
 import com.taskflow.core.utils.isAllowedAttachment
 import com.taskflow.core.utils.isValidUrl
+import com.taskflow.core.utils.TaskSearch
 import com.taskflow.domain.model.*
 import java.io.File
 import java.time.Instant
@@ -315,13 +316,7 @@ fun HomeScreen(vm: TaskFlowViewModel, onNew: () -> Unit, onDetail: (String) -> U
         else -> tasks.filter { !it.isCompleted && (it.dueDate?.toLocalDate() == LocalDate.now() || it.dueDate == null) }
     }
     fun matchesSearch(task: Task): Boolean {
-        val query = searchQuery.trim().lowercase()
-        if (query.isBlank()) return true
-        val assignee = users.firstOrNull { it.id == task.assignedTo }?.name.orEmpty()
-        val taskAttachments = attachments.filter { it.taskId == task.id }.joinToString(" ") { it.fileName }
-        val taskLinks = links.filter { it.taskId == task.id }.joinToString(" ") { "${it.title} ${it.url} ${it.category}" }
-        val taskFields = fields.filter { it.taskId == task.id }.joinToString(" ") { "${it.fieldName} ${it.fieldValue}" }
-        return listOf(task.title, task.description, assignee, taskAttachments, taskLinks, taskFields).any { it.lowercase().contains(query) }
+        return TaskSearch.matches(task, searchQuery, users, lists, attachments, links, fields)
     }
     val filtered = filteredByTab
         .filter(::matchesSearch)
