@@ -41,7 +41,7 @@ object FirebaseStoragePaths {
     }
 
     fun thumbnail(userId: String, taskId: String, attachmentId: String): String {
-        return "users/$userId/tasks/$taskId/attachments/$attachmentId/thumbnail.jpg"
+        return "users/$userId/tasks/$taskId/thumbnails/$attachmentId.jpg"
     }
 }
 

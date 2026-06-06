@@ -944,7 +944,7 @@ Implementar identidade visual moderna, limpa e premium.
 - [ ] Criar coleções `comments`.
 - [ ] Criar coleções `activityLog`.
 - [ ] Criar coleções `invites`.
-- [ ] Criar regras de segurança.
+- [x] Criar regras de segurança.
 
 ### Critérios de aceite
 

@@ -50,7 +50,7 @@ class FirebaseContractsTest {
             FirebaseStoragePaths.attachment("user-1", "task-1", attachment)
         )
         assertEquals(
-            "users/user-1/tasks/task-1/attachments/att-1/thumbnail.jpg",
+            "users/user-1/tasks/task-1/thumbnails/att-1.jpg",
             FirebaseStoragePaths.thumbnail("user-1", "task-1", "att-1")
         )
     }

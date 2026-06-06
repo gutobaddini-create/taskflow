@@ -1,0 +1,38 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function ownsUserPath(userId) {
+      return signedIn() && request.auth.uid == userId;
+    }
+
+    function validAttachment() {
+      return request.resource != null
+        && request.resource.size <= 20 * 1024 * 1024
+        && request.resource.contentType.matches('(image/jpeg|image/png|application/pdf|application/msword|application/vnd.openxmlformats-officedocument.wordprocessingml.document|application/vnd.ms-excel|application/vnd.openxmlformats-officedocument.spreadsheetml.sheet|text/plain)');
+    }
+
+    match /users/{userId}/tasks/{taskId}/attachments/{attachmentId}/{fileName} {
+      allow read: if ownsUserPath(userId);
+      allow create, update: if ownsUserPath(userId) && validAttachment();
+      allow delete: if ownsUserPath(userId);
+    }
+
+    match /users/{userId}/tasks/{taskId}/thumbnails/{attachmentId}.jpg {
+      allow read: if ownsUserPath(userId);
+      allow create, update: if ownsUserPath(userId)
+        && request.resource != null
+        && request.resource.size <= 1024 * 1024
+        && request.resource.contentType.matches('image/jpeg');
+      allow delete: if ownsUserPath(userId);
+    }
+
+    match /{path=**} {
+      allow read, write: if false;
+    }
+  }
+}
