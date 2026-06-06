@@ -1306,7 +1306,10 @@ fun SpacesScreen(vm: TaskFlowViewModel, onDetail: (String) -> Unit) {
     val reminders by vm.reminders.collectAsState()
     var dialog by remember { mutableStateOf<CrudDialogState?>(null) }
     var message by remember { mutableStateOf<String?>(null) }
+    var selectedSpaceId by remember { mutableStateOf<String?>(null) }
     var selectedListId by remember { mutableStateOf<String?>(null) }
+    val selectedSpace = spaces.firstOrNull { it.id == selectedSpaceId }
+    val selectedSpaceTasks = selectedSpace?.let { space -> tasks.filter { it.spaceId == space.id } } ?: emptyList()
     val selectedList = lists.firstOrNull { it.id == selectedListId }
     val selectedListTasks = selectedList?.let { list -> tasks.filter { it.listId == list.id } } ?: emptyList()
     dialog?.let { state ->
@@ -1342,7 +1345,18 @@ fun SpacesScreen(vm: TaskFlowViewModel, onDetail: (String) -> Unit) {
         items(spaces) { space ->
             TaskFlowCard {
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                    Text(space.name, fontSize = 22.sp, fontWeight = FontWeight.Bold, color = Text)
+                    Column(
+                        Modifier.weight(1f).clip(RoundedCornerShape(14.dp)).clickable {
+                            selectedSpaceId = space.id
+                            selectedListId = null
+                        }.padding(horizontal = 8.dp, vertical = 6.dp).testTag("open-space-${space.name}").semantics { contentDescription = "Abrir espaco ${space.name}" }
+                    ) {
+                        Text(space.name, fontSize = 22.sp, fontWeight = FontWeight.Bold, color = Text)
+                        val listCount = lists.count { it.spaceId == space.id }
+                        val taskCount = tasks.count { it.spaceId == space.id }
+                        val selectedSuffix = if (selectedSpaceId == space.id) " - aberto" else ""
+                        Text("$listCount listas - $taskCount tarefas$selectedSuffix", color = Muted, fontSize = 13.sp)
+                    }
                     Row {
                         IconButton(onClick = { dialog = CrudDialogState(CrudKind.EditSpace, "Renomear espaco", space.name, space = space) }, modifier = Modifier.testTag("edit-space-${space.name}").semantics { contentDescription = "Renomear espaco ${space.name}" }) { Icon(Icons.Default.Edit, null, tint = Muted) }
                         IconButton(onClick = { dialog = CrudDialogState(CrudKind.CreateList, "Nova lista", space = space) }, modifier = Modifier.testTag("create-list-${space.name}").semantics { contentDescription = "Criar lista em ${space.name}" }) { Icon(Icons.Default.PlaylistAdd, null, tint = Blue) }
@@ -1353,7 +1367,10 @@ fun SpacesScreen(vm: TaskFlowViewModel, onDetail: (String) -> Unit) {
                 }
                 lists.filter { it.spaceId == space.id }.forEach { list ->
                     Row(Modifier.fillMaxWidth().padding(vertical = 8.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                        Column(Modifier.weight(1f).clip(RoundedCornerShape(14.dp)).clickable { selectedListId = list.id }.padding(horizontal = 8.dp, vertical = 6.dp).testTag("open-list-${list.name}").semantics { contentDescription = "Filtrar lista ${list.name}" }) {
+                        Column(Modifier.weight(1f).clip(RoundedCornerShape(14.dp)).clickable {
+                            selectedListId = list.id
+                            selectedSpaceId = null
+                        }.padding(horizontal = 8.dp, vertical = 6.dp).testTag("open-list-${list.name}").semantics { contentDescription = "Filtrar lista ${list.name}" }) {
                             Text(list.name, color = Text)
                             val openCount = tasks.count { it.listId == list.id && !it.isCompleted }
                             val selectedSuffix = if (selectedListId == list.id) " - filtrando" else ""
@@ -1367,6 +1384,29 @@ fun SpacesScreen(vm: TaskFlowViewModel, onDetail: (String) -> Unit) {
                 }
             }
             Spacer(Modifier.height(12.dp))
+        }
+        selectedSpace?.let { space ->
+            item {
+                SectionTitle("Tarefas em ${space.name}")
+                val spaceLists = lists.filter { it.spaceId == space.id }
+                TaskFlowCard {
+                    InfoRow("Listas", spaceLists.joinToString { it.name }.ifBlank { "Nenhuma lista" })
+                    InfoRow("Tarefas abertas", selectedSpaceTasks.count { !it.isCompleted }.toString())
+                }
+                Spacer(Modifier.height(12.dp))
+                if (selectedSpaceTasks.isEmpty()) {
+                    TaskFlowCard {
+                        Text("Nenhuma tarefa neste espaco.", fontWeight = FontWeight.Bold, color = Text)
+                        Text("Crie uma lista e uma tarefa para preencher este espaco.", color = Muted, modifier = Modifier.padding(top = 4.dp))
+                    }
+                    Spacer(Modifier.height(12.dp))
+                }
+            }
+            items(selectedSpaceTasks) { task ->
+                val listName = lists.firstOrNull { it.id == task.listId }?.name ?: "Lista"
+                TaskCard(task, listName, reminders.any { it.taskId == task.id && it.isActive }) { onDetail(task.id) }
+                Spacer(Modifier.height(12.dp))
+            }
         }
         selectedList?.let { list ->
             item {

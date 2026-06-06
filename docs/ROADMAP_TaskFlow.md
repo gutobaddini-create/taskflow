@@ -441,7 +441,7 @@ Implementar identidade visual moderna, limpa e premium.
 
 - [x] Espaços aparecem em cards.
 - [x] Novo espaço pode ser criado.
-- [ ] Ao tocar em espaço, abre listas/tarefas daquele espaço.
+- [x] Ao tocar em espaço, abre listas/tarefas daquele espaço.
 
 ---
 
