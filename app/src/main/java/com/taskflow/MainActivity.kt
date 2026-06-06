@@ -57,6 +57,7 @@ import com.taskflow.data.local.TaskFlowPreferences
 import com.taskflow.data.local.TaskFlowUserPreferences
 import com.taskflow.data.local.TaskFlowDatabase
 import com.taskflow.data.repository.LocalTaskFlowRepository
+import com.taskflow.core.design.TaskFlowTheme
 import com.taskflow.core.notifications.ReminderEngine
 import com.taskflow.core.notifications.ReminderReceiver
 import com.taskflow.core.permissions.PermissionPolicy
@@ -262,7 +263,7 @@ fun TaskFlowRoot(
             onNotificationTaskHandled()
         }
     }
-    MaterialTheme(colorScheme = lightColorScheme(primary = Blue, secondary = Purple, background = OffWhite)) {
+    TaskFlowTheme {
         Surface(Modifier.fillMaxSize(), color = OffWhite) {
             when (screen) {
                 Screen.Onboarding -> OnboardingScreen(vm) { screen = Screen.Home }

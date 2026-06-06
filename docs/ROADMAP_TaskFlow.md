@@ -133,7 +133,7 @@ O TaskFlow deve funcionar como uma lista de tarefas moderna e colaborativa, pare
 | Marco | Nome | Resultado esperado | Status |
 |---|---|---|---|
 | M0 | Setup inicial | Projeto compila e abre tela inicial | [x] |
-| M1 | Design system | Componentes visuais base prontos | [ ] |
+| M1 | Design system | Componentes visuais base prontos | [x] |
 | M2 | Navegação | Fluxo de telas principal funcionando | [x] |
 | M3 | Tarefas locais | Criar, editar, listar e concluir tarefas | [x] |
 | M4 | Lembretes | Lembretes únicos e recorrentes funcionando | [x] |
@@ -229,12 +229,12 @@ Implementar identidade visual moderna, limpa e premium.
 
 ### Tarefas
 
-- [ ] Criar paleta de cores.
-- [ ] Criar tipografia.
-- [ ] Definir espaçamentos.
-- [ ] Definir raio dos cards.
-- [ ] Definir estilo dos botões.
-- [ ] Definir tema claro.
+- [x] Criar paleta de cores.
+- [x] Criar tipografia.
+- [x] Definir espaçamentos.
+- [x] Definir raio dos cards.
+- [x] Definir estilo dos botões.
+- [x] Definir tema claro.
 - [ ] Preparar estrutura para tema escuro futuro.
 
 ### Direção visual
@@ -250,9 +250,9 @@ Implementar identidade visual moderna, limpa e premium.
 
 ### Critérios de aceite
 
-- [ ] Todas as telas usam o mesmo tema.
-- [ ] Cores não são definidas aleatoriamente dentro das telas.
-- [ ] Componentes principais seguem padrão consistente.
+- [x] Todas as telas usam o mesmo tema.
+- [x] Cores não são definidas aleatoriamente dentro das telas.
+- [x] Componentes principais seguem padrão consistente.
 - [ ] Interface lembra app moderno/polido com inspiração iOS-like.
 
 ---
@@ -261,30 +261,30 @@ Implementar identidade visual moderna, limpa e premium.
 
 ### Tarefas
 
-- [ ] Criar `TaskFlowButton`.
-- [ ] Criar `TaskFlowOutlinedButton`.
-- [ ] Criar `TaskFlowCard`.
-- [ ] Criar `TaskCard`.
-- [ ] Criar `ReminderCard`.
-- [ ] Criar `AttachmentCard`.
-- [ ] Criar `LinkCard`.
-- [ ] Criar `CustomFieldRow`.
-- [ ] Criar `StatusPill`.
-- [ ] Criar `PriorityChip`.
-- [ ] Criar `SegmentedControl`.
-- [ ] Criar `ToggleSwitch`.
-- [ ] Criar `BottomNavigationBar`.
-- [ ] Criar `FloatingAddButton`.
-- [ ] Criar `EmptyState`.
-- [ ] Criar `LoadingState`.
-- [ ] Criar `ErrorState`.
+- [x] Criar `TaskFlowButton`.
+- [x] Criar `TaskFlowOutlinedButton`.
+- [x] Criar `TaskFlowCard`.
+- [x] Criar `TaskCard`.
+- [x] Criar `ReminderCard`.
+- [x] Criar `AttachmentCard`.
+- [x] Criar `LinkCard`.
+- [x] Criar `CustomFieldRow`.
+- [x] Criar `StatusPill`.
+- [x] Criar `PriorityChip`.
+- [x] Criar `SegmentedControl`.
+- [x] Criar `ToggleSwitch`.
+- [x] Criar `BottomNavigationBar`.
+- [x] Criar `FloatingAddButton`.
+- [x] Criar `EmptyState`.
+- [x] Criar `LoadingState`.
+- [x] Criar `ErrorState`.
 
 ### Critérios de aceite
 
 - [ ] Componentes reutilizados em mais de uma tela quando aplicável.
-- [ ] Componentes têm previews do Compose.
-- [ ] Componentes aceitam estados principais.
-- [ ] Componentes não contêm regra de negócio.
+- [x] Componentes têm previews do Compose.
+- [x] Componentes aceitam estados principais.
+- [x] Componentes não contêm regra de negócio.
 
 ---
 
