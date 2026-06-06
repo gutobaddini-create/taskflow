@@ -10,15 +10,19 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.database.Cursor
+import android.graphics.BitmapFactory
+import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
 import android.provider.OpenableColumns
+import android.util.Size
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.compose.setContent
 import androidx.core.content.FileProvider
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -36,7 +40,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.contentDescription
@@ -707,7 +713,10 @@ fun MaterialsScreen(vm: TaskFlowViewModel, onBack: () -> Unit) {
         }
     }
     val photoPicker = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
-        uri?.let { addUriAttachment(it, AttachmentSource.Gallery) }
+        uri?.let {
+            runCatching { context.contentResolver.takePersistableUriPermission(it, Intent.FLAG_GRANT_READ_URI_PERMISSION) }
+            addUriAttachment(it, AttachmentSource.Gallery)
+        }
     }
     val cameraLauncher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { success ->
         if (success) cameraUri?.let { addUriAttachment(it, AttachmentSource.Camera) }
@@ -1426,7 +1435,7 @@ fun MaterialRow(icon: ImageVector, title: String, subtitle: String) = TaskFlowCa
 @Composable
 fun AttachmentRow(attachment: Attachment, onOpen: () -> Unit, onShare: () -> Unit, onDelete: () -> Unit) = TaskFlowCard(Modifier.padding(bottom = 10.dp)) {
     Row(verticalAlignment = Alignment.CenterVertically) {
-        IconBubble(if (attachment.fileType == AttachmentType.Image) Icons.Default.Image else Icons.Default.Description, Purple.copy(.10f), Purple)
+        AttachmentPreview(attachment)
         Spacer(Modifier.width(12.dp))
         Column(Modifier.weight(1f)) {
             Text(attachment.fileName, fontWeight = FontWeight.Bold, color = Text)
@@ -1439,6 +1448,43 @@ fun AttachmentRow(attachment: Attachment, onOpen: () -> Unit, onShare: () -> Uni
         SmallAction(Icons.Default.DeleteOutline, "Excluir", Modifier.weight(1f), onDelete)
     }
 }
+
+@Composable
+fun AttachmentPreview(attachment: Attachment) {
+    val context = LocalContext.current
+    val imageBitmap = remember(attachment.storagePath, attachment.fileType) {
+        if (attachment.fileType != AttachmentType.Image) {
+            null
+        } else loadAttachmentImageBitmap(context, attachment.storagePath)
+    }
+    if (imageBitmap != null) {
+        Image(
+            bitmap = imageBitmap,
+            contentDescription = "Miniatura de ${attachment.fileName}",
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.size(42.dp).clip(RoundedCornerShape(14.dp))
+        )
+    } else {
+        IconBubble(if (attachment.fileType == AttachmentType.Image) Icons.Default.Image else Icons.Default.Description, Purple.copy(.10f), Purple)
+    }
+}
+
+private fun loadAttachmentImageBitmap(context: Context, storagePath: String) = runCatching {
+    val uri = Uri.parse(storagePath)
+    when (uri.scheme) {
+        "content" -> {
+            val decoded = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) runCatching {
+                ImageDecoder.decodeBitmap(ImageDecoder.createSource(context.contentResolver, uri)).asImageBitmap()
+            }.getOrNull() else null
+            val thumbnail = if (decoded == null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) runCatching {
+                context.contentResolver.loadThumbnail(uri, Size(96, 96), null).asImageBitmap()
+            }.getOrNull() else null
+            decoded ?: thumbnail ?: context.contentResolver.openInputStream(uri)?.use { stream -> BitmapFactory.decodeStream(stream)?.asImageBitmap() }
+        }
+        "file" -> context.contentResolver.openInputStream(uri)?.use { stream -> BitmapFactory.decodeStream(stream)?.asImageBitmap() }
+        else -> null
+    }
+}.getOrNull()
 @Composable
 fun LinkRow(link: TaskLink, onOpen: () -> Unit, onCopy: () -> Unit, onEdit: () -> Unit, onDelete: () -> Unit) = TaskFlowCard(Modifier.padding(bottom = 10.dp)) {
     Row(verticalAlignment = Alignment.CenterVertically) {
