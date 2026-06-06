@@ -1,9 +1,12 @@
 package com.taskflow.core.utils
 
-import android.util.Patterns
 import com.taskflow.domain.model.AttachmentType
+import java.net.URI
 
-fun isValidUrl(value: String): Boolean = Patterns.WEB_URL.matcher(value).matches() && (value.startsWith("http://") || value.startsWith("https://"))
+fun isValidUrl(value: String): Boolean = runCatching {
+    val uri = URI(value.trim())
+    uri.scheme in setOf("http", "https") && !uri.host.isNullOrBlank()
+}.getOrDefault(false)
 
 fun isAllowedAttachment(fileName: String, sizeBytes: Long): Boolean {
     val ext = fileName.substringAfterLast('.', "").lowercase()

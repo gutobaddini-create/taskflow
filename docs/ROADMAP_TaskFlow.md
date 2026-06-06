@@ -121,9 +121,9 @@ O TaskFlow deve funcionar como uma lista de tarefas moderna e colaborativa, pare
 
 - [x] Android notification permission.
 - [x] AlarmManager ou WorkManager conforme necessidade técnica.
-- [ ] Photo Picker para imagens.
-- [ ] CameraX ou intent de câmera para fotos.
-- [ ] Storage Access Framework para arquivos.
+- [x] Photo Picker para imagens.
+- [x] CameraX ou intent de câmera para fotos.
+- [x] Storage Access Framework para arquivos.
 - [ ] Android Sharesheet para compartilhamento.
 
 ---
@@ -651,23 +651,23 @@ Implementar identidade visual moderna, limpa e premium.
 
 ### Tarefas
 
-- [ ] Criar tela `Materiais da tarefa`.
-- [ ] Criar abas `Anexos`, `Links`, `Campos`.
-- [ ] Criar botão `Arquivo`.
-- [ ] Criar botão `Foto`.
-- [ ] Criar botão `Link`.
-- [ ] Criar área de seleção/arraste visual.
-- [ ] Listar anexos recentes.
-- [ ] Listar links.
-- [ ] Listar campos complementares.
+- [x] Criar tela `Materiais da tarefa`.
+- [x] Criar abas `Anexos`, `Links`, `Campos`.
+- [x] Criar botão `Arquivo`.
+- [x] Criar botão `Foto`.
+- [x] Criar botão `Link`.
+- [x] Criar área de seleção/arraste visual.
+- [x] Listar anexos recentes.
+- [x] Listar links.
+- [x] Listar campos complementares.
 - [ ] Exibir menu de ações por item.
 
 ### Critérios de aceite
 
-- [ ] Tela mostra anexos, links e campos em seções claras.
-- [ ] Tocar em arquivo abre seletor.
-- [ ] Tocar em foto abre câmera ou seletor de foto.
-- [ ] Tocar em link abre formulário de link.
+- [x] Tela mostra anexos, links e campos em seções claras.
+- [x] Tocar em arquivo abre seletor.
+- [x] Tocar em foto abre câmera ou seletor de foto.
+- [x] Tocar em link abre formulário de link.
 
 ---
 
@@ -681,10 +681,10 @@ Implementar identidade visual moderna, limpa e premium.
 - [ ] Selecionar DOC/DOCX.
 - [ ] Selecionar XLS/XLSX.
 - [ ] Selecionar TXT.
-- [ ] Validar tamanho máximo.
-- [ ] Exibir nome do arquivo.
-- [ ] Exibir tamanho.
-- [ ] Exibir tipo.
+- [x] Validar tamanho máximo.
+- [x] Exibir nome do arquivo.
+- [x] Exibir tamanho.
+- [x] Exibir tipo.
 - [ ] Exibir miniatura quando imagem.
 - [ ] Abrir anexo.
 - [ ] Excluir anexo.
@@ -705,13 +705,13 @@ Implementar identidade visual moderna, limpa e premium.
 
 ### Tarefas
 
-- [ ] Criar formulário de link.
-- [ ] Campo título.
-- [ ] Campo URL.
-- [ ] Campo descrição.
-- [ ] Campo categoria.
-- [ ] Validar URL.
-- [ ] Salvar link.
+- [x] Criar formulário de link.
+- [x] Campo título.
+- [x] Campo URL.
+- [x] Campo descrição.
+- [x] Campo categoria.
+- [x] Validar URL.
+- [x] Salvar link.
 - [ ] Abrir link.
 - [ ] Copiar link.
 - [ ] Editar link.
@@ -719,9 +719,9 @@ Implementar identidade visual moderna, limpa e premium.
 
 ### Critérios de aceite
 
-- [ ] Link válido é salvo.
+- [x] Link válido é salvo.
 - [ ] Link inválido mostra erro.
-- [ ] Link aparece na seção de materiais.
+- [x] Link aparece na seção de materiais.
 - [ ] Link abre no navegador ou WebView conforme decisão técnica.
 
 ---
@@ -730,14 +730,14 @@ Implementar identidade visual moderna, limpa e premium.
 
 ### Tarefas
 
-- [ ] Criar formulário de campo complementar.
-- [ ] Criar campo tipo texto.
-- [ ] Criar campo tipo número.
+- [x] Criar formulário de campo complementar.
+- [x] Criar campo tipo texto.
+- [x] Criar campo tipo número.
 - [ ] Criar campo tipo moeda.
 - [ ] Criar campo tipo data.
 - [ ] Criar campo tipo telefone.
 - [ ] Criar campo tipo e-mail.
-- [ ] Criar campo tipo URL.
+- [x] Criar campo tipo URL.
 - [ ] Criar campo tipo localização.
 - [ ] Criar campo tipo número de processo.
 - [ ] Criar campo tipo documento.
@@ -757,19 +757,19 @@ Implementar identidade visual moderna, limpa e premium.
 
 ### Tarefas
 
-- [ ] Criar checklist dentro da tarefa.
-- [ ] Adicionar item.
+- [x] Criar checklist dentro da tarefa.
+- [x] Adicionar item.
 - [ ] Marcar item como concluído.
 - [ ] Desmarcar item.
 - [ ] Editar item.
 - [ ] Excluir item.
-- [ ] Mostrar progresso do checklist.
+- [x] Mostrar progresso do checklist.
 
 ### Critérios de aceite
 
-- [ ] Checklist salva estado dos itens.
-- [ ] Progresso aparece corretamente.
-- [ ] Checklist pode ser usado em tarefa com anexos e lembretes.
+- [x] Checklist salva estado dos itens.
+- [x] Progresso aparece corretamente.
+- [x] Checklist pode ser usado em tarefa com anexos e lembretes.
 
 ---
 
@@ -1028,15 +1028,15 @@ Implementar identidade visual moderna, limpa e premium.
 ### Tarefas
 
 - [x] Solicitar permissão de notificação.
-- [ ] Solicitar câmera apenas quando usuário usar câmera.
-- [ ] Não pedir acesso amplo à galeria sem necessidade.
-- [ ] Usar Photo Picker para imagens.
-- [ ] Usar seletor de arquivos para documentos.
+- [x] Solicitar câmera apenas quando usuário usar câmera.
+- [x] Não pedir acesso amplo à galeria sem necessidade.
+- [x] Usar Photo Picker para imagens.
+- [x] Usar seletor de arquivos para documentos.
 
 ### Critérios de aceite
 
-- [ ] App não pede permissões desnecessárias na abertura.
-- [ ] Permissões aparecem no contexto certo.
+- [x] App não pede permissões desnecessárias na abertura.
+- [x] Permissões aparecem no contexto certo.
 - [ ] Usuário consegue continuar mesmo negando permissão não essencial.
 
 ---
@@ -1141,8 +1141,8 @@ Implementar identidade visual moderna, limpa e premium.
 - [x] Testar último dia útil.
 - [x] Testar fim por data.
 - [x] Testar fim por ocorrências.
-- [ ] Testar validação de URL.
-- [ ] Testar validação de arquivo.
+- [x] Testar validação de URL.
+- [x] Testar validação de arquivo.
 
 ### Critérios de aceite
 

@@ -1,6 +1,7 @@
 package com.taskflow
 
 import com.taskflow.core.utils.isAllowedAttachment
+import com.taskflow.core.utils.isValidUrl
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -19,5 +20,17 @@ class ValidatorsTest {
     @Test
     fun rejectsUnsupportedExtension() {
         assertFalse(isAllowedAttachment("arquivo.exe", 1200))
+    }
+
+    @Test
+    fun acceptsHttpAndHttpsUrls() {
+        assertTrue(isValidUrl("https://taskflow.local/convite/abc"))
+        assertTrue(isValidUrl("http://example.com/path"))
+    }
+
+    @Test
+    fun rejectsUrlsWithoutWebScheme() {
+        assertFalse(isValidUrl("taskflow.local/convite/abc"))
+        assertFalse(isValidUrl("ftp://example.com/file.pdf"))
     }
 }
