@@ -1037,7 +1037,7 @@ Implementar identidade visual moderna, limpa e premium.
 
 - [x] App não pede permissões desnecessárias na abertura.
 - [x] Permissões aparecem no contexto certo.
-- [ ] Usuário consegue continuar mesmo negando permissão não essencial.
+- [x] Usuário consegue continuar mesmo negando permissão não essencial.
 
 ---
 
