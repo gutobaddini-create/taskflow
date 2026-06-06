@@ -676,7 +676,7 @@ Implementar identidade visual moderna, limpa e premium.
 ### Tarefas
 
 - [x] Selecionar imagem via Photo Picker.
-- [ ] Tirar foto via câmera.
+- [x] Tirar foto via câmera.
 - [x] Selecionar PDF.
 - [ ] Selecionar DOC/DOCX.
 - [ ] Selecionar XLS/XLSX.
@@ -692,7 +692,7 @@ Implementar identidade visual moderna, limpa e premium.
 
 ### Critérios de aceite
 
-- [ ] Usuário consegue anexar foto tirada na hora.
+- [x] Usuário consegue anexar foto tirada na hora.
 - [x] Usuário consegue anexar imagem existente.
 - [x] Usuário consegue anexar PDF.
 - [x] Arquivo aparece na tarefa.
@@ -1271,7 +1271,7 @@ O MVP só estará pronto quando todos os itens abaixo estiverem concluídos:
 - [ ] Ação de adiar funcionando.
 - [ ] Múltiplos lembretes funcionando.
 - [x] Anexar imagem funcionando.
-- [ ] Tirar foto funcionando.
+- [x] Tirar foto funcionando.
 - [x] Anexar PDF funcionando.
 - [x] Links funcionando.
 - [x] Campos complementares funcionando.
