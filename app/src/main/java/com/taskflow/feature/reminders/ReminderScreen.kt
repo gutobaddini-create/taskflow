@@ -38,7 +38,7 @@ import com.taskflow.core.design.InfoRow
 import com.taskflow.core.design.SectionTitle
 import com.taskflow.core.design.Segmented
 import com.taskflow.core.design.TaskFlowCard
-import com.taskflow.TaskFlowViewModel
+import com.taskflow.core.app.TaskFlowViewModel
 import com.taskflow.core.design.TopRow
 import com.taskflow.core.design.LoadingFullScreen
 import com.taskflow.core.design.TaskFlowColors

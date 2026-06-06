@@ -49,7 +49,7 @@ import com.taskflow.core.design.NextReminderCard
 import com.taskflow.core.design.Segmented
 import com.taskflow.core.design.TaskCard
 import com.taskflow.core.design.TaskFlowCard
-import com.taskflow.TaskFlowViewModel
+import com.taskflow.core.app.TaskFlowViewModel
 import com.taskflow.core.design.TaskFlowColors
 import com.taskflow.core.notifications.ReminderEngine
 import com.taskflow.core.utils.TaskSearch

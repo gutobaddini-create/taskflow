@@ -53,6 +53,7 @@ import com.taskflow.data.local.TaskFlowPreferences
 import com.taskflow.data.local.TaskFlowUserPreferences
 import com.taskflow.data.local.TaskFlowDatabase
 import com.taskflow.data.repository.LocalTaskFlowRepository
+import com.taskflow.core.app.TaskFlowViewModel
 import com.taskflow.core.design.LoadingFullScreen
 import com.taskflow.core.design.SegmentedControl as DesignSegmentedControl
 import com.taskflow.core.design.TaskFlowButton as DesignTaskFlowButton
@@ -123,105 +124,6 @@ class MainActivity : ComponentActivity() {
 
 private fun Intent.inviteToken(): String? = data?.takeIf { it.scheme == "taskflow" && it.host == "invite" }?.lastPathSegment
 private fun Intent.notificationTaskId(): String? = getStringExtra(ReminderReceiver.EXTRA_TASK_ID)
-
-class TaskFlowViewModel(application: Application) : AndroidViewModel(application) {
-    val repo = LocalTaskFlowRepository(TaskFlowDatabase.get(application).dao(), application, viewModelScope)
-    private val preferencesStore = TaskFlowPreferences(application)
-    val users = repo.users
-    val spaces = repo.spaces
-    val lists = repo.lists
-    val tasks = repo.tasks
-    val reminders = repo.reminders
-    val attachments = repo.attachments
-    val links = repo.links
-    val customFields = repo.customFields
-    val checklist = repo.checklist
-    val comments = repo.comments
-    val invites = repo.invites
-    val activity = repo.activity
-    val pendingOperations = repo.pendingOperations
-    private val _preferences = MutableStateFlow(TaskFlowUserPreferences())
-    val preferences: StateFlow<TaskFlowUserPreferences> = _preferences
-    var remindersVisible by mutableStateOf(true)
-        private set
-    var homeFilter by mutableStateOf("Hoje")
-        private set
-    var selectedTaskId by mutableStateOf<String?>(null)
-    var materialsTab by mutableStateOf("Anexos")
-
-    init {
-        viewModelScope.launch {
-            preferencesStore.values.collect { prefs ->
-                _preferences.value = prefs
-                remindersVisible = prefs.remindersVisible
-                homeFilter = prefs.homeFilter
-            }
-        }
-    }
-
-    fun updateHomeFilter(value: String) {
-        homeFilter = value
-        viewModelScope.launch { preferencesStore.setHomeFilter(value) }
-    }
-
-    fun updateRemindersVisible(value: Boolean) {
-        remindersVisible = value
-        viewModelScope.launch {
-            preferencesStore.setRemindersVisible(value)
-            preferencesStore.setNotificationsEnabled(value)
-        }
-    }
-
-    fun setTheme(value: String) {
-        viewModelScope.launch { preferencesStore.setTheme(value) }
-    }
-
-    fun setNotificationsEnabled(value: Boolean) {
-        remindersVisible = value
-        viewModelScope.launch {
-            preferencesStore.setNotificationsEnabled(value)
-            preferencesStore.setRemindersVisible(value)
-        }
-    }
-
-    fun setCurrentUserIfNeeded(userId: String) {
-        if (preferences.value.currentUserId.isBlank()) {
-            viewModelScope.launch { preferencesStore.setCurrentUserId(userId) }
-        }
-    }
-
-    fun setCurrentUser(userId: String) {
-        viewModelScope.launch { preferencesStore.setCurrentUserId(userId) }
-    }
-
-    fun logoutLocal() {
-        viewModelScope.launch { preferencesStore.setCurrentUserId("") }
-    }
-
-    fun loginLocal(email: String): Boolean {
-        val normalized = email.trim().lowercase()
-        val user = users.value.firstOrNull { it.email.lowercase() == normalized } ?: return false
-        setCurrentUser(user.id)
-        return true
-    }
-
-    fun registerLocal(name: String, email: String): Boolean {
-        val cleanName = name.trim()
-        val normalized = email.trim().lowercase()
-        if (cleanName.isBlank() || !normalized.contains("@")) return false
-        val existing = users.value.firstOrNull { it.email.lowercase() == normalized }
-        val user = existing ?: User(name = cleanName, email = normalized)
-        repo.saveUser(user)
-        setCurrentUser(user.id)
-        return true
-    }
-
-    fun currentUser(): User {
-        val currentId = preferences.value.currentUserId
-        return users.value.firstOrNull { it.id == currentId } ?: users.value.firstOrNull() ?: User(name = "Manuel", email = "manuel@taskflow.local")
-    }
-    fun selectedTask(): Task? = tasks.value.firstOrNull { it.id == selectedTaskId } ?: tasks.value.firstOrNull()
-}
 
 sealed class Screen(val label: String) {
     data object Onboarding : Screen("Inicio")

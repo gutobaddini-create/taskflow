@@ -47,7 +47,7 @@ import com.taskflow.core.design.InfoRow
 import com.taskflow.core.design.SectionTitle
 import com.taskflow.core.design.TaskCard
 import com.taskflow.core.design.TaskFlowCard
-import com.taskflow.TaskFlowViewModel
+import com.taskflow.core.app.TaskFlowViewModel
 import com.taskflow.core.design.NameDialog
 import com.taskflow.core.design.TaskFlowColors
 import com.taskflow.domain.model.Space

@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.sp
 import com.taskflow.core.design.GradientButton
 import com.taskflow.core.design.InfoRow
 import com.taskflow.core.design.TaskFlowCard
-import com.taskflow.TaskFlowViewModel
+import com.taskflow.core.app.TaskFlowViewModel
 import com.taskflow.core.design.TaskFlowColors
 import com.taskflow.domain.model.now
 import java.time.format.DateTimeFormatter

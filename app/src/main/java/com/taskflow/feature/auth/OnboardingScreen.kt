@@ -27,7 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.taskflow.core.design.GradientButton
 import com.taskflow.core.design.Segmented
-import com.taskflow.TaskFlowViewModel
+import com.taskflow.core.app.TaskFlowViewModel
 import com.taskflow.core.design.TaskFlowColors
 
 @Composable
