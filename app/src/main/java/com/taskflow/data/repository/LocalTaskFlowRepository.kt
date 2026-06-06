@@ -22,6 +22,10 @@ class LocalTaskFlowRepository(
     private val scope: CoroutineScope
 ) : TaskFlowRepository {
     private val reminderScheduler = ReminderScheduler(context.applicationContext)
+    private suspend fun logActivity(taskId: String, userId: String, action: String) {
+        dao.upsertActivity(listOf(ActivityLog(taskId = taskId, userId = userId, action = action).toEntity()))
+    }
+
     override val users = MutableStateFlow(emptyList<User>())
     override val spaces = MutableStateFlow(emptyList<Space>())
     override val lists = MutableStateFlow(emptyList<TaskList>())
@@ -174,33 +178,53 @@ class LocalTaskFlowRepository(
     }
 
     override fun addAttachment(attachment: Attachment) {
-        scope.launch(Dispatchers.IO) { dao.upsertAttachments(listOf(attachment.toEntity())) }
+        scope.launch(Dispatchers.IO) {
+            dao.upsertAttachments(listOf(attachment.toEntity()))
+            logActivity(attachment.taskId, attachment.uploadedBy, "Anexo adicionado: ${attachment.fileName}")
+        }
     }
 
     override fun addLink(link: TaskLink) {
-        scope.launch(Dispatchers.IO) { dao.upsertLinks(listOf(link.toEntity())) }
+        scope.launch(Dispatchers.IO) {
+            dao.upsertLinks(listOf(link.toEntity()))
+            logActivity(link.taskId, link.createdBy, "Link adicionado: ${link.title}")
+        }
     }
 
     override fun addCustomField(field: CustomField) {
-        scope.launch(Dispatchers.IO) { dao.upsertCustomFields(listOf(field.toEntity())) }
+        scope.launch(Dispatchers.IO) {
+            dao.upsertCustomFields(listOf(field.toEntity()))
+            logActivity(field.taskId, field.createdBy, "Campo alterado: ${field.fieldName}")
+        }
     }
 
     override fun addChecklistItem(item: ChecklistItem) {
-        scope.launch(Dispatchers.IO) { dao.upsertChecklistItems(listOf(item.toEntity())) }
+        scope.launch(Dispatchers.IO) {
+            dao.upsertChecklistItems(listOf(item.toEntity()))
+            logActivity(item.taskId, users.value.firstOrNull()?.id ?: "local", "Checklist adicionado: ${item.title}")
+        }
     }
 
     override fun toggleChecklistItem(itemId: String) {
         scope.launch(Dispatchers.IO) {
             val item = dao.checklistItemById(itemId)?.toDomain() ?: return@launch
-            dao.upsertChecklistItems(listOf(item.copy(isDone = !item.isDone).toEntity()))
+            val updated = item.copy(isDone = !item.isDone)
+            dao.upsertChecklistItems(listOf(updated.toEntity()))
+            logActivity(item.taskId, users.value.firstOrNull()?.id ?: "local", if (updated.isDone) "Checklist concluido: ${item.title}" else "Checklist reaberto: ${item.title}")
         }
     }
 
     override fun addComment(comment: Comment) {
-        scope.launch(Dispatchers.IO) { dao.upsertComments(listOf(comment.toEntity())) }
+        scope.launch(Dispatchers.IO) {
+            dao.upsertComments(listOf(comment.toEntity()))
+            logActivity(comment.taskId, comment.authorId, "Comentario adicionado")
+        }
     }
 
     override fun createInvite(invite: Invite) {
-        scope.launch(Dispatchers.IO) { dao.upsertInvites(listOf(invite.toEntity())) }
+        scope.launch(Dispatchers.IO) {
+            dao.upsertInvites(listOf(invite.toEntity()))
+            logActivity(invite.taskId, invite.createdBy, "Convite criado: ${invite.permission.label}")
+        }
     }
 }

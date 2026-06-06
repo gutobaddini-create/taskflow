@@ -57,9 +57,11 @@ import com.taskflow.core.utils.isAllowedAttachment
 import com.taskflow.core.utils.isValidUrl
 import com.taskflow.domain.model.*
 import java.io.File
+import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -354,11 +356,13 @@ fun DetailScreen(vm: TaskFlowViewModel, onBack: () -> Unit, onMaterials: () -> U
     val links by vm.links.collectAsState()
     val fields by vm.customFields.collectAsState()
     val comments by vm.comments.collectAsState()
+    val activity by vm.activity.collectAsState()
     if (task == null) {
         LoadingFullScreen("Carregando tarefa...")
         return
     }
     var editing by remember(task.id) { mutableStateOf(false) }
+    var commentText by remember(task.id) { mutableStateOf("") }
     var editTitle by remember(task.id) { mutableStateOf(task.title) }
     var editDescription by remember(task.id) { mutableStateOf(task.description) }
     var editStatus by remember(task.id) { mutableStateOf(task.status) }
@@ -434,7 +438,40 @@ fun DetailScreen(vm: TaskFlowViewModel, onBack: () -> Unit, onMaterials: () -> U
                 Text(links.firstOrNull { it.taskId == task.id }?.title ?: "Nenhum link", color = Text)
             }
             SectionTitle("Comentarios")
-            comments.filter { it.taskId == task.id }.forEach { Text("Manuel: ${it.text}", color = Muted, modifier = Modifier.padding(vertical = 4.dp)) }
+            TaskFlowCard {
+                val taskComments = comments.filter { it.taskId == task.id }
+                if (taskComments.isEmpty()) {
+                    Text("Nenhum comentario.", color = Muted)
+                } else {
+                    taskComments.forEach {
+                        Text(users.firstOrNull { user -> user.id == it.authorId }?.name ?: "Usuario", fontWeight = FontWeight.Bold, color = Text)
+                        Text(it.text, color = Muted, modifier = Modifier.padding(bottom = 4.dp))
+                        Text(formatTimestamp(it.createdAt), color = Muted, fontSize = 12.sp, modifier = Modifier.padding(bottom = 12.dp))
+                    }
+                }
+                OutlinedTextField(commentText, { commentText = it }, label = { Text("Novo comentario") }, shape = RoundedCornerShape(18.dp), singleLine = true, modifier = Modifier.fillMaxWidth())
+                Spacer(Modifier.height(10.dp))
+                Button(onClick = {
+                    if (commentText.isNotBlank()) {
+                        vm.repo.addComment(Comment(taskId = task.id, authorId = vm.currentUser().id, text = commentText.trim()))
+                        commentText = ""
+                    }
+                }, modifier = Modifier.fillMaxWidth().height(54.dp).semantics { contentDescription = "Adicionar comentario" }, enabled = commentText.isNotBlank(), shape = RoundedCornerShape(50)) {
+                    Text("Adicionar comentario", fontWeight = FontWeight.Bold)
+                }
+            }
+            SectionTitle("Historico")
+            TaskFlowCard {
+                val taskActivity = activity.filter { it.taskId == task.id }.take(6)
+                if (taskActivity.isEmpty()) {
+                    Text("Nenhum evento.", color = Muted)
+                } else {
+                    taskActivity.forEach {
+                        Text(it.action, color = Text, fontWeight = FontWeight.SemiBold)
+                        Text(formatTimestamp(it.createdAt), color = Muted, fontSize = 12.sp, modifier = Modifier.padding(bottom = 10.dp))
+                    }
+                }
+            }
             Spacer(Modifier.height(20.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 OutlinedButton(onClick = onShare, modifier = Modifier.weight(1f), shape = RoundedCornerShape(50)) { Text("Compartilhar") }
@@ -1007,6 +1044,7 @@ fun InfoRow(label: String, value: String) = Row(Modifier.fillMaxWidth().padding(
 @Composable
 fun MaterialRow(icon: ImageVector, title: String, subtitle: String) = TaskFlowCard(Modifier.padding(bottom = 10.dp)) { Row(verticalAlignment = Alignment.CenterVertically) { IconBubble(icon, Purple.copy(.10f), Purple); Spacer(Modifier.width(12.dp)); Column(Modifier.weight(1f)) { Text(title, fontWeight = FontWeight.Bold, color = Text); Text(subtitle, color = Muted, maxLines = 1) }; Icon(Icons.Default.MoreVert, null, tint = Muted) } }
 fun priorityColor(priority: TaskPriority) = when (priority) { TaskPriority.High -> Color(0xFFEF4444); TaskPriority.Medium -> Blue; TaskPriority.Low -> Color(0xFF22C55E) }
+fun formatTimestamp(value: Long): String = Instant.ofEpochMilli(value).atZone(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))
 
 data class AttachmentMetadata(val name: String, val sizeBytes: Long, val mimeType: String)
 

@@ -828,16 +828,16 @@ Implementar identidade visual moderna, limpa e premium.
 
 ### Tarefas
 
-- [ ] Exibir comentários na tarefa.
-- [ ] Adicionar comentário.
+- [x] Exibir comentários na tarefa.
+- [x] Adicionar comentário.
 - [ ] Editar comentário próprio.
 - [ ] Excluir comentário próprio.
-- [ ] Mostrar autor.
-- [ ] Mostrar data/hora.
+- [x] Mostrar autor.
+- [x] Mostrar data/hora.
 
 ### Critérios de aceite
 
-- [ ] Comentário aparece em tempo real local/mockado.
+- [x] Comentário aparece em tempo real local/mockado.
 - [ ] Participantes autorizados podem comentar.
 - [ ] Visualizadores sem permissão não comentam.
 
@@ -847,21 +847,21 @@ Implementar identidade visual moderna, limpa e premium.
 
 ### Tarefas
 
-- [ ] Registrar criação da tarefa.
+- [x] Registrar criação da tarefa.
 - [ ] Registrar alteração de status.
 - [ ] Registrar alteração de prazo.
 - [ ] Registrar alteração de responsável.
-- [ ] Registrar anexo adicionado.
+- [x] Registrar anexo adicionado.
 - [ ] Registrar anexo removido.
-- [ ] Registrar link adicionado.
-- [ ] Registrar campo alterado.
-- [ ] Registrar tarefa concluída.
+- [x] Registrar link adicionado.
+- [x] Registrar campo alterado.
+- [x] Registrar tarefa concluída.
 
 ### Critérios de aceite
 
-- [ ] Histórico mostra eventos relevantes.
-- [ ] Eventos têm usuário, data e ação.
-- [ ] Histórico não expõe dados sensíveis desnecessários.
+- [x] Histórico mostra eventos relevantes.
+- [x] Eventos têm usuário, data e ação.
+- [x] Histórico não expõe dados sensíveis desnecessários.
 
 ---
 

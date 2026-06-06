@@ -91,11 +91,32 @@ class InMemoryTaskFlowRepository : TaskFlowRepository {
         reminders.value = reminders.value.filterNot { it.id == reminder.id } + reminder
     }
 
-    override fun addAttachment(attachment: Attachment) { attachments.value = attachments.value + attachment }
-    override fun addLink(link: TaskLink) { links.value = links.value + link }
-    override fun addCustomField(field: CustomField) { customFields.value = customFields.value + field }
-    override fun addChecklistItem(item: ChecklistItem) { checklist.value = checklist.value + item }
-    override fun toggleChecklistItem(itemId: String) { checklist.value = checklist.value.map { if (it.id == itemId) it.copy(isDone = !it.isDone) else it } }
-    override fun addComment(comment: Comment) { comments.value = comments.value + comment }
-    override fun createInvite(invite: Invite) { invites.value = invites.value + invite }
+    override fun addAttachment(attachment: Attachment) {
+        attachments.value = attachments.value + attachment
+        activity.value = activity.value + ActivityLog(taskId = attachment.taskId, userId = attachment.uploadedBy, action = "Anexo adicionado: ${attachment.fileName}")
+    }
+    override fun addLink(link: TaskLink) {
+        links.value = links.value + link
+        activity.value = activity.value + ActivityLog(taskId = link.taskId, userId = link.createdBy, action = "Link adicionado: ${link.title}")
+    }
+    override fun addCustomField(field: CustomField) {
+        customFields.value = customFields.value + field
+        activity.value = activity.value + ActivityLog(taskId = field.taskId, userId = field.createdBy, action = "Campo alterado: ${field.fieldName}")
+    }
+    override fun addChecklistItem(item: ChecklistItem) {
+        checklist.value = checklist.value + item
+        activity.value = activity.value + ActivityLog(taskId = item.taskId, userId = users.value.first().id, action = "Checklist adicionado: ${item.title}")
+    }
+    override fun toggleChecklistItem(itemId: String) {
+        checklist.value = checklist.value.map { if (it.id == itemId) it.copy(isDone = !it.isDone) else it }
+        checklist.value.firstOrNull { it.id == itemId }?.let { activity.value = activity.value + ActivityLog(taskId = it.taskId, userId = users.value.first().id, action = if (it.isDone) "Checklist concluido: ${it.title}" else "Checklist reaberto: ${it.title}") }
+    }
+    override fun addComment(comment: Comment) {
+        comments.value = comments.value + comment
+        activity.value = activity.value + ActivityLog(taskId = comment.taskId, userId = comment.authorId, action = "Comentario adicionado")
+    }
+    override fun createInvite(invite: Invite) {
+        invites.value = invites.value + invite
+        activity.value = activity.value + ActivityLog(taskId = invite.taskId, userId = invite.createdBy, action = "Convite criado: ${invite.permission.label}")
+    }
 }
