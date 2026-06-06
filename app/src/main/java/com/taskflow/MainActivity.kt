@@ -1304,10 +1304,13 @@ fun SpacesScreen(vm: TaskFlowViewModel, onDetail: (String) -> Unit) {
     val lists by vm.lists.collectAsState()
     val tasks by vm.tasks.collectAsState()
     val reminders by vm.reminders.collectAsState()
+    val users by vm.users.collectAsState()
+    val preferences by vm.preferences.collectAsState()
     var dialog by remember { mutableStateOf<CrudDialogState?>(null) }
     var message by remember { mutableStateOf<String?>(null) }
     var selectedSpaceId by remember { mutableStateOf<String?>(null) }
     var selectedListId by remember { mutableStateOf<String?>(null) }
+    val currentUser = users.firstOrNull { it.id == preferences.currentUserId } ?: users.firstOrNull() ?: vm.currentUser()
     val selectedSpace = spaces.firstOrNull { it.id == selectedSpaceId }
     val selectedSpaceTasks = selectedSpace?.let { space -> tasks.filter { it.spaceId == space.id } } ?: emptyList()
     val selectedList = lists.firstOrNull { it.id == selectedListId }
@@ -1352,10 +1355,14 @@ fun SpacesScreen(vm: TaskFlowViewModel, onDetail: (String) -> Unit) {
                         }.padding(horizontal = 8.dp, vertical = 6.dp).testTag("open-space-${space.name}").semantics { contentDescription = "Abrir espaco ${space.name}" }
                     ) {
                         Text(space.name, fontSize = 22.sp, fontWeight = FontWeight.Bold, color = Text)
+                        val shared = space.ownerId != currentUser.id || space.members.size > 1
+                        Row(Modifier.padding(top = 6.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            ChipText(if (shared) "Compartilhado" else "Meu espaco", active = shared)
+                        }
                         val listCount = lists.count { it.spaceId == space.id }
                         val taskCount = tasks.count { it.spaceId == space.id }
                         val selectedSuffix = if (selectedSpaceId == space.id) " - aberto" else ""
-                        Text("$listCount listas - $taskCount tarefas$selectedSuffix", color = Muted, fontSize = 13.sp)
+                        Text("$listCount listas - $taskCount tarefas - ${space.members.size} membros$selectedSuffix", color = Muted, fontSize = 13.sp)
                     }
                     Row {
                         IconButton(onClick = { dialog = CrudDialogState(CrudKind.EditSpace, "Renomear espaco", space.name, space = space) }, modifier = Modifier.testTag("edit-space-${space.name}").semantics { contentDescription = "Renomear espaco ${space.name}" }) { Icon(Icons.Default.Edit, null, tint = Muted) }
@@ -1390,6 +1397,9 @@ fun SpacesScreen(vm: TaskFlowViewModel, onDetail: (String) -> Unit) {
                 SectionTitle("Tarefas em ${space.name}")
                 val spaceLists = lists.filter { it.spaceId == space.id }
                 TaskFlowCard {
+                    val ownerName = users.firstOrNull { it.id == space.ownerId }?.name ?: "Usuario local"
+                    InfoRow("Proprietario", ownerName)
+                    InfoRow("Acesso", if (space.ownerId == currentUser.id) "Meu espaco" else "Compartilhado comigo")
                     InfoRow("Listas", spaceLists.joinToString { it.name }.ifBlank { "Nenhuma lista" })
                     InfoRow("Tarefas abertas", selectedSpaceTasks.count { !it.isCompleted }.toString())
                 }

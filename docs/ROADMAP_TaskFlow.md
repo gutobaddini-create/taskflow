@@ -435,7 +435,7 @@ Implementar identidade visual moderna, limpa e premium.
 - [x] Editar espaço.
 - [x] Excluir espaço.
 - [x] Mostrar quantidade de tarefas abertas.
-- [ ] Mostrar espaços compartilhados.
+- [x] Mostrar espaços compartilhados.
 
 ### Critérios de aceite
 
