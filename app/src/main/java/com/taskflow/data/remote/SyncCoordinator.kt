@@ -10,6 +10,7 @@ import com.taskflow.data.mapper.toDomain
 import com.taskflow.data.mapper.toEntity
 import com.taskflow.domain.model.PendingOperation
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -94,7 +95,7 @@ class SyncCoordinator(
     private val connectivity: ConnectivityMonitor
 ) {
     fun start(scope: CoroutineScope) {
-        scope.launch {
+        scope.launch(Dispatchers.IO) {
             connectivity.isOnline
                 .collect { online ->
                     if (online) syncOnce()
