@@ -46,6 +46,10 @@ Primary QA report:
 
 - `docs/QA_TaskFlow.md`
 
+Completion audit:
+
+- `docs/COMPLETION_AUDIT_TaskFlow.md`
+
 Screenshots:
 
 - `docs/qa/screenshots/release-onboarding-emulator-2026-06-06.png`
