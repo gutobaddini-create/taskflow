@@ -17,12 +17,12 @@ Validated target:
 Command executed:
 
 ```powershell
-pwsh -NoProfile -File tools/qa/verify-local-mvp.ps1 -SkipFirebaseRules
+npm run verify:local-mvp
 ```
 
 Result: passed.
 
-Latest run: 2026-06-06 22:58 UTC.
+Latest run: 2026-06-06 23:06 UTC.
 
 Covered by the command:
 
@@ -32,6 +32,7 @@ Covered by the command:
 - `:app:compileDebugAndroidTestKotlin`
 - `:app:assembleRelease`
 - `:app:bundleRelease`
+- Firebase emulator security rules
 - artifact existence checks
 - release manifest generation with SHA-256 checksums
 
@@ -43,16 +44,16 @@ Artifacts verified:
 | --- | ---: |
 | `app/build/outputs/apk/debug/app-debug.apk` | 18,397,193 bytes |
 | `app/build/outputs/apk/release/app-release.apk` | 11,911,970 bytes |
-| `app/build/outputs/bundle/release/app-release.aab` | 11,534,301 bytes |
+| `app/build/outputs/bundle/release/app-release.aab` | 11,534,305 bytes |
 
 Release integrity manifest:
 
 - `docs/qa/release-manifest.json`
 
-Previous full verification also passed with Firebase rules enabled through:
+PowerShell Core direct verification without Firebase rules is available through:
 
 ```powershell
-npm run verify:local-mvp
+pwsh -NoProfile -File tools/qa/verify-local-mvp.ps1 -SkipFirebaseRules
 ```
 
 The GitHub Actions workflow now runs the same full verification path and uploads the APK/AAB artifacts.

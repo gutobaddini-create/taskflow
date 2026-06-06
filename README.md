@@ -35,7 +35,7 @@ tools/firebase-rules/
 
 ## Requisitos Locais
 
-- Windows com PowerShell.
+- PowerShell 7+ (`pwsh`) para executar os scripts de QA no Windows, Linux ou GitHub Actions.
 - Android SDK em `C:\TaskFlowAndroidSdk` ou SDK equivalente configurado.
 - Java 17 disponivel pelo projeto em `.tools/jdk-17`.
 - Node/npm para testes de regras Firebase.
@@ -52,6 +52,8 @@ npm run verify:local-mvp
 
 O mesmo fluxo esta preparado para GitHub Actions em `.github/workflows/android-ci.yml`.
 O comando tambem atualiza `docs/qa/release-manifest.json` com tamanho e SHA-256 dos APK/AAB.
+
+Se estiver usando apenas Windows PowerShell 5 localmente, execute os scripts `.ps1` diretamente com `powershell`; os scripts tambem foram validados com `pwsh`, que e o caminho recomendado para CI.
 
 Comandos individuais:
 

@@ -4,8 +4,8 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "verify:local-mvp": "powershell -NoProfile -ExecutionPolicy Bypass -File tools/qa/verify-local-mvp.ps1",
-    "release:manifest": "powershell -NoProfile -ExecutionPolicy Bypass -File tools/qa/write-release-manifest.ps1",
+    "verify:local-mvp": "pwsh -NoProfile -File tools/qa/verify-local-mvp.ps1",
+    "release:manifest": "pwsh -NoProfile -File tools/qa/write-release-manifest.ps1",
     "test:firestore-rules": "firebase emulators:exec --only firestore --project taskflow-rules-test \"node tools/firebase-rules/firestore-rules.test.mjs\"",
     "test:storage-rules": "firebase emulators:exec --only storage --project taskflow-rules-test \"node tools/firebase-rules/storage-rules.test.mjs\"",
     "test:firebase-rules": "firebase emulators:exec --only firestore,storage --project taskflow-rules-test \"node tools/firebase-rules/firestore-rules.test.mjs && node tools/firebase-rules/storage-rules.test.mjs\""
