@@ -51,6 +51,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -247,8 +248,8 @@ fun TaskCard(title: String, subtitle: String, priorityColor: Color, modifier: Mo
             Box(Modifier.size(32.dp).border(2.dp, TaskFlowColors.Border, CircleShape).clip(CircleShape))
             Spacer(Modifier.width(DesignTokens.itemGap))
             Column(Modifier.weight(1f)) {
-                Text(title, style = MaterialTheme.typography.titleMedium)
-                Text(subtitle, style = MaterialTheme.typography.bodyMedium)
+                Text(title, style = MaterialTheme.typography.titleMedium, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                Text(subtitle, style = MaterialTheme.typography.bodyMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
             PriorityChip("Alta", priorityColor)
         }
@@ -263,7 +264,7 @@ fun ReminderCard(title: String, dateLabel: String, modifier: Modifier = Modifier
             Spacer(Modifier.width(DesignTokens.itemGap))
             Column(Modifier.weight(1f)) {
                 Text("Proximo lembrete", color = TaskFlowColors.Purple, fontWeight = FontWeight.Bold)
-                Text(title, style = MaterialTheme.typography.titleMedium)
+                Text(title, style = MaterialTheme.typography.titleMedium, maxLines = 2, overflow = TextOverflow.Ellipsis)
                 Text(dateLabel, style = MaterialTheme.typography.bodyMedium)
             }
         }
@@ -277,8 +278,8 @@ fun AttachmentCard(title: String, subtitle: String, modifier: Modifier = Modifie
             DesignIconBubble(Icons.Default.Inbox, TaskFlowColors.Purple.copy(alpha = .12f), TaskFlowColors.Purple)
             Spacer(Modifier.width(DesignTokens.itemGap))
             Column(Modifier.weight(1f)) {
-                Text(title, fontWeight = FontWeight.Bold, color = TaskFlowColors.Text)
-                Text(subtitle, style = MaterialTheme.typography.bodyMedium)
+                Text(title, fontWeight = FontWeight.Bold, color = TaskFlowColors.Text, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text(subtitle, style = MaterialTheme.typography.bodyMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
         }
     }
@@ -293,7 +294,7 @@ fun LinkCard(title: String, url: String, modifier: Modifier = Modifier) {
 fun CustomFieldRow(label: String, value: String, modifier: Modifier = Modifier) {
     Row(modifier.fillMaxWidth().padding(vertical = 7.dp), horizontalArrangement = Arrangement.SpaceBetween) {
         Text(label, color = TaskFlowColors.Muted)
-        Text(value, color = TaskFlowColors.Text, fontWeight = FontWeight.SemiBold)
+        Text(value, color = TaskFlowColors.Text, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
     }
 }
 
@@ -303,6 +304,8 @@ fun StatusPill(text: String, modifier: Modifier = Modifier) {
         text,
         color = TaskFlowColors.Blue,
         fontWeight = FontWeight.SemiBold,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
         modifier = modifier.clip(RoundedCornerShape(DesignTokens.pillRadius)).background(TaskFlowColors.Blue.copy(alpha = .10f)).padding(horizontal = 12.dp, vertical = 8.dp)
     )
 }
@@ -313,6 +316,8 @@ fun PriorityChip(text: String, color: Color, modifier: Modifier = Modifier) {
         text,
         color = color,
         fontWeight = FontWeight.SemiBold,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
         modifier = modifier.clip(RoundedCornerShape(DesignTokens.pillRadius)).background(color.copy(alpha = .12f)).padding(horizontal = 12.dp, vertical = 8.dp)
     )
 }
@@ -328,7 +333,7 @@ fun SegmentedControl(options: List<String>, selected: String, onSelect: (String)
                 Modifier.weight(1f).clip(RoundedCornerShape(18.dp)).background(if (active) TaskFlowGradient else Brush.linearGradient(listOf(Color.Transparent, Color.Transparent))).clickable { onSelect(option) }.padding(vertical = 12.dp),
                 contentAlignment = Alignment.Center
             ) {
-                Text(option, color = if (active) Color.White else TaskFlowColors.Text, fontWeight = FontWeight.SemiBold)
+                Text(option, color = if (active) Color.White else TaskFlowColors.Text, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
         }
     }
@@ -406,7 +411,7 @@ private fun StateMessage(icon: ImageVector, title: String, message: String, modi
         DesignIconBubble(icon, iconColor.copy(alpha = .10f), iconColor)
         Spacer(Modifier.height(12.dp))
         Text(title, style = MaterialTheme.typography.titleMedium)
-        Text(message, style = MaterialTheme.typography.bodyMedium)
+        Text(message, style = MaterialTheme.typography.bodyMedium, maxLines = 2, overflow = TextOverflow.Ellipsis)
     }
 }
 

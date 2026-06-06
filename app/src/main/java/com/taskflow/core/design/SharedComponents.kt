@@ -39,6 +39,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.taskflow.domain.model.Task
@@ -56,8 +57,8 @@ fun TaskCard(task: Task, listName: String, hasReminder: Boolean, onClick: () -> 
             Box(Modifier.size(34.dp).border(2.dp, TaskFlowColors.Border, CircleShape).clip(CircleShape))
             Spacer(Modifier.width(14.dp))
             Column(Modifier.weight(1f)) {
-                Text(task.title, fontSize = 21.sp, fontWeight = FontWeight.Bold, color = TaskFlowColors.Text)
-                Text("${task.dueDate?.format(DateTimeFormatter.ofPattern("HH:mm")) ?: "--:--"}  -  $listName", color = TaskFlowColors.Muted)
+                Text(task.title, fontSize = 21.sp, fontWeight = FontWeight.Bold, color = TaskFlowColors.Text, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                Text("${task.dueDate?.format(DateTimeFormatter.ofPattern("HH:mm")) ?: "--:--"}  -  $listName", color = TaskFlowColors.Muted, maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
             PriorityPill(task.priority)
             if (hasReminder) Icon(Icons.Default.Notifications, null, tint = TaskFlowColors.Muted, modifier = Modifier.padding(start = 8.dp))
@@ -73,7 +74,7 @@ fun NextReminderCard(title: String, date: LocalDateTime) {
             Spacer(Modifier.width(14.dp))
             Column(Modifier.weight(1f)) {
                 Text("Proximo lembrete", color = TaskFlowColors.Purple, fontWeight = FontWeight.Bold)
-                Text(title, fontSize = 22.sp, fontWeight = FontWeight.Bold, color = TaskFlowColors.Text)
+                Text(title, fontSize = 22.sp, fontWeight = FontWeight.Bold, color = TaskFlowColors.Text, maxLines = 2, overflow = TextOverflow.Ellipsis)
                 Text(date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy - HH:mm")), color = TaskFlowColors.Muted)
             }
             Icon(Icons.Default.ChevronRight, null, tint = TaskFlowColors.Text)
@@ -113,6 +114,8 @@ fun ChipText(text: String, active: Boolean = true, modifier: Modifier = Modifier
         text,
         color = if (active) TaskFlowColors.Purple else TaskFlowColors.Muted,
         fontWeight = FontWeight.SemiBold,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
         modifier = modifier
             .clip(RoundedCornerShape(50))
             .background(if (active) TaskFlowColors.Purple.copy(.10f) else TaskFlowColors.Border.copy(.45f))
@@ -124,6 +127,8 @@ fun PriorityPill(priority: TaskPriority) =
     Text(
         priority.label,
         color = priorityColor(priority),
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
         modifier = Modifier
             .clip(RoundedCornerShape(50))
             .background(priorityColor(priority).copy(.12f))
@@ -135,6 +140,8 @@ fun StatusPill(status: TaskStatus) =
     Text(
         status.label,
         color = TaskFlowColors.Blue,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
         modifier = Modifier
             .clip(RoundedCornerShape(50))
             .background(TaskFlowColors.Blue.copy(.10f))
@@ -146,7 +153,7 @@ fun SmallAction(icon: ImageVector, label: String, modifier: Modifier = Modifier,
     OutlinedButton(onClick = onClick, modifier = modifier, shape = RoundedCornerShape(18.dp), contentPadding = PaddingValues(10.dp)) {
         Icon(icon, null)
         Spacer(Modifier.width(6.dp))
-        Text(label)
+        Text(label, maxLines = 1, overflow = TextOverflow.Ellipsis)
     }
 
 @Composable
@@ -163,7 +170,7 @@ fun TopRow(action: String, title: String, onAction: () -> Unit) =
 fun InfoRow(label: String, value: String) =
     Row(Modifier.fillMaxWidth().padding(vertical = 7.dp), horizontalArrangement = Arrangement.SpaceBetween) {
         Text(label, color = TaskFlowColors.Muted)
-        Text(value, color = TaskFlowColors.Text, fontWeight = FontWeight.SemiBold)
+        Text(value, color = TaskFlowColors.Text, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
     }
 
 @Composable
@@ -173,8 +180,8 @@ fun MaterialRow(icon: ImageVector, title: String, subtitle: String) =
             IconBubble(icon, TaskFlowColors.Purple.copy(.10f), TaskFlowColors.Purple)
             Spacer(Modifier.width(12.dp))
             Column(Modifier.weight(1f)) {
-                Text(title, fontWeight = FontWeight.Bold, color = TaskFlowColors.Text)
-                Text(subtitle, color = TaskFlowColors.Muted, maxLines = 1)
+                Text(title, fontWeight = FontWeight.Bold, color = TaskFlowColors.Text, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text(subtitle, color = TaskFlowColors.Muted, maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
             Icon(Icons.Default.MoreVert, null, tint = TaskFlowColors.Muted)
         }
@@ -211,7 +218,7 @@ fun FeedbackBanner(message: String?, kind: FeedbackKind, modifier: Modifier = Mo
         ) {
             Icon(icon, null, tint = color, modifier = Modifier.size(20.dp))
             Spacer(Modifier.width(10.dp))
-            Text(message ?: "", color = TaskFlowColors.Text, fontWeight = FontWeight.SemiBold)
+            Text(message ?: "", color = TaskFlowColors.Text, fontWeight = FontWeight.SemiBold, maxLines = 2, overflow = TextOverflow.Ellipsis)
         }
     }
 }
