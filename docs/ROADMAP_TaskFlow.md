@@ -678,9 +678,9 @@ Implementar identidade visual moderna, limpa e premium.
 - [x] Selecionar imagem via Photo Picker.
 - [x] Tirar foto via câmera.
 - [x] Selecionar PDF.
-- [ ] Selecionar DOC/DOCX.
-- [ ] Selecionar XLS/XLSX.
-- [ ] Selecionar TXT.
+- [x] Selecionar DOC/DOCX.
+- [x] Selecionar XLS/XLSX.
+- [x] Selecionar TXT.
 - [x] Validar tamanho máximo.
 - [x] Exibir nome do arquivo.
 - [x] Exibir tamanho.
