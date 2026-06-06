@@ -1297,19 +1297,19 @@ Use esta seção para registrar decisões importantes.
 
 ## Decisão 001
 
-- Data:
-- Tema:
-- Decisão:
-- Motivo:
-- Impacto:
+- Data: 2026-06-06
+- Tema: MVP local-first
+- Decisão: Entregar o MVP com Room/DataStore e contratos remotos preparados, mantendo Firebase real desativado até haver projeto e credenciais.
+- Motivo: O pacote inicial não continha `google-services.json`, projeto Firebase, regras publicadas ou credenciais de teste.
+- Impacto: O app funciona localmente e enfileira operações pendentes; Auth/Firestore/Storage/FCM ficam como fase de integração final.
 
 ## Decisão 002
 
-- Data:
-- Tema:
-- Decisão:
-- Motivo:
-- Impacto:
+- Data: 2026-06-06
+- Tema: Fronteira Firebase
+- Decisão: Criar `RemoteTaskFlowDataSource`, contratos de coleções/caminhos e `FirebaseTaskFlowDataSource` fail-closed sem SDK Firebase obrigatório.
+- Motivo: Preparar a troca do repositório remoto sem quebrar builds locais nem exigir credenciais ausentes.
+- Impacto: A integração Firebase futura tem pontos de entrada explícitos para Auth, sync de operações pendentes, upload/delete de anexos e registro FCM.
 
 ---
 
@@ -1319,7 +1319,8 @@ Use esta seção para listar bloqueios.
 
 | Data | Bloqueio | Impacto | Responsável | Status |
 |---|---|---|---|---|
-| | | | | |
+| 2026-06-06 | Ausência de projeto Firebase/`google-services.json`/credenciais de teste. | Impede validar Firebase Authentication, Firestore, Storage, FCM e regras publicadas. | Dono do projeto Firebase | Aberto |
+| 2026-06-06 | Aparelho físico conectado exige PIN/biometria. | APK release instala no aparelho, mas os fluxos navegáveis não puderam ser testados fisicamente via adb. | Dono do aparelho | Aberto |
 
 ---
 
