@@ -1218,9 +1218,9 @@ Implementar identidade visual moderna, limpa e premium.
 
 ### Critérios de aceite
 
-- [ ] App visualmente consistente.
-- [ ] Telas principais parecem parte do mesmo produto.
-- [ ] Nenhuma tela parece protótipo inacabado.
+- [x] App visualmente consistente.
+- [x] Telas principais parecem parte do mesmo produto.
+- [x] Nenhuma tela parece protótipo inacabado.
 
 ---
 

@@ -110,6 +110,38 @@ Observed evidence:
 - App process remained alive after navigation.
 - Crash buffer was empty before and after onboarding/home navigation.
 
+## Release Visual QA
+
+Commands executed:
+
+```powershell
+$adb='C:\TaskFlowAndroidSdk\platform-tools\adb.exe'
+& $adb -s emulator-5554 exec-out screencap -p > docs\qa\screenshots\<screen>.png
+& $adb -s emulator-5554 exec-out uiautomator dump /dev/tty > docs\qa\<screen>.xml
+```
+
+Result: passed.
+
+Observed evidence:
+
+- Release build navigated through Home, new task, task detail, custom reminder, materials, and sharing/invite flows.
+- UI hierarchy dumps confirmed primary labels and controls for each captured screen.
+- The visual set matches the primary mockup families for Home, Nova tarefa, Lembrete personalizado, Materiais, Detalhe da tarefa, and Compartilhar.
+- App process remained alive after the visual navigation pass.
+- Recent logcat sample after the pass did not show a TaskFlow crash or ANR.
+
+Captured screenshots:
+
+- `docs/qa/screenshots/visual-home-filtered-release-2026-06-06.png`
+- `docs/qa/screenshots/visual-new-task-release-2026-06-06.png`
+- `docs/qa/screenshots/visual-new-task-filled-release-2026-06-06.png`
+- `docs/qa/screenshots/visual-home-created-task-release-2026-06-06.png`
+- `docs/qa/screenshots/visual-detail-release-2026-06-06.png`
+- `docs/qa/screenshots/visual-reminder-release-2026-06-06.png`
+- `docs/qa/screenshots/visual-materials-release-2026-06-06.png`
+- `docs/qa/screenshots/visual-share-release-2026-06-06.png`
+- `docs/qa/screenshots/visual-detail-actions-release-2026-06-06.png`
+
 ## Current External Blockers
 
 These items cannot be completed from the local workspace alone:

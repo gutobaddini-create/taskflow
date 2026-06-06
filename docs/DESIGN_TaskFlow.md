@@ -669,13 +669,13 @@ A interface será considerada aderente ao design quando:
 - [x] Usa chips para status, prioridade e contadores.
 - [x] Usa bottom navigation com quatro itens.
 - [x] Usa floating action button na Home.
-- [ ] A tela Home se parece com `mockup_de_tela_de_tarefas_diário.png`.
-- [ ] A tela Nova tarefa se parece com `tela_de_criação_de_tarefa.png`.
-- [ ] A tela Lembrete personalizado se parece com `configurações_de_lembrete_personalizado.png`.
-- [ ] A tela Materiais da tarefa se parece com `interface_moderna_de_materiais_da_tarefa.png`.
-- [ ] A tela Detalhe da tarefa se parece com `detalhe_da_tarefa_em_app_moderno.png`.
-- [ ] A tela Compartilhar se parece com `tela_de_compartilhamento_de_convite.png`.
+- [x] A tela Home se parece com `mockup_de_tela_de_tarefas_diário.png`.
+- [x] A tela Nova tarefa se parece com `tela_de_criação_de_tarefa.png`.
+- [x] A tela Lembrete personalizado se parece com `configurações_de_lembrete_personalizado.png`.
+- [x] A tela Materiais da tarefa se parece com `interface_moderna_de_materiais_da_tarefa.png`.
+- [x] A tela Detalhe da tarefa se parece com `detalhe_da_tarefa_em_app_moderno.png`.
+- [x] A tela Compartilhar se parece com `tela_de_compartilhamento_de_convite.png`.
 - [x] A interface mantém espaçamentos generosos.
 - [x] Os textos são legíveis.
 - [x] As ações principais são óbvias.
-- [ ] O app parece moderno, limpo e premium.
+- [x] O app parece moderno, limpo e premium.
