@@ -1186,7 +1186,7 @@ Implementar identidade visual moderna, limpa e premium.
 ### Tarefas
 
 - [x] Ajustar espaçamentos.
-- [ ] Ajustar alinhamentos.
+- [x] Ajustar alinhamentos.
 - [x] Ajustar tamanhos de fonte.
 - [x] Ajustar cores dos chips.
 - [x] Ajustar contraste.

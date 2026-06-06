@@ -38,6 +38,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -181,19 +182,24 @@ fun SmallAction(icon: ImageVector, label: String, modifier: Modifier = Modifier,
 
 @Composable
 fun TopRow(action: String, title: String, onAction: () -> Unit) =
-    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-        TextButton(onClick = onAction) { Text(action) }
-        Spacer(Modifier.weight(1f))
-        Text(title, fontWeight = FontWeight.Bold, color = TaskFlowColors.Text)
-        Spacer(Modifier.weight(1f))
-        Spacer(Modifier.width(76.dp))
+    Box(Modifier.fillMaxWidth()) {
+        TextButton(onClick = onAction, modifier = Modifier.align(Alignment.CenterStart)) { Text(action) }
+        Text(
+            title,
+            fontWeight = FontWeight.Bold,
+            color = TaskFlowColors.Text,
+            textAlign = TextAlign.Center,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.align(Alignment.Center).padding(horizontal = 92.dp)
+        )
     }
 
 @Composable
 fun InfoRow(label: String, value: String) =
-    Row(Modifier.fillMaxWidth().padding(vertical = 7.dp), horizontalArrangement = Arrangement.SpaceBetween) {
-        Text(label, color = TaskFlowColors.Muted)
-        Text(value, color = TaskFlowColors.Text, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+    Row(Modifier.fillMaxWidth().padding(vertical = 7.dp), verticalAlignment = Alignment.CenterVertically) {
+        Text(label, color = TaskFlowColors.Muted, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f).padding(end = 12.dp))
+        Text(value, color = TaskFlowColors.Text, fontWeight = FontWeight.SemiBold, textAlign = TextAlign.End, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
     }
 
 @Composable
