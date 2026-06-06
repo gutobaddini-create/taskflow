@@ -951,7 +951,7 @@ Implementar identidade visual moderna, limpa e premium.
 - [ ] Usuário acessa apenas seus dados.
 - [ ] Participante acessa apenas tarefas permitidas.
 - [ ] Dados sincronizam entre sessões.
-- [ ] Regras impedem leitura pública indevida.
+- [x] Regras impedem leitura pública indevida.
 
 ---
 
@@ -1284,7 +1284,7 @@ O MVP só estará pronto quando todos os itens abaixo estiverem concluídos:
 - [ ] Firestore funcionando.
 - [ ] Firebase Storage funcionando.
 - [x] Permissões funcionando.
-- [ ] Regras de segurança básicas funcionando.
+- [x] Regras de segurança básicas funcionando.
 - [x] Persistência local funcionando.
 - [ ] App testado em aparelho físico.
 - [x] Build release gerado.

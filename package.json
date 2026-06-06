@@ -1,0 +1,14 @@
+{
+  "name": "taskflow-android",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "test:firestore-rules": "firebase emulators:exec --only firestore --project taskflow-rules-test \"node tools/firebase-rules/firestore-rules.test.mjs\""
+  },
+  "devDependencies": {
+    "@firebase/rules-unit-testing": "^5.0.0",
+    "firebase": "^12.6.0",
+    "firebase-tools": "^15.19.1"
+  }
+}
