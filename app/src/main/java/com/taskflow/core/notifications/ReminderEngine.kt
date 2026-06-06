@@ -8,6 +8,16 @@ import java.time.LocalTime
 import java.time.YearMonth
 
 object ReminderEngine {
+    fun afterDelivery(reminder: Reminder, deliveredAt: LocalDateTime = LocalDateTime.now()): Reminder {
+        val delivered = reminder.copy(occurrencesCompleted = reminder.occurrencesCompleted + 1)
+        if (delivered.type == ReminderType.OneTime || delivered.recurrenceType == RecurrenceType.None) {
+            return delivered.copy(nextTriggerAt = null, isActive = false, updatedAt = now())
+        }
+
+        val next = nextOccurrence(delivered, deliveredAt)
+        return delivered.copy(nextTriggerAt = next, isActive = next != null, updatedAt = now())
+    }
+
     fun nextOccurrence(reminder: Reminder, from: LocalDateTime = LocalDateTime.now()): LocalDateTime? {
         if (!reminder.isActive) return null
         if (reminder.endType == ReminderEndType.AfterOccurrences && reminder.maxOccurrences != null && reminder.occurrencesCompleted >= reminder.maxOccurrences) return null

@@ -3,7 +3,9 @@ package com.taskflow
 import com.taskflow.core.notifications.ReminderEngine
 import com.taskflow.domain.model.*
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -154,5 +156,63 @@ class ReminderEngineTest {
             startTime = LocalTime.of(9, 0)
         )
         assertNull(ReminderEngine.nextOccurrence(reminder, LocalDateTime.of(2026, 6, 5, 8, 0)))
+    }
+
+    @Test
+    fun oneTimeReminderDeactivatesAfterDelivery() {
+        val delivered = ReminderEngine.afterDelivery(
+            Reminder(
+                taskId = "task",
+                userId = "user",
+                startDate = LocalDate.of(2026, 6, 10),
+                startTime = LocalTime.of(9, 0)
+            ),
+            LocalDateTime.of(2026, 6, 10, 9, 0)
+        )
+
+        assertFalse(delivered.isActive)
+        assertEquals(1, delivered.occurrencesCompleted)
+        assertNull(delivered.nextTriggerAt)
+    }
+
+    @Test
+    fun recurringReminderSchedulesNextAfterDelivery() {
+        val delivered = ReminderEngine.afterDelivery(
+            Reminder(
+                taskId = "task",
+                userId = "user",
+                type = ReminderType.Recurring,
+                recurrenceType = RecurrenceType.Daily,
+                startDate = LocalDate.of(2026, 6, 10),
+                startTime = LocalTime.of(9, 0)
+            ),
+            LocalDateTime.of(2026, 6, 10, 9, 0)
+        )
+
+        assertTrue(delivered.isActive)
+        assertEquals(1, delivered.occurrencesCompleted)
+        assertEquals(LocalDateTime.of(2026, 6, 11, 9, 0), delivered.nextTriggerAt)
+    }
+
+    @Test
+    fun occurrenceLimitDeactivatesAfterFinalDelivery() {
+        val delivered = ReminderEngine.afterDelivery(
+            Reminder(
+                taskId = "task",
+                userId = "user",
+                type = ReminderType.Recurring,
+                recurrenceType = RecurrenceType.Daily,
+                endType = ReminderEndType.AfterOccurrences,
+                maxOccurrences = 3,
+                occurrencesCompleted = 2,
+                startDate = LocalDate.of(2026, 6, 10),
+                startTime = LocalTime.of(9, 0)
+            ),
+            LocalDateTime.of(2026, 6, 12, 9, 0)
+        )
+
+        assertFalse(delivered.isActive)
+        assertEquals(3, delivered.occurrencesCompleted)
+        assertNull(delivered.nextTriggerAt)
     }
 }

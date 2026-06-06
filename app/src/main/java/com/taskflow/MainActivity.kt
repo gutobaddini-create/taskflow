@@ -58,6 +58,7 @@ import com.taskflow.data.local.TaskFlowUserPreferences
 import com.taskflow.data.local.TaskFlowDatabase
 import com.taskflow.data.repository.LocalTaskFlowRepository
 import com.taskflow.core.notifications.ReminderEngine
+import com.taskflow.core.notifications.ReminderReceiver
 import com.taskflow.core.permissions.PermissionPolicy
 import com.taskflow.core.utils.attachmentType
 import com.taskflow.core.utils.isAllowedAttachment
@@ -98,23 +99,34 @@ private fun CustomFieldType.label(): String = CustomFieldTypeLabels.firstOrNull 
 
 class MainActivity : ComponentActivity() {
     private val pendingInviteToken = mutableStateOf<String?>(null)
+    private val pendingTaskId = mutableStateOf<String?>(null)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         pendingInviteToken.value = intent.inviteToken()
+        pendingTaskId.value = intent.notificationTaskId()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), 1001)
         }
-        setContent { TaskFlowRoot(inviteToken = pendingInviteToken.value, onInviteHandled = { pendingInviteToken.value = null }) }
+        setContent {
+            TaskFlowRoot(
+                inviteToken = pendingInviteToken.value,
+                notificationTaskId = pendingTaskId.value,
+                onInviteHandled = { pendingInviteToken.value = null },
+                onNotificationTaskHandled = { pendingTaskId.value = null }
+            )
+        }
     }
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         pendingInviteToken.value = intent.inviteToken()
+        pendingTaskId.value = intent.notificationTaskId()
     }
 }
 
 private fun Intent.inviteToken(): String? = data?.takeIf { it.scheme == "taskflow" && it.host == "invite" }?.lastPathSegment
+private fun Intent.notificationTaskId(): String? = getStringExtra(ReminderReceiver.EXTRA_TASK_ID)
 
 class TaskFlowViewModel(application: Application) : AndroidViewModel(application) {
     val repo = LocalTaskFlowRepository(TaskFlowDatabase.get(application).dao(), application, viewModelScope)
@@ -211,10 +223,24 @@ sealed class Screen(val label: String) {
 }
 
 @Composable
-fun TaskFlowRoot(inviteToken: String? = null, onInviteHandled: () -> Unit = {}, vm: TaskFlowViewModel = viewModel()) {
+fun TaskFlowRoot(
+    inviteToken: String? = null,
+    notificationTaskId: String? = null,
+    onInviteHandled: () -> Unit = {},
+    onNotificationTaskHandled: () -> Unit = {},
+    vm: TaskFlowViewModel = viewModel()
+) {
     var screen by remember { mutableStateOf<Screen>(Screen.Onboarding) }
+    val tasks by vm.tasks.collectAsState()
     LaunchedEffect(inviteToken) {
         if (!inviteToken.isNullOrBlank()) screen = Screen.AcceptInvite
+    }
+    LaunchedEffect(notificationTaskId, tasks) {
+        if (!notificationTaskId.isNullOrBlank() && tasks.any { it.id == notificationTaskId }) {
+            vm.selectedTaskId = notificationTaskId
+            screen = Screen.Detail
+            onNotificationTaskHandled()
+        }
     }
     MaterialTheme(colorScheme = lightColorScheme(primary = Blue, secondary = Purple, background = OffWhite)) {
         Surface(Modifier.fillMaxSize(), color = OffWhite) {

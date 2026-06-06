@@ -633,15 +633,15 @@ Implementar identidade visual moderna, limpa e premium.
 - [x] Implementar ação `Concluir`.
 - [x] Implementar ação `Adiar`.
 - [x] Implementar ação `Abrir`.
-- [ ] Reagendar próxima ocorrência após disparo.
+- [x] Reagendar próxima ocorrência após disparo.
 
 ### Critérios de aceite
 
 - [ ] Notificação dispara no horário correto.
-- [ ] Ação `Abrir` abre detalhe da tarefa.
-- [ ] Ação `Concluir` conclui a tarefa.
-- [ ] Ação `Adiar` cria novo disparo.
-- [ ] Recorrência é reagendada sem duplicar.
+- [x] Ação `Abrir` abre detalhe da tarefa.
+- [x] Ação `Concluir` conclui a tarefa.
+- [x] Ação `Adiar` cria novo disparo.
+- [x] Recorrência é reagendada sem duplicar.
 
 ---
 
@@ -1268,7 +1268,7 @@ O MVP só estará pronto quando todos os itens abaixo estiverem concluídos:
 - [ ] Lembrete único funcionando.
 - [x] Lembrete recorrente personalizado funcionando.
 - [ ] Notificações locais funcionando.
-- [ ] Ação de adiar funcionando.
+- [x] Ação de adiar funcionando.
 - [ ] Múltiplos lembretes funcionando.
 - [x] Anexar imagem funcionando.
 - [x] Tirar foto funcionando.

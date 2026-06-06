@@ -32,7 +32,9 @@ class ReminderScheduler(private val context: Context) {
     }
 
     fun snooze(reminderId: String, taskId: String, minutes: Long = 10) {
-        val intent = ReminderReceiver.intent(context, ReminderReceiver.ACTION_SHOW, reminderId, taskId)
+        val intent = ReminderReceiver.intent(context, ReminderReceiver.ACTION_SHOW, reminderId, taskId).apply {
+            putExtra(ReminderReceiver.EXTRA_SNOOZED, true)
+        }
         val pendingIntent = PendingIntent.getBroadcast(
             context,
             "${reminderId}:snooze".hashCode(),

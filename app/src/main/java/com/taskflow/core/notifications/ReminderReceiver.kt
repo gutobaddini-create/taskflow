@@ -18,6 +18,7 @@ import com.taskflow.domain.model.now
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.time.LocalDateTime
 
 class ReminderReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
@@ -26,11 +27,11 @@ class ReminderReceiver : BroadcastReceiver() {
         when (intent.action) {
             ACTION_COMPLETE -> completeTask(context, taskId)
             ACTION_SNOOZE -> ReminderScheduler(context).snooze(reminderId, taskId)
-            else -> showReminder(context, reminderId, taskId)
+            else -> showReminder(context, reminderId, taskId, intent.getBooleanExtra(EXTRA_SNOOZED, false))
         }
     }
 
-    private fun showReminder(context: Context, reminderId: String, taskId: String) {
+    private fun showReminder(context: Context, reminderId: String, taskId: String, fromSnooze: Boolean) {
         ReminderScheduler.ensureChannel(context)
         val pendingResult = goAsync()
         CoroutineScope(Dispatchers.IO).launch {
@@ -50,6 +51,13 @@ class ReminderReceiver : BroadcastReceiver() {
                     .addAction(R.drawable.ic_taskflow, "Adiar", actionPendingIntent(context, ACTION_SNOOZE, reminderId, taskId))
                     .build()
                 (context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).notify(reminderId.hashCode(), notification)
+                if (!fromSnooze) {
+                    val updated = ReminderEngine.afterDelivery(reminder, LocalDateTime.now())
+                    dao.upsertReminders(listOf(updated.toEntity()))
+                    if (updated.isActive && updated.nextTriggerAt != null) {
+                        ReminderScheduler(context).schedule(updated, updated.nextTriggerAt)
+                    }
+                }
             }
             pendingResult.finish()
         }
@@ -95,6 +103,7 @@ class ReminderReceiver : BroadcastReceiver() {
         const val ACTION_SNOOZE = "com.taskflow.reminders.SNOOZE"
         const val EXTRA_REMINDER_ID = "reminder_id"
         const val EXTRA_TASK_ID = "task_id"
+        const val EXTRA_SNOOZED = "snoozed"
 
         fun intent(context: Context, action: String, reminderId: String, taskId: String): Intent {
             return Intent(context, ReminderReceiver::class.java).apply {
