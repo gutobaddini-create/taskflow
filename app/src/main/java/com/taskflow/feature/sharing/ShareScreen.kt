@@ -17,7 +17,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Chat
+import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material3.Text
@@ -126,7 +126,7 @@ fun ShareScreen(vm: TaskFlowViewModel, onBack: () -> Unit) {
             Segmented(listOf("Editar", "Comentar", "Ver"), permission) { permission = it }
             SectionTitle("Compartilhar por")
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                SmallAction(Icons.Default.Chat, "WhatsApp") { sendShare("com.whatsapp") }
+                SmallAction(Icons.AutoMirrored.Filled.Chat, "WhatsApp") { sendShare("com.whatsapp") }
                 SmallAction(Icons.Default.Email, "E-mail") { sendEmail() }
                 SmallAction(Icons.Default.ContentCopy, "Copiar") { copyInvite() }
             }

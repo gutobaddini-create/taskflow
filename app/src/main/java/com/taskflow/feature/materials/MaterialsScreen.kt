@@ -35,6 +35,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.AttachFile
 import androidx.compose.material.icons.filled.CloudUpload
@@ -49,7 +50,6 @@ import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.OpenInBrowser
-import androidx.compose.material.icons.filled.OpenInNew
 import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Checkbox
@@ -506,14 +506,14 @@ fun AttachmentRow(attachment: Attachment, canManage: Boolean = true, onOpen: () 
         ItemActionMenu(
             contentDescription = "Menu do anexo ${attachment.fileName}",
             actions = listOfNotNull(
-                ItemAction("Abrir", Icons.Default.OpenInNew, onOpen),
+                ItemAction("Abrir", Icons.AutoMirrored.Filled.OpenInNew, onOpen),
                 ItemAction("Compartilhar", Icons.Default.IosShare, onShare),
                 if (canManage) ItemAction("Excluir", Icons.Default.DeleteOutline, onDelete) else null
             )
         )
     }
     Row(Modifier.fillMaxWidth().padding(top = 12.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        SmallAction(Icons.Default.OpenInNew, "Abrir", Modifier.weight(1f), onOpen)
+        SmallAction(Icons.AutoMirrored.Filled.OpenInNew, "Abrir", Modifier.weight(1f), onOpen)
         SmallAction(Icons.Default.IosShare, "Compart.", Modifier.weight(1f), onShare)
         if (canManage) SmallAction(Icons.Default.DeleteOutline, "Excluir", Modifier.weight(1f), onDelete)
     }
