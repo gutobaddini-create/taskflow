@@ -52,6 +52,7 @@ import com.taskflow.data.local.TaskFlowUserPreferences
 import com.taskflow.data.local.TaskFlowDatabase
 import com.taskflow.data.repository.LocalTaskFlowRepository
 import com.taskflow.core.notifications.ReminderEngine
+import com.taskflow.core.permissions.PermissionPolicy
 import com.taskflow.core.utils.attachmentType
 import com.taskflow.core.utils.isAllowedAttachment
 import com.taskflow.core.utils.isValidUrl
@@ -160,11 +161,18 @@ class TaskFlowViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
+    fun setCurrentUser(userId: String) {
+        viewModelScope.launch { preferencesStore.setCurrentUserId(userId) }
+    }
+
     fun logoutLocal() {
         viewModelScope.launch { preferencesStore.setCurrentUserId("") }
     }
 
-    fun currentUser() = users.value.firstOrNull() ?: User(name = "Manuel", email = "manuel@taskflow.local")
+    fun currentUser(): User {
+        val currentId = preferences.value.currentUserId
+        return users.value.firstOrNull { it.id == currentId } ?: users.value.firstOrNull() ?: User(name = "Manuel", email = "manuel@taskflow.local")
+    }
     fun selectedTask(): Task? = tasks.value.firstOrNull { it.id == selectedTaskId } ?: tasks.value.firstOrNull()
 }
 
@@ -246,7 +254,9 @@ fun HomeScreen(vm: TaskFlowViewModel, onNew: () -> Unit, onDetail: (String) -> U
     val fields by vm.customFields.collectAsState()
     val lists by vm.lists.collectAsState()
     val users by vm.users.collectAsState()
+    val preferences by vm.preferences.collectAsState()
     users.firstOrNull()?.let { LaunchedEffect(it.id) { vm.setCurrentUserIfNeeded(it.id) } }
+    val currentUser = users.firstOrNull { it.id == preferences.currentUserId } ?: users.firstOrNull() ?: vm.currentUser()
     var searchQuery by remember { mutableStateOf("") }
     var priorityFilter by remember { mutableStateOf("Todas") }
     var responsibleFilter by remember { mutableStateOf("Todos") }
@@ -284,7 +294,7 @@ fun HomeScreen(vm: TaskFlowViewModel, onNew: () -> Unit, onDetail: (String) -> U
             item {
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                     Column {
-                        Text("Bom dia, Manuel", fontSize = 30.sp, fontWeight = FontWeight.Bold, color = Text)
+                        Text("Bom dia, ${currentUser.name}", fontSize = 30.sp, fontWeight = FontWeight.Bold, color = Text)
                         Text("Sexta, 5 de junho", color = Muted, fontSize = 18.sp)
                     }
                     Row { IconTile(Icons.Default.Notifications); Spacer(Modifier.width(8.dp)); IconTile(Icons.Default.AutoAwesome, Purple.copy(alpha = .12f), Purple) }
@@ -417,11 +427,13 @@ fun NewTaskScreen(vm: TaskFlowViewModel, onCancel: () -> Unit, onReminder: () ->
 fun DetailScreen(vm: TaskFlowViewModel, onBack: () -> Unit, onMaterials: () -> Unit, onShare: () -> Unit, onReminder: () -> Unit) {
     val task = vm.selectedTask()
     val users by vm.users.collectAsState()
+    val preferences by vm.preferences.collectAsState()
     val reminders by vm.reminders.collectAsState()
     val attachments by vm.attachments.collectAsState()
     val links by vm.links.collectAsState()
     val fields by vm.customFields.collectAsState()
     val comments by vm.comments.collectAsState()
+    val invites by vm.invites.collectAsState()
     val activity by vm.activity.collectAsState()
     if (task == null) {
         LoadingFullScreen("Carregando tarefa...")
@@ -437,10 +449,12 @@ fun DetailScreen(vm: TaskFlowViewModel, onBack: () -> Unit, onMaterials: () -> U
     var editPriority by remember(task.id) { mutableStateOf(task.priority) }
     var editDueDay by remember(task.id) { mutableStateOf(if (task.dueDate?.toLocalDate() == LocalDate.now().plusDays(1)) "Amanha" else "Hoje") }
     var editDueHour by remember(task.id) { mutableStateOf(task.dueDate?.toLocalTime()?.format(DateTimeFormatter.ofPattern("HH:mm")) ?: "09:00") }
-    var editAssignedTo by remember(task.id) { mutableStateOf(task.assignedTo ?: vm.currentUser().id) }
-    val userOptions = users.ifEmpty { listOf(vm.currentUser()) }
-    val currentUser = vm.currentUser()
-    val canComment = task.createdBy == currentUser.id || task.assignedTo == currentUser.id || currentUser.id in task.participants
+    val currentUser = users.firstOrNull { it.id == preferences.currentUserId } ?: users.firstOrNull() ?: vm.currentUser()
+    var editAssignedTo by remember(task.id, currentUser.id) { mutableStateOf(task.assignedTo ?: currentUser.id) }
+    val userOptions = users.ifEmpty { listOf(currentUser) }
+    val effectivePermission = PermissionPolicy.acceptedPermission(task.id, currentUser.id, invites)
+    val canEditTask = PermissionPolicy.canEditTask(task, currentUser.id, effectivePermission)
+    val canComment = PermissionPolicy.canCommentOnTask(task, currentUser.id, effectivePermission)
     val assigneeName = userOptions.firstOrNull { it.id == task.assignedTo }?.name ?: "Manuel"
     LazyColumn(Modifier.fillMaxSize().statusBarsPadding().padding(22.dp), contentPadding = PaddingValues(bottom = 30.dp)) {
         item {
@@ -449,7 +463,11 @@ fun DetailScreen(vm: TaskFlowViewModel, onBack: () -> Unit, onMaterials: () -> U
                 Spacer(Modifier.weight(1f))
                 Text("Detalhe da tarefa", fontWeight = FontWeight.Bold, color = Text)
                 Spacer(Modifier.weight(1f))
-                TextButton(onClick = { editing = !editing }) { Text(if (editing) "Cancelar" else "Editar") }
+                if (canEditTask) {
+                    TextButton(onClick = { editing = !editing }) { Text(if (editing) "Cancelar" else "Editar") }
+                } else {
+                    Text("Ver", color = Muted, modifier = Modifier.padding(end = 12.dp))
+                }
             }
             if (editing) {
                 OutlinedTextField(editTitle, { editTitle = it }, label = { Text("Titulo") }, modifier = Modifier.fillMaxWidth().padding(top = 18.dp), shape = RoundedCornerShape(18.dp))
@@ -481,11 +499,12 @@ fun DetailScreen(vm: TaskFlowViewModel, onBack: () -> Unit, onMaterials: () -> U
                 Row(Modifier.padding(top = 10.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) { StatusPill(task.status); PriorityPill(task.priority) }
             }
             SectionTitle("Proximo lembrete")
-            TaskFlowCard(Modifier.clickable(onClick = onReminder).testTag("open-reminder").semantics { contentDescription = "Configurar lembrete" }) {
+            val reminderModifier = if (canEditTask) Modifier.clickable(onClick = onReminder) else Modifier
+            TaskFlowCard(reminderModifier.testTag("open-reminder").semantics { contentDescription = "Configurar lembrete" }) {
                 val next = reminders.firstOrNull { it.taskId == task.id }?.let { ReminderEngine.nextOccurrence(it) }
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                     Column { Text("Recorrencia personalizada", fontWeight = FontWeight.Bold, color = Text); Text(next?.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")) ?: "Nenhum lembrete", color = Muted) }
-                    Switch(checked = reminders.any { it.taskId == task.id && it.isActive }, onCheckedChange = {})
+                    Switch(checked = reminders.any { it.taskId == task.id && it.isActive }, onCheckedChange = {}, enabled = canEditTask)
                 }
             }
             SectionTitle("Descricao")
@@ -497,7 +516,8 @@ fun DetailScreen(vm: TaskFlowViewModel, onBack: () -> Unit, onMaterials: () -> U
                 InfoRow("Participantes", "2 pessoas")
             }
             SectionTitle("Materiais da tarefa")
-            TaskFlowCard(Modifier.clickable(onClick = onMaterials)) {
+            val materialsModifier = if (canEditTask) Modifier.clickable(onClick = onMaterials) else Modifier
+            TaskFlowCard(materialsModifier) {
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     ChipText("${attachments.count { it.taskId == task.id }} anexos")
                     ChipText("${links.count { it.taskId == task.id }} link")
@@ -575,7 +595,7 @@ fun DetailScreen(vm: TaskFlowViewModel, onBack: () -> Unit, onMaterials: () -> U
             Spacer(Modifier.height(20.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 OutlinedButton(onClick = onShare, modifier = Modifier.weight(1f), shape = RoundedCornerShape(50)) { Text("Compartilhar") }
-                GradientButton("Concluir", { vm.repo.completeTask(task.id); onBack() }, Modifier.weight(1f))
+                GradientButton("Concluir", { vm.repo.completeTask(task.id); onBack() }, Modifier.weight(1f), enabled = canEditTask)
             }
         }
     }
@@ -982,9 +1002,10 @@ fun AcceptInviteScreen(vm: TaskFlowViewModel, token: String?, onDone: () -> Unit
     val invites by vm.invites.collectAsState()
     val tasks by vm.tasks.collectAsState()
     val users by vm.users.collectAsState()
+    val preferences by vm.preferences.collectAsState()
     val invite = invites.firstOrNull { it.token == token }
     val task = invite?.let { value -> tasks.firstOrNull { it.id == value.taskId } }
-    val currentUser = users.firstOrNull() ?: vm.currentUser()
+    val currentUser = users.firstOrNull { it.id == preferences.currentUserId } ?: users.firstOrNull() ?: vm.currentUser()
     val expired = invite?.expiresAt?.let { it < now() } == true
     LazyColumn(Modifier.fillMaxSize().statusBarsPadding().padding(24.dp), contentPadding = PaddingValues(bottom = 40.dp)) {
         item {
@@ -1188,9 +1209,29 @@ fun FieldDialog(initialName: String, initialType: CustomFieldType, initialValue:
 
 @Composable
 fun PeopleScreen(vm: TaskFlowViewModel) {
+    val users by vm.users.collectAsState()
     val invites by vm.invites.collectAsState()
+    val preferences by vm.preferences.collectAsState()
     LazyColumn(Modifier.fillMaxSize().statusBarsPadding().padding(24.dp), contentPadding = PaddingValues(bottom = 120.dp)) {
         item { Text("Pessoas", fontSize = 30.sp, fontWeight = FontWeight.Bold, color = Text); Text("Convites e participantes", color = Muted); Spacer(Modifier.height(16.dp)) }
+        item {
+            SectionTitle("Usuarios locais")
+            users.forEach { user ->
+                TaskFlowCard {
+                    InfoRow(user.name, user.email)
+                    Button(
+                        onClick = { vm.setCurrentUser(user.id) },
+                        enabled = preferences.currentUserId != user.id,
+                        modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+                        shape = RoundedCornerShape(50)
+                    ) {
+                        Text(if (preferences.currentUserId == user.id) "Usuario atual" else "Tornar atual")
+                    }
+                }
+                Spacer(Modifier.height(12.dp))
+            }
+            SectionTitle("Convites")
+        }
         items(invites.ifEmpty { listOf(Invite(taskId = "demo", createdBy = "demo", permission = UserPermission.Participant)) }) {
             TaskFlowCard { InfoRow("Permissao", it.permission.label); InfoRow("Token", it.token.take(8)); InfoRow("Status", if (it.acceptedBy == null) "Pendente" else "Aceito") }
             Spacer(Modifier.height(12.dp))

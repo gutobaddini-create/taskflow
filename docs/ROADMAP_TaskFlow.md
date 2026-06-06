@@ -818,7 +818,7 @@ Implementar identidade visual moderna, limpa e premium.
 
 - [x] Convite válido permite entrar na tarefa.
 - [ ] Convite expirado mostra mensagem adequada.
-- [ ] Usuário sem permissão não edita tarefa.
+- [x] Usuário sem permissão não edita tarefa.
 
 ---
 
@@ -839,7 +839,7 @@ Implementar identidade visual moderna, limpa e premium.
 
 - [x] Comentário aparece em tempo real local/mockado.
 - [ ] Participantes autorizados podem comentar.
-- [ ] Visualizadores sem permissão não comentam.
+- [x] Visualizadores sem permissão não comentam.
 
 ---
 
