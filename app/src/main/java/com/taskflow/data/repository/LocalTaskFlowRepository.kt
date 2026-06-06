@@ -66,6 +66,12 @@ class LocalTaskFlowRepository(
         dao.upsertPendingOperations(listOf(PendingOperation(entity = entity, entityId = entityId, operation = operation).toEntity()))
     }
 
+    override fun saveUser(user: User) {
+        scope.launch(Dispatchers.IO) {
+            dao.upsertUsers(listOf(user.toEntity()))
+        }
+    }
+
     private suspend fun seedIfNeeded() {
         if (dao.taskCount() > 0) return
 

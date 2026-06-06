@@ -18,6 +18,7 @@ interface TaskFlowRepository {
     val activity: StateFlow<List<ActivityLog>>
     val pendingOperations: StateFlow<List<PendingOperation>>
 
+    fun saveUser(user: User)
     fun createTask(task: Task)
     fun updateTask(task: Task)
     fun completeTask(taskId: String)

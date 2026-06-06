@@ -1258,7 +1258,7 @@ Implementar identidade visual moderna, limpa e premium.
 O MVP só estará pronto quando todos os itens abaixo estiverem concluídos:
 
 - [x] Projeto compila sem erros.
-- [ ] Login/cadastro funcionando.
+- [x] Login/cadastro funcionando.
 - [x] Home funcionando.
 - [x] Espaços funcionando.
 - [x] Listas funcionando.
@@ -1299,7 +1299,7 @@ Use esta seção para registrar decisões importantes.
 
 - Data: 2026-06-06
 - Tema: MVP local-first
-- Decisão: Entregar o MVP com Room/DataStore e contratos remotos preparados, mantendo Firebase real desativado até haver projeto e credenciais.
+- Decisão: Entregar o MVP com login/cadastro local placeholder, Room/DataStore e contratos remotos preparados, mantendo Firebase real desativado até haver projeto e credenciais.
 - Motivo: O pacote inicial não continha `google-services.json`, projeto Firebase, regras publicadas ou credenciais de teste.
 - Impacto: O app funciona localmente e enfileira operações pendentes; Auth/Firestore/Storage/FCM ficam como fase de integração final.
 

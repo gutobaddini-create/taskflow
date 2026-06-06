@@ -50,6 +50,10 @@ class InMemoryTaskFlowRepository : TaskFlowRepository {
         pendingOperations.value = pendingOperations.value + PendingOperation(entity = entity, entityId = entityId, operation = operation)
     }
 
+    override fun saveUser(user: User) {
+        users.value = users.value.filterNot { it.id == user.id || it.email.equals(user.email, ignoreCase = true) } + user
+    }
+
     override fun createTask(task: Task) {
         if (lists.value.none { it.id == task.listId && it.spaceId == task.spaceId }) return
         tasks.value = tasks.value + task
