@@ -18,7 +18,7 @@ enum class AttachmentType { Image, Pdf, Document, Spreadsheet, Text, Other }
 enum class CustomFieldType { Text, Number, Money, Date, Phone, Email, Url, Location, ProcessNumber, Document }
 enum class UserPermission(val label: String) { Owner("Editar"), Responsible("Comentar"), Participant("Comentar"), Viewer("Ver") }
 enum class PendingOperationType { Create, Update, Delete }
-enum class PendingEntityType { Task, Attachment, Link, CustomField }
+enum class PendingEntityType { Space, List, Task, Reminder, Attachment, Link, CustomField, Checklist, Comment, Invite }
 
 data class User(val id: String = uuid(), val name: String, val email: String, val photoUrl: String? = null, val createdAt: Long = now(), val notificationPermissionStatus: String = "unknown")
 data class Space(val id: String = uuid(), val name: String, val ownerId: String, val members: List<String> = emptyList(), val createdAt: Long = now(), val updatedAt: Long = now())

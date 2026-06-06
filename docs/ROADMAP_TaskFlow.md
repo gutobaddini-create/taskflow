@@ -1010,6 +1010,7 @@ Implementar identidade visual moderna, limpa e premium.
 - [x] Sincronizar anexos pendentes.
 - [x] Sincronizar links.
 - [x] Sincronizar campos complementares.
+- [x] Enfileirar lembretes, checklist, comentários e convites para sincronização futura.
 - [x] Resolver conflitos simples.
 
 ### Critérios de aceite

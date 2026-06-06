@@ -139,6 +139,7 @@ class LocalTaskFlowRepository(
         scope.launch(Dispatchers.IO) {
             val task = dao.taskById(taskId)?.toDomain() ?: return@launch
             dao.upsertTasks(listOf(task.copy(status = TaskStatus.Done, isCompleted = true, completedAt = now(), updatedAt = now()).toEntity()))
+            enqueue(PendingEntityType.Task, task.id, PendingOperationType.Update)
             dao.remindersByTaskId(taskId)
                 .map { it.toDomain() }
                 .forEach { reminder ->
@@ -153,6 +154,7 @@ class LocalTaskFlowRepository(
         scope.launch(Dispatchers.IO) {
             val task = dao.taskById(taskId)?.toDomain() ?: return@launch
             dao.deleteTask(taskId)
+            enqueue(PendingEntityType.Task, task.id, PendingOperationType.Delete)
             dao.upsertActivity(listOf(ActivityLog(taskId = taskId, userId = task.createdBy, action = "Tarefa excluida").toEntity()))
         }
     }
@@ -160,46 +162,60 @@ class LocalTaskFlowRepository(
     override fun createSpace(name: String) {
         scope.launch(Dispatchers.IO) {
             val owner = users.value.firstOrNull()?.id ?: "local"
-            dao.upsertSpaces(listOf(Space(name = name, ownerId = owner, members = listOf(owner)).toEntity()))
+            val space = Space(name = name, ownerId = owner, members = listOf(owner))
+            dao.upsertSpaces(listOf(space.toEntity()))
+            enqueue(PendingEntityType.Space, space.id, PendingOperationType.Create)
         }
     }
 
     override fun updateSpace(space: Space) {
         scope.launch(Dispatchers.IO) {
             dao.upsertSpaces(listOf(space.copy(updatedAt = now()).toEntity()))
+            enqueue(PendingEntityType.Space, space.id, PendingOperationType.Update)
         }
     }
 
     override fun deleteSpace(spaceId: String) {
         scope.launch(Dispatchers.IO) {
-            if (dao.taskCountBySpace(spaceId) == 0) dao.deleteSpace(spaceId)
+            if (dao.taskCountBySpace(spaceId) == 0) {
+                dao.deleteSpace(spaceId)
+                enqueue(PendingEntityType.Space, spaceId, PendingOperationType.Delete)
+            }
         }
     }
 
     override fun createList(spaceId: String, name: String) {
         scope.launch(Dispatchers.IO) {
             val nextOrder = (lists.value.filter { it.spaceId == spaceId }.maxOfOrNull { it.order } ?: -1) + 1
-            dao.upsertLists(listOf(TaskList(spaceId = spaceId, name = name, order = nextOrder).toEntity()))
+            val list = TaskList(spaceId = spaceId, name = name, order = nextOrder)
+            dao.upsertLists(listOf(list.toEntity()))
+            enqueue(PendingEntityType.List, list.id, PendingOperationType.Create)
         }
     }
 
     override fun updateList(list: TaskList) {
         scope.launch(Dispatchers.IO) {
             dao.upsertLists(listOf(list.copy(updatedAt = now()).toEntity()))
+            enqueue(PendingEntityType.List, list.id, PendingOperationType.Update)
         }
     }
 
     override fun deleteList(listId: String) {
         scope.launch(Dispatchers.IO) {
-            if (dao.taskCountByList(listId) == 0) dao.deleteList(listId)
+            if (dao.taskCountByList(listId) == 0) {
+                dao.deleteList(listId)
+                enqueue(PendingEntityType.List, listId, PendingOperationType.Delete)
+            }
         }
     }
 
     override fun saveReminder(reminder: Reminder) {
         scope.launch(Dispatchers.IO) {
+            val operation = if (dao.reminderById(reminder.id) == null) PendingOperationType.Create else PendingOperationType.Update
             val nextTriggerAt = ReminderEngine.nextOccurrence(reminder)
             val value = reminder.copy(nextTriggerAt = nextTriggerAt, updatedAt = now())
             dao.upsertReminders(listOf(value.toEntity()))
+            enqueue(PendingEntityType.Reminder, value.id, operation)
             if (value.isActive && nextTriggerAt != null) {
                 reminderScheduler.schedule(value, nextTriggerAt)
             } else {
@@ -246,6 +262,7 @@ class LocalTaskFlowRepository(
         scope.launch(Dispatchers.IO) {
             val link = dao.linkById(linkId)?.toDomain() ?: return@launch
             dao.deleteLink(linkId)
+            enqueue(PendingEntityType.Link, link.id, PendingOperationType.Delete)
             logActivity(link.taskId, users.value.firstOrNull()?.id ?: link.createdBy, "Link removido: ${link.title}")
         }
     }
@@ -270,6 +287,7 @@ class LocalTaskFlowRepository(
         scope.launch(Dispatchers.IO) {
             val field = dao.customFieldById(fieldId)?.toDomain() ?: return@launch
             dao.deleteCustomField(fieldId)
+            enqueue(PendingEntityType.CustomField, field.id, PendingOperationType.Delete)
             logActivity(field.taskId, users.value.firstOrNull()?.id ?: field.createdBy, "Campo removido: ${field.fieldName}")
         }
     }
@@ -277,6 +295,7 @@ class LocalTaskFlowRepository(
     override fun addChecklistItem(item: ChecklistItem) {
         scope.launch(Dispatchers.IO) {
             dao.upsertChecklistItems(listOf(item.toEntity()))
+            enqueue(PendingEntityType.Checklist, item.id, PendingOperationType.Create)
             logActivity(item.taskId, users.value.firstOrNull()?.id ?: "local", "Checklist adicionado: ${item.title}")
         }
     }
@@ -284,6 +303,7 @@ class LocalTaskFlowRepository(
     override fun updateChecklistItem(item: ChecklistItem) {
         scope.launch(Dispatchers.IO) {
             dao.upsertChecklistItems(listOf(item.toEntity()))
+            enqueue(PendingEntityType.Checklist, item.id, PendingOperationType.Update)
             logActivity(item.taskId, users.value.firstOrNull()?.id ?: "local", "Checklist atualizado: ${item.title}")
         }
     }
@@ -293,6 +313,7 @@ class LocalTaskFlowRepository(
             val item = dao.checklistItemById(itemId)?.toDomain() ?: return@launch
             val updated = item.copy(isDone = !item.isDone)
             dao.upsertChecklistItems(listOf(updated.toEntity()))
+            enqueue(PendingEntityType.Checklist, item.id, PendingOperationType.Update)
             logActivity(item.taskId, users.value.firstOrNull()?.id ?: "local", if (updated.isDone) "Checklist concluido: ${item.title}" else "Checklist reaberto: ${item.title}")
         }
     }
@@ -301,6 +322,7 @@ class LocalTaskFlowRepository(
         scope.launch(Dispatchers.IO) {
             val item = dao.checklistItemById(itemId)?.toDomain() ?: return@launch
             dao.deleteChecklistItem(itemId)
+            enqueue(PendingEntityType.Checklist, item.id, PendingOperationType.Delete)
             logActivity(item.taskId, users.value.firstOrNull()?.id ?: "local", "Checklist removido: ${item.title}")
         }
     }
@@ -308,6 +330,7 @@ class LocalTaskFlowRepository(
     override fun addComment(comment: Comment) {
         scope.launch(Dispatchers.IO) {
             dao.upsertComments(listOf(comment.toEntity()))
+            enqueue(PendingEntityType.Comment, comment.id, PendingOperationType.Create)
             logActivity(comment.taskId, comment.authorId, "Comentario adicionado")
         }
     }
@@ -316,6 +339,7 @@ class LocalTaskFlowRepository(
         scope.launch(Dispatchers.IO) {
             val previous = dao.commentById(comment.id)?.toDomain() ?: return@launch
             dao.upsertComments(listOf(comment.copy(updatedAt = now()).toEntity()))
+            enqueue(PendingEntityType.Comment, comment.id, PendingOperationType.Update)
             logActivity(previous.taskId, previous.authorId, "Comentario editado")
         }
     }
@@ -324,6 +348,7 @@ class LocalTaskFlowRepository(
         scope.launch(Dispatchers.IO) {
             val comment = dao.commentById(commentId)?.toDomain() ?: return@launch
             dao.deleteComment(commentId)
+            enqueue(PendingEntityType.Comment, comment.id, PendingOperationType.Delete)
             logActivity(comment.taskId, users.value.firstOrNull()?.id ?: comment.authorId, "Comentario removido")
         }
     }
@@ -331,6 +356,7 @@ class LocalTaskFlowRepository(
     override fun createInvite(invite: Invite) {
         scope.launch(Dispatchers.IO) {
             dao.upsertInvites(listOf(invite.toEntity()))
+            enqueue(PendingEntityType.Invite, invite.id, PendingOperationType.Create)
             logActivity(invite.taskId, invite.createdBy, "Convite criado: ${invite.permission.label}")
         }
     }
@@ -341,8 +367,10 @@ class LocalTaskFlowRepository(
             if (!PermissionPolicy.isInviteActive(invite)) return@launch
             val task = dao.taskById(invite.taskId)?.toDomain() ?: return@launch
             dao.upsertInvites(listOf(invite.copy(acceptedBy = userId).toEntity()))
+            enqueue(PendingEntityType.Invite, invite.id, PendingOperationType.Update)
             if (userId !in task.participants) {
                 dao.updateTask(task.copy(participants = task.participants + userId, updatedAt = now()).toEntity())
+                enqueue(PendingEntityType.Task, task.id, PendingOperationType.Update)
             }
             logActivity(invite.taskId, userId, "Convite aceito: ${invite.permission.label}")
         }
@@ -352,6 +380,7 @@ class LocalTaskFlowRepository(
         scope.launch(Dispatchers.IO) {
             val invite = dao.inviteByToken(token)?.toDomain()
             dao.deleteInviteByToken(token)
+            invite?.let { enqueue(PendingEntityType.Invite, it.id, PendingOperationType.Delete) }
             invite?.let { logActivity(it.taskId, users.value.firstOrNull()?.id ?: "local", "Convite recusado") }
         }
     }

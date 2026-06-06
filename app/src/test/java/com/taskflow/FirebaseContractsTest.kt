@@ -5,6 +5,7 @@ import com.taskflow.data.remote.FirebaseStoragePaths
 import com.taskflow.data.remote.FirebaseTaskFlowDataSource
 import com.taskflow.domain.model.Attachment
 import com.taskflow.domain.model.AttachmentType
+import com.taskflow.domain.model.PendingEntityType
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -24,11 +25,32 @@ class FirebaseContractsTest {
                 "attachments",
                 "links",
                 "customFields",
+                "checklist",
                 "comments",
                 "activityLog",
-                "invites"
+                "invites",
+                "pendingOperations"
             )
         ))
+    }
+
+    @Test
+    fun pendingEntityTypesHaveRemoteCollectionsPrepared() {
+        val collectionByEntity = mapOf(
+            PendingEntityType.Space to FirebaseCollections.Spaces,
+            PendingEntityType.List to FirebaseCollections.Lists,
+            PendingEntityType.Task to FirebaseCollections.Tasks,
+            PendingEntityType.Reminder to FirebaseCollections.Reminders,
+            PendingEntityType.Attachment to FirebaseCollections.Attachments,
+            PendingEntityType.Link to FirebaseCollections.Links,
+            PendingEntityType.CustomField to FirebaseCollections.CustomFields,
+            PendingEntityType.Checklist to FirebaseCollections.Checklist,
+            PendingEntityType.Comment to FirebaseCollections.Comments,
+            PendingEntityType.Invite to FirebaseCollections.Invites
+        )
+
+        assertEquals(PendingEntityType.entries.toSet(), collectionByEntity.keys)
+        assertTrue(FirebaseCollections.all.containsAll(collectionByEntity.values))
     }
 
     @Test
