@@ -14,7 +14,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -45,13 +44,13 @@ fun AcceptInviteScreen(vm: TaskFlowViewModel, token: String?, onDone: () -> Unit
             Spacer(Modifier.height(22.dp))
             when {
                 token.isNullOrBlank() -> {
-                    TaskFlowCard { Text("Link de convite sem token.", color = Color(0xFFEF4444), fontWeight = FontWeight.Bold) }
+                    TaskFlowCard { Text("Link de convite sem token.", color = TaskFlowColors.Danger, fontWeight = FontWeight.Bold) }
                     Spacer(Modifier.height(20.dp))
                     GradientButton("Voltar", onCancel, Modifier.fillMaxWidth())
                 }
                 invite == null || task == null -> {
                     TaskFlowCard {
-                        Text("Convite invalido.", color = Color(0xFFEF4444), fontWeight = FontWeight.Bold)
+                        Text("Convite invalido.", color = TaskFlowColors.Danger, fontWeight = FontWeight.Bold)
                         Text("O token nao foi encontrado neste dispositivo.", color = TaskFlowColors.Muted, modifier = Modifier.padding(top = 6.dp))
                     }
                     Spacer(Modifier.height(20.dp))
@@ -59,7 +58,7 @@ fun AcceptInviteScreen(vm: TaskFlowViewModel, token: String?, onDone: () -> Unit
                 }
                 expired -> {
                     TaskFlowCard {
-                        Text("Convite expirado.", color = Color(0xFFEF4444), fontWeight = FontWeight.Bold)
+                        Text("Convite expirado.", color = TaskFlowColors.Danger, fontWeight = FontWeight.Bold)
                         Text(task.title, color = TaskFlowColors.Text, modifier = Modifier.padding(top = 8.dp))
                     }
                     Spacer(Modifier.height(20.dp))
@@ -91,7 +90,7 @@ fun AcceptInviteScreen(vm: TaskFlowViewModel, token: String?, onDone: () -> Unit
                     TextButton({
                         vm.repo.declineInvite(invite.token)
                         onCancel()
-                    }, Modifier.fillMaxWidth()) { Text("Recusar", color = Color(0xFFEF4444)) }
+                    }, Modifier.fillMaxWidth()) { Text("Recusar", color = TaskFlowColors.Danger) }
                 }
             }
         }

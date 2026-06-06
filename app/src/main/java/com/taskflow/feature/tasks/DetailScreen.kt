@@ -173,7 +173,7 @@ fun DetailScreen(vm: TaskFlowViewModel, onBack: () -> Unit, onMaterials: () -> U
                         editing = false
                     }
                 }, Modifier.fillMaxWidth().testTag("save-task-edits").semantics { contentDescription = "Salvar alteracoes da tarefa" }, enabled = editTitle.isNotBlank())
-                TextButton(onClick = { vm.repo.deleteTask(task.id); onBack() }, modifier = Modifier.fillMaxWidth()) { Text("Excluir tarefa", color = Color(0xFFEF4444)) }
+                TextButton(onClick = { vm.repo.deleteTask(task.id); onBack() }, modifier = Modifier.fillMaxWidth()) { Text("Excluir tarefa", color = TaskFlowColors.Danger) }
             } else {
                 ScreenTitle(task.title, Modifier.padding(top = 18.dp))
                 Row(Modifier.padding(top = 10.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) { StatusPill(task.status); PriorityPill(task.priority) }
@@ -230,7 +230,7 @@ fun DetailScreen(vm: TaskFlowViewModel, onBack: () -> Unit, onMaterials: () -> U
                                     editingCommentId = it.id
                                     editingCommentText = it.text
                                 }, modifier = Modifier.semantics { contentDescription = "Editar comentario" }) { Text("Editar") }
-                                TextButton(onClick = { vm.repo.deleteComment(it.id) }, modifier = Modifier.semantics { contentDescription = "Excluir comentario" }) { Text("Excluir", color = Color(0xFFEF4444)) }
+                                TextButton(onClick = { vm.repo.deleteComment(it.id) }, modifier = Modifier.semantics { contentDescription = "Excluir comentario" }) { Text("Excluir", color = TaskFlowColors.Danger) }
                             }
                         }
                         if (editingCommentId == it.id) {

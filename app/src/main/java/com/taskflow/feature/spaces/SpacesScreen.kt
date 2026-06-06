@@ -140,7 +140,7 @@ fun SpacesScreen(vm: TaskFlowViewModel, onDetail: (String) -> Unit) {
                         IconButton(onClick = { dialog = CrudDialogState(CrudKind.CreateList, "Nova lista", space = space) }, modifier = Modifier.testTag("create-list-${space.name}").semantics { contentDescription = "Criar lista em ${space.name}" }) { Icon(Icons.AutoMirrored.Filled.PlaylistAdd, null, tint = TaskFlowColors.Blue) }
                         IconButton(onClick = {
                             if (tasks.any { it.spaceId == space.id }) message = "Exclua ou mova as tarefas antes de remover este espaco." else vm.repo.deleteSpace(space.id)
-                        }, modifier = Modifier.testTag("delete-space-${space.name}").semantics { contentDescription = "Excluir espaco ${space.name}" }) { Icon(Icons.Default.Delete, null, tint = Color(0xFFEF4444)) }
+                        }, modifier = Modifier.testTag("delete-space-${space.name}").semantics { contentDescription = "Excluir espaco ${space.name}" }) { Icon(Icons.Default.Delete, null, tint = TaskFlowColors.Danger) }
                     }
                 }
                 orderedLists(space.id).forEach { list ->
@@ -169,7 +169,7 @@ fun SpacesScreen(vm: TaskFlowViewModel, onDetail: (String) -> Unit) {
                         IconButton(onClick = { dialog = CrudDialogState(CrudKind.EditList, "Renomear lista", list.name, list = list) }, modifier = Modifier.testTag("edit-list-${list.name}").semantics { contentDescription = "Renomear lista ${list.name}" }) { Icon(Icons.Default.Edit, null, tint = TaskFlowColors.Muted) }
                         IconButton(onClick = {
                             if (tasks.any { it.listId == list.id }) message = "Exclua ou mova as tarefas antes de remover esta lista." else vm.repo.deleteList(list.id)
-                        }, modifier = Modifier.testTag("delete-list-${list.name}").semantics { contentDescription = "Excluir lista ${list.name}" }) { Icon(Icons.Default.Delete, null, tint = Color(0xFFEF4444)) }
+                        }, modifier = Modifier.testTag("delete-list-${list.name}").semantics { contentDescription = "Excluir lista ${list.name}" }) { Icon(Icons.Default.Delete, null, tint = TaskFlowColors.Danger) }
                     }
                 }
             }

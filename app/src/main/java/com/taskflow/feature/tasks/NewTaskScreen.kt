@@ -29,7 +29,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -85,7 +84,7 @@ fun NewTaskScreen(vm: TaskFlowViewModel, onCancel: () -> Unit) {
             TaskFlowCard {
                 Text("Lista", color = TaskFlowColors.Muted)
                 if (lists.isEmpty()) {
-                    Text("Crie uma lista antes de salvar tarefas.", color = Color(0xFFEF4444), modifier = Modifier.padding(top = 8.dp))
+                    Text("Crie uma lista antes de salvar tarefas.", color = TaskFlowColors.Danger, modifier = Modifier.padding(top = 8.dp))
                 } else {
                     Segmented(lists.map { it.name }, selectedList?.name ?: lists.first().name) { name ->
                         selectedListId = lists.first { it.name == name }.id
