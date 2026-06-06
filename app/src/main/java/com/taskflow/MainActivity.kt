@@ -67,8 +67,8 @@ import com.taskflow.core.permissions.PermissionPolicy
 import com.taskflow.core.utils.attachmentType
 import com.taskflow.core.utils.isAllowedAttachment
 import com.taskflow.core.utils.isValidUrl
-import com.taskflow.core.utils.TaskSearch
 import com.taskflow.feature.auth.OnboardingScreen
+import com.taskflow.feature.home.HomeScreen
 import com.taskflow.feature.people.PeopleScreen
 import com.taskflow.feature.settings.SettingsScreen
 import com.taskflow.feature.sharing.AcceptInviteScreen
@@ -305,97 +305,6 @@ fun Shell(current: Screen, navigate: (Screen) -> Unit, content: @Composable () -
 }
 
 fun navItems() = listOf(Screen.Home to Icons.Default.CalendarToday, Screen.Spaces to Icons.Default.List, Screen.People to Icons.Default.Groups, Screen.Settings to Icons.Default.Settings)
-
-@Composable
-fun HomeScreen(vm: TaskFlowViewModel, onNew: () -> Unit, onDetail: (String) -> Unit) {
-    val tasks by vm.tasks.collectAsState()
-    val reminders by vm.reminders.collectAsState()
-    val attachments by vm.attachments.collectAsState()
-    val links by vm.links.collectAsState()
-    val fields by vm.customFields.collectAsState()
-    val lists by vm.lists.collectAsState()
-    val users by vm.users.collectAsState()
-    val preferences by vm.preferences.collectAsState()
-    users.firstOrNull()?.let { LaunchedEffect(it.id) { vm.setCurrentUserIfNeeded(it.id) } }
-    val currentUser = users.firstOrNull { it.id == preferences.currentUserId } ?: users.firstOrNull() ?: vm.currentUser()
-    var searchQuery by remember { mutableStateOf("") }
-    var priorityFilter by remember { mutableStateOf("Todas") }
-    var responsibleFilter by remember { mutableStateOf("Todos") }
-    var materialFilter by remember { mutableStateOf("Todos") }
-    val now = LocalDateTime.now()
-    val filteredByTab = when (vm.homeFilter) {
-        "Concluidas" -> tasks.filter { it.isCompleted }
-        "Atrasadas" -> tasks.filter { !it.isCompleted && it.dueDate?.isBefore(now) == true }
-        "Proximas" -> tasks.filter { !it.isCompleted && (it.dueDate?.isAfter(now) ?: true) }
-        else -> tasks.filter { !it.isCompleted && (it.dueDate?.toLocalDate() == LocalDate.now() || it.dueDate == null) }
-    }
-    fun matchesSearch(task: Task): Boolean {
-        return TaskSearch.matches(task, searchQuery, users, lists, attachments, links, fields)
-    }
-    val filtered = filteredByTab
-        .filter(::matchesSearch)
-        .filter { priorityFilter == "Todas" || it.priority.label == priorityFilter }
-        .filter { responsibleFilter == "Todos" || users.firstOrNull { user -> user.id == it.assignedTo }?.name == responsibleFilter }
-        .filter {
-            when (materialFilter) {
-                "Anexos" -> attachments.any { attachment -> attachment.taskId == it.id }
-                "Links" -> links.any { link -> link.taskId == it.id }
-                "Lembretes" -> reminders.any { reminder -> reminder.taskId == it.id && reminder.isActive }
-                else -> true
-            }
-        }
-    Box {
-        LazyColumn(Modifier.fillMaxSize().statusBarsPadding().padding(horizontal = 24.dp, vertical = 12.dp), contentPadding = PaddingValues(bottom = 120.dp)) {
-            item {
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                    Column {
-                        Text("Bom dia, ${currentUser.name}", fontSize = 30.sp, fontWeight = FontWeight.Bold, color = Text)
-                        Text(LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")), color = Muted, fontSize = 18.sp)
-                    }
-                    Row { IconTile(Icons.Default.Notifications); Spacer(Modifier.width(8.dp)); IconTile(Icons.Default.AutoAwesome, Purple.copy(alpha = .12f), Purple) }
-                }
-                Spacer(Modifier.height(24.dp))
-                Segmented(listOf("Hoje", "Proximas", "Atrasadas", "Concluidas"), vm.homeFilter) { vm.updateHomeFilter(it) }
-                Spacer(Modifier.height(12.dp))
-                OutlinedTextField(searchQuery, { searchQuery = it }, label = { Text("Buscar tarefas") }, leadingIcon = { Icon(Icons.Default.Search, null) }, singleLine = true, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(18.dp))
-                Spacer(Modifier.height(12.dp))
-                Segmented(listOf("Todas", "Alta", "Media", "Baixa"), priorityFilter) { priorityFilter = it }
-                Spacer(Modifier.height(8.dp))
-                Segmented(listOf("Todos") + users.map { it.name }, responsibleFilter) { responsibleFilter = it }
-                Spacer(Modifier.height(8.dp))
-                Segmented(listOf("Todos", "Anexos", "Links", "Lembretes"), materialFilter) { materialFilter = it }
-                Spacer(Modifier.height(20.dp))
-                TaskFlowCard {
-                    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
-                        Row(verticalAlignment = Alignment.CenterVertically) { IconBubble(Icons.Default.NotificationsActive); Spacer(Modifier.width(14.dp)); Text("Lembretes ativos", fontSize = 20.sp, fontWeight = FontWeight.SemiBold, color = Text) }
-                        Switch(checked = vm.remindersVisible, onCheckedChange = { vm.updateRemindersVisible(it) })
-                    }
-                }
-                Spacer(Modifier.height(12.dp))
-            }
-            items(filtered) { task ->
-                TaskCard(task, lists.firstOrNull { it.id == task.listId }?.name ?: "Lista", reminders.any { it.taskId == task.id && it.isActive }) { onDetail(task.id) }
-                Spacer(Modifier.height(14.dp))
-            }
-            if (filtered.isEmpty()) {
-                item {
-                    TaskFlowCard {
-                        Text("Nenhuma tarefa encontrada.", fontWeight = FontWeight.Bold, color = Text)
-                        Text("Ajuste a busca ou os filtros.", color = Muted, modifier = Modifier.padding(top = 4.dp))
-                    }
-                    Spacer(Modifier.height(14.dp))
-                }
-            }
-            item {
-                val next = reminders.mapNotNull { r -> ReminderEngine.nextOccurrence(r)?.let { r to it } }.minByOrNull { it.second }
-                if (next != null) NextReminderCard(tasks.firstOrNull { it.id == next.first.taskId }?.title ?: "Lembrete", next.second)
-            }
-        }
-        FloatingActionButton(onClick = onNew, containerColor = Purple, contentColor = Color.White, modifier = Modifier.align(Alignment.BottomEnd).padding(end = 28.dp, bottom = 96.dp).size(70.dp).testTag("new-task").semantics { contentDescription = "Nova tarefa" }) {
-            Icon(Icons.Default.Add, null, Modifier.size(34.dp))
-        }
-    }
-}
 
 @Composable
 fun NewTaskScreen(vm: TaskFlowViewModel, onCancel: () -> Unit) {
