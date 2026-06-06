@@ -2,6 +2,7 @@ package com.taskflow.data.repository
 
 import com.taskflow.domain.model.*
 import com.taskflow.domain.repository.TaskFlowRepository
+import com.taskflow.core.security.AttachmentSecurity
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import java.time.LocalDateTime
@@ -102,8 +103,9 @@ class InMemoryTaskFlowRepository : TaskFlowRepository {
     }
 
     override fun addAttachment(attachment: Attachment) {
-        attachments.value = attachments.value + attachment
-        activity.value = activity.value + ActivityLog(taskId = attachment.taskId, userId = attachment.uploadedBy, action = "Anexo adicionado: ${attachment.fileName}")
+        val safeAttachment = AttachmentSecurity.withoutPublicPermanentUrls(attachment)
+        attachments.value = attachments.value + safeAttachment
+        activity.value = activity.value + ActivityLog(taskId = safeAttachment.taskId, userId = safeAttachment.uploadedBy, action = "Anexo adicionado: ${safeAttachment.fileName}")
     }
     override fun deleteAttachment(attachmentId: String) {
         val attachment = attachments.value.firstOrNull { it.id == attachmentId } ?: return

@@ -1050,7 +1050,7 @@ Implementar identidade visual moderna, limpa e premium.
 - [x] Validar permissão de anexos.
 - [x] Validar permissão de links.
 - [x] Validar permissão de campos.
-- [ ] Evitar URLs públicas permanentes.
+- [x] Evitar URLs públicas permanentes.
 - [x] Remover logs com dados sensíveis.
 
 ### Critérios de aceite

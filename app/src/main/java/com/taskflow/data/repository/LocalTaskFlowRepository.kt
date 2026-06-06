@@ -3,6 +3,7 @@ package com.taskflow.data.repository
 import android.content.Context
 import com.taskflow.core.notifications.ReminderEngine
 import com.taskflow.core.notifications.ReminderScheduler
+import com.taskflow.core.security.AttachmentSecurity
 import com.taskflow.data.local.TaskFlowDao
 import com.taskflow.data.mapper.*
 import com.taskflow.domain.model.*
@@ -194,8 +195,9 @@ class LocalTaskFlowRepository(
 
     override fun addAttachment(attachment: Attachment) {
         scope.launch(Dispatchers.IO) {
-            dao.upsertAttachments(listOf(attachment.toEntity()))
-            logActivity(attachment.taskId, attachment.uploadedBy, "Anexo adicionado: ${attachment.fileName}")
+            val safeAttachment = AttachmentSecurity.withoutPublicPermanentUrls(attachment)
+            dao.upsertAttachments(listOf(safeAttachment.toEntity()))
+            logActivity(safeAttachment.taskId, safeAttachment.uploadedBy, "Anexo adicionado: ${safeAttachment.fileName}")
         }
     }
 
