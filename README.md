@@ -137,3 +137,4 @@ Comandos executados com sucesso neste workspace:
 
 Consulte `docs/ROADMAP_TaskFlow.md` para o checklist completo e os registros de decisao/bloqueio.
 Consulte `docs/QA_TaskFlow.md` para a evidencia atual de build, artefatos e smoke QA no emulador.
+Consulte `docs/RELEASE_HANDOFF_TaskFlow.md` para o resumo de entrega local, artefatos, hashes e proximos insumos externos.
