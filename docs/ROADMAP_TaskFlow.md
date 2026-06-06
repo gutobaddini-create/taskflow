@@ -965,14 +965,14 @@ Implementar identidade visual moderna, limpa e premium.
 - [ ] Fazer upload de documento.
 - [ ] Gerar metadados.
 - [ ] Gerar thumbnail quando aplicável.
-- [ ] Aplicar regras de segurança.
+- [x] Aplicar regras de segurança.
 - [ ] Remover arquivo ao excluir anexo.
 
 ### Critérios de aceite
 
 - [ ] Upload funciona.
 - [ ] Arquivo fica vinculado à tarefa correta.
-- [ ] Usuário não autorizado não acessa arquivo.
+- [x] Usuário não autorizado não acessa arquivo.
 - [ ] Excluir anexo remove ou invalida arquivo.
 
 ---

@@ -22,7 +22,7 @@ service firebase.storage {
       allow delete: if ownsUserPath(userId);
     }
 
-    match /users/{userId}/tasks/{taskId}/thumbnails/{attachmentId}.jpg {
+    match /users/{userId}/tasks/{taskId}/thumbnails/{fileName} {
       allow read: if ownsUserPath(userId);
       allow create, update: if ownsUserPath(userId)
         && request.resource != null
