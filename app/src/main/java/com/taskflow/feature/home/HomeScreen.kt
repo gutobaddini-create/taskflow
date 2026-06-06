@@ -45,6 +45,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.taskflow.core.design.IconBubble
 import com.taskflow.core.design.IconTile
+import com.taskflow.core.design.DesignTokens
 import com.taskflow.core.design.NextReminderCard
 import com.taskflow.core.design.ScreenTitle
 import com.taskflow.core.design.Segmented
@@ -101,7 +102,7 @@ fun HomeScreen(vm: TaskFlowViewModel, onNew: () -> Unit, onDetail: (String) -> U
             }
         }
     Box {
-        LazyColumn(Modifier.fillMaxSize().statusBarsPadding().padding(horizontal = 24.dp, vertical = 12.dp), contentPadding = PaddingValues(bottom = 120.dp)) {
+        LazyColumn(Modifier.fillMaxSize().statusBarsPadding().padding(horizontal = DesignTokens.screenPadding, vertical = 12.dp), contentPadding = PaddingValues(bottom = DesignTokens.navigationBottomPadding)) {
             item {
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                     Column {

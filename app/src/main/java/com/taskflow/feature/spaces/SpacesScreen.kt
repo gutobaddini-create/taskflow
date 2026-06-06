@@ -42,6 +42,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.taskflow.core.design.ChipText
+import com.taskflow.core.design.DesignTokens
 import com.taskflow.core.design.EmptyState
 import com.taskflow.core.design.FeedbackBanner
 import com.taskflow.core.design.FeedbackKind
@@ -101,7 +102,7 @@ fun SpacesScreen(vm: TaskFlowViewModel, onDetail: (String) -> Unit) {
             }
         )
     }
-    LazyColumn(Modifier.fillMaxSize().statusBarsPadding().padding(24.dp), contentPadding = PaddingValues(bottom = 120.dp)) {
+    LazyColumn(Modifier.fillMaxSize().statusBarsPadding().padding(DesignTokens.screenPadding), contentPadding = PaddingValues(bottom = DesignTokens.navigationBottomPadding)) {
         item {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                 ScreenTitle("Espacos e listas")

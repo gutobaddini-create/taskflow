@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.taskflow.core.design.DesignTokens
 import com.taskflow.core.design.InfoRow
 import com.taskflow.core.design.ScreenTitle
 import com.taskflow.core.design.SectionTitle
@@ -34,7 +35,7 @@ fun PeopleScreen(vm: TaskFlowViewModel) {
     val invites by vm.invites.collectAsState()
     val preferences by vm.preferences.collectAsState()
 
-    LazyColumn(Modifier.fillMaxSize().statusBarsPadding().padding(24.dp), contentPadding = PaddingValues(bottom = 120.dp)) {
+    LazyColumn(Modifier.fillMaxSize().statusBarsPadding().padding(DesignTokens.screenPadding), contentPadding = PaddingValues(bottom = DesignTokens.navigationBottomPadding)) {
         item {
             ScreenTitle("Pessoas")
             Text("Convites e participantes", color = TaskFlowColors.Muted)

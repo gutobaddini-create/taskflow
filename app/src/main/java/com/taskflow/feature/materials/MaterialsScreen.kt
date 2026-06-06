@@ -112,6 +112,7 @@ import com.taskflow.domain.model.TaskLink
 import java.io.File
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import com.taskflow.core.design.DesignTokens
 private val CustomFieldTypeLabels = listOf(
     CustomFieldType.Text to "Texto",
     CustomFieldType.Number to "Numero",
@@ -157,7 +158,7 @@ fun MaterialsScreen(vm: TaskFlowViewModel, onBack: () -> Unit) {
     val canViewMaterial = PermissionPolicy.canViewMaterial(task, currentUser.id, effectivePermission)
     val canManageMaterial = PermissionPolicy.canManageMaterial(task, currentUser.id, effectivePermission)
     if (!canViewMaterial) {
-        LazyColumn(Modifier.fillMaxSize().statusBarsPadding().padding(22.dp), contentPadding = PaddingValues(bottom = 30.dp)) {
+        LazyColumn(Modifier.fillMaxSize().statusBarsPadding().padding(DesignTokens.screenPadding), contentPadding = PaddingValues(bottom = DesignTokens.screenBottomPadding)) {
             item {
                 TopRow("<", "Materiais da tarefa", onBack)
                 Spacer(Modifier.height(24.dp))
@@ -343,7 +344,7 @@ fun MaterialsScreen(vm: TaskFlowViewModel, onBack: () -> Unit) {
             message = if (current == null) "Item adicionado." else "Item atualizado."
         }
     }
-    LazyColumn(Modifier.fillMaxSize().statusBarsPadding().padding(22.dp), contentPadding = PaddingValues(bottom = 30.dp)) {
+    LazyColumn(Modifier.fillMaxSize().statusBarsPadding().padding(DesignTokens.screenPadding), contentPadding = PaddingValues(bottom = DesignTokens.screenBottomPadding)) {
         item {
             TopRow("<", "Materiais da tarefa", onBack)
             Spacer(Modifier.height(18.dp))

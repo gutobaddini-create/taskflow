@@ -68,6 +68,8 @@ object DesignTokens {
     val compactRadius = 16.dp
     val pillRadius = 50.dp
     val screenPadding = 24.dp
+    val screenBottomPadding = 36.dp
+    val navigationBottomPadding = 120.dp
     val cardPadding = 18.dp
     val itemGap = 12.dp
     val controlHeight = 54.dp

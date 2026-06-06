@@ -32,6 +32,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.taskflow.core.design.ChipText
+import com.taskflow.core.design.DesignTokens
 import com.taskflow.core.design.GradientButton
 import com.taskflow.core.design.InfoRow
 import com.taskflow.core.design.SectionTitle
@@ -71,7 +72,7 @@ fun ReminderScreen(vm: TaskFlowViewModel, onSave: () -> Unit) {
     var endMode by remember { mutableStateOf("Em uma data") }
     var endDate by remember { mutableStateOf("31/12/2026") }
     var maxOccurrences by remember { mutableStateOf("5") }
-    LazyColumn(Modifier.fillMaxSize().statusBarsPadding().padding(22.dp), contentPadding = PaddingValues(bottom = 30.dp)) {
+    LazyColumn(Modifier.fillMaxSize().statusBarsPadding().padding(DesignTokens.screenPadding), contentPadding = PaddingValues(bottom = DesignTokens.screenBottomPadding)) {
         item {
             TopRow("<", "Lembrete personalizado", onSave)
             SectionTitle("Ativar lembrete")

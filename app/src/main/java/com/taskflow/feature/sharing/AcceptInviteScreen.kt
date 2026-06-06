@@ -18,6 +18,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.taskflow.core.design.DesignTokens
 import com.taskflow.core.design.GradientButton
 import com.taskflow.core.design.InfoRow
 import com.taskflow.core.design.ScreenTitle
@@ -37,7 +38,7 @@ fun AcceptInviteScreen(vm: TaskFlowViewModel, token: String?, onDone: () -> Unit
     val task = invite?.let { value -> tasks.firstOrNull { it.id == value.taskId } }
     val currentUser = users.firstOrNull { it.id == preferences.currentUserId } ?: users.firstOrNull() ?: vm.currentUser()
     val expired = invite?.expiresAt?.let { it < now() } == true
-    LazyColumn(Modifier.fillMaxSize().statusBarsPadding().padding(24.dp), contentPadding = PaddingValues(bottom = 40.dp)) {
+    LazyColumn(Modifier.fillMaxSize().statusBarsPadding().padding(DesignTokens.screenPadding), contentPadding = PaddingValues(bottom = DesignTokens.screenBottomPadding)) {
         item {
             ScreenTitle("Convite TaskFlow")
             Text("Revise os detalhes antes de entrar na tarefa.", color = TaskFlowColors.Muted, modifier = Modifier.padding(top = 8.dp))

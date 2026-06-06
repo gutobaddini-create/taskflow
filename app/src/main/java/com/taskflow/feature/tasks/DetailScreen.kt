@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.taskflow.core.design.ChipText
 import com.taskflow.core.design.ChipTone
+import com.taskflow.core.design.DesignTokens
 import com.taskflow.core.design.EmptyState
 import com.taskflow.core.design.GradientButton
 import com.taskflow.core.design.InfoRow
@@ -122,7 +123,7 @@ fun DetailScreen(vm: TaskFlowViewModel, onBack: () -> Unit, onMaterials: () -> U
         )
     }
     if (!canViewTask) {
-        LazyColumn(Modifier.fillMaxSize().statusBarsPadding().padding(22.dp), contentPadding = PaddingValues(bottom = 30.dp)) {
+        LazyColumn(Modifier.fillMaxSize().statusBarsPadding().padding(DesignTokens.screenPadding), contentPadding = PaddingValues(bottom = DesignTokens.screenBottomPadding)) {
             item {
                 TopRow("<", "Detalhe da tarefa", onBack)
                 Spacer(Modifier.height(24.dp))
@@ -135,7 +136,7 @@ fun DetailScreen(vm: TaskFlowViewModel, onBack: () -> Unit, onMaterials: () -> U
         }
         return
     }
-    LazyColumn(Modifier.fillMaxSize().statusBarsPadding().padding(22.dp), contentPadding = PaddingValues(bottom = 30.dp)) {
+    LazyColumn(Modifier.fillMaxSize().statusBarsPadding().padding(DesignTokens.screenPadding), contentPadding = PaddingValues(bottom = DesignTokens.screenBottomPadding)) {
         item {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 TextButton(onClick = onBack) { Text("<") }

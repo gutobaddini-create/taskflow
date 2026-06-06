@@ -22,6 +22,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.taskflow.core.design.DesignTokens
 import com.taskflow.core.design.InfoRow
 import com.taskflow.core.design.ScreenTitle
 import com.taskflow.core.design.SectionTitle
@@ -35,7 +36,7 @@ fun SettingsScreen(vm: TaskFlowViewModel, onLogout: () -> Unit) {
     val preferences by vm.preferences.collectAsState()
     val pendingOperations by vm.pendingOperations.collectAsState()
 
-    LazyColumn(Modifier.fillMaxSize().statusBarsPadding().padding(24.dp), contentPadding = PaddingValues(bottom = 120.dp)) {
+    LazyColumn(Modifier.fillMaxSize().statusBarsPadding().padding(DesignTokens.screenPadding), contentPadding = PaddingValues(bottom = DesignTokens.navigationBottomPadding)) {
         item {
             ScreenTitle("Ajustes")
             Spacer(Modifier.height(16.dp))

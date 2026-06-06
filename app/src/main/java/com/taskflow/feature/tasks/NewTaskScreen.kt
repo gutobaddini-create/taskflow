@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.taskflow.core.design.ChipText
 import com.taskflow.core.design.ChipTone
+import com.taskflow.core.design.DesignTokens
 import com.taskflow.core.design.GradientButton
 import com.taskflow.core.design.SectionTitle
 import com.taskflow.core.design.Segmented
@@ -74,7 +75,7 @@ fun NewTaskScreen(vm: TaskFlowViewModel, onCancel: () -> Unit) {
     LaunchedEffect(lists) {
         if (selectedListId == null && lists.isNotEmpty()) selectedListId = lists.first().id
     }
-    LazyColumn(Modifier.fillMaxSize().statusBarsPadding().padding(22.dp), contentPadding = PaddingValues(bottom = 36.dp)) {
+    LazyColumn(Modifier.fillMaxSize().statusBarsPadding().padding(DesignTokens.screenPadding), contentPadding = PaddingValues(bottom = DesignTokens.screenBottomPadding)) {
         item {
             TopRow("Cancelar", "Nova tarefa", onCancel)
             Spacer(Modifier.height(18.dp))

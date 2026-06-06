@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.taskflow.core.design.ChipText
 import com.taskflow.core.design.ChipTone
+import com.taskflow.core.design.DesignTokens
 import com.taskflow.core.design.FeedbackBanner
 import com.taskflow.core.design.FeedbackKind
 import com.taskflow.core.design.GradientButton
@@ -121,7 +122,7 @@ fun ShareScreen(vm: TaskFlowViewModel, onBack: () -> Unit) {
         message = "Link copiado."
     }
 
-    LazyColumn(Modifier.fillMaxSize().statusBarsPadding().padding(22.dp), contentPadding = PaddingValues(bottom = 30.dp)) {
+    LazyColumn(Modifier.fillMaxSize().statusBarsPadding().padding(DesignTokens.screenPadding), contentPadding = PaddingValues(bottom = DesignTokens.screenBottomPadding)) {
         item {
             TopRow("<", "Compartilhar", onBack)
             Text("Convide alguem para esta tarefa", color = TaskFlowColors.Muted, modifier = Modifier.padding(top = 8.dp))
