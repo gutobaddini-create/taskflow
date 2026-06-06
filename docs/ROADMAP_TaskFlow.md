@@ -722,7 +722,7 @@ Implementar identidade visual moderna, limpa e premium.
 - [x] Link válido é salvo.
 - [x] Link inválido mostra erro.
 - [x] Link aparece na seção de materiais.
-- [ ] Link abre no navegador ou WebView conforme decisão técnica.
+- [x] Link abre no navegador ou WebView conforme decisão técnica.
 
 ---
 
