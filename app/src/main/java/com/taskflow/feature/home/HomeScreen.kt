@@ -54,14 +54,15 @@ import com.taskflow.core.design.TaskFlowColors
 import com.taskflow.core.notifications.ReminderEngine
 import com.taskflow.core.utils.TaskSearch
 import com.taskflow.domain.model.Task
+import com.taskflow.domain.usecase.TaskQueries
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 @Composable
 fun HomeScreen(vm: TaskFlowViewModel, onNew: () -> Unit, onDetail: (String) -> Unit) {
     val tasks by vm.tasks.collectAsState()
     val reminders by vm.reminders.collectAsState()
+    val invites by vm.invites.collectAsState()
     val attachments by vm.attachments.collectAsState()
     val links by vm.links.collectAsState()
     val fields by vm.customFields.collectAsState()
@@ -74,12 +75,13 @@ fun HomeScreen(vm: TaskFlowViewModel, onNew: () -> Unit, onDetail: (String) -> U
     var priorityFilter by remember { mutableStateOf("Todas") }
     var responsibleFilter by remember { mutableStateOf("Todos") }
     var materialFilter by remember { mutableStateOf("Todos") }
-    val now = LocalDateTime.now()
+    val today = LocalDate.now()
+    val visibleTasks = TaskQueries.visibleForUser(tasks, currentUser.id, invites)
     val filteredByTab = when (vm.homeFilter) {
-        "Concluidas" -> tasks.filter { it.isCompleted }
-        "Atrasadas" -> tasks.filter { !it.isCompleted && it.dueDate?.isBefore(now) == true }
-        "Proximas" -> tasks.filter { !it.isCompleted && (it.dueDate?.isAfter(now) ?: true) }
-        else -> tasks.filter { !it.isCompleted && (it.dueDate?.toLocalDate() == LocalDate.now() || it.dueDate == null) }
+        "Concluidas" -> TaskQueries.completed(visibleTasks)
+        "Atrasadas" -> TaskQueries.overdue(visibleTasks, today)
+        "Proximas" -> TaskQueries.upcoming(visibleTasks, today)
+        else -> TaskQueries.todayOrUnscheduled(visibleTasks, today)
     }
     fun matchesSearch(task: Task): Boolean {
         return TaskSearch.matches(task, searchQuery, users, lists, attachments, links, fields)
@@ -102,7 +104,7 @@ fun HomeScreen(vm: TaskFlowViewModel, onNew: () -> Unit, onDetail: (String) -> U
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                     Column {
                         Text("Bom dia, ${currentUser.name}", fontSize = 30.sp, fontWeight = FontWeight.Bold, color = TaskFlowColors.Text)
-                        Text(LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")), color = TaskFlowColors.Muted, fontSize = 18.sp)
+                        Text(today.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")), color = TaskFlowColors.Muted, fontSize = 18.sp)
                     }
                     Row {
                         IconTile(Icons.Default.Notifications)

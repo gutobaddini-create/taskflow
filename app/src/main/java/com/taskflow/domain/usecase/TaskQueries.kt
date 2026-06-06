@@ -3,13 +3,14 @@ package com.taskflow.domain.usecase
 import com.taskflow.domain.model.Invite
 import com.taskflow.domain.model.Task
 import com.taskflow.domain.model.TaskStatus
+import com.taskflow.domain.model.now
 import java.time.LocalDate
 
 object TaskQueries {
-    fun visibleForUser(tasks: List<Task>, userId: String, invites: List<Invite> = emptyList()): List<Task> {
+    fun visibleForUser(tasks: List<Task>, userId: String, invites: List<Invite> = emptyList(), referenceTime: Long = now()): List<Task> {
         val invitedTaskIds = invites
             .asSequence()
-            .filter { it.acceptedBy == userId }
+            .filter { it.acceptedBy == userId && (it.expiresAt == null || it.expiresAt > referenceTime) }
             .map { it.taskId }
             .toSet()
         return tasks.filter { task ->
@@ -23,6 +24,11 @@ object TaskQueries {
     fun today(tasks: List<Task>, date: LocalDate = LocalDate.now()): List<Task> =
         tasks.filter { task ->
             !task.isCompleted && task.dueDate?.toLocalDate() == date
+        }
+
+    fun todayOrUnscheduled(tasks: List<Task>, date: LocalDate = LocalDate.now()): List<Task> =
+        tasks.filter { task ->
+            !task.isCompleted && (task.dueDate == null || task.dueDate.toLocalDate() == date)
         }
 
     fun upcoming(tasks: List<Task>, date: LocalDate = LocalDate.now()): List<Task> =

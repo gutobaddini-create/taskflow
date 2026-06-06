@@ -23,10 +23,23 @@ class TaskQueriesTest {
         val result = TaskQueries.visibleForUser(
             tasks = listOf(visibleTask, assignedTask, participantTask, invitedTask, hiddenTask),
             userId = "ana",
-            invites = listOf(Invite(taskId = invitedTask.id, createdBy = "manuel", permission = UserPermission.Viewer, acceptedBy = "ana"))
+            invites = listOf(Invite(taskId = invitedTask.id, createdBy = "manuel", permission = UserPermission.Viewer, acceptedBy = "ana")),
+            referenceTime = 1_000
         )
 
         assertEquals(listOf("visible", "assigned", "participant", "invited"), result.map { it.id })
+    }
+
+    @Test
+    fun visibleForUserIgnoresExpiredInvites() {
+        val result = TaskQueries.visibleForUser(
+            tasks = listOf(invitedTask),
+            userId = "ana",
+            invites = listOf(Invite(taskId = invitedTask.id, createdBy = "manuel", permission = UserPermission.Viewer, acceptedBy = "ana", expiresAt = 999)),
+            referenceTime = 1_000
+        )
+
+        assertEquals(emptyList<String>(), result.map { it.id })
     }
 
     @Test
@@ -39,9 +52,17 @@ class TaskQueriesTest {
         )
 
         assertEquals(listOf("today"), TaskQueries.today(tasks, today).map { it.id })
+        assertEquals(listOf("today"), TaskQueries.todayOrUnscheduled(tasks, today).map { it.id })
         assertEquals(listOf("tomorrow"), TaskQueries.upcoming(tasks, today).map { it.id })
         assertEquals(listOf("yesterday"), TaskQueries.overdue(tasks, today).map { it.id })
         assertEquals(listOf("done-today"), TaskQueries.completed(tasks).map { it.id })
+    }
+
+    @Test
+    fun todayOrUnscheduledIncludesTasksWithoutDueDate() {
+        val tasks = listOf(task("today", dueDate = today.atTime(9, 0)), task("no-date", dueDate = null))
+
+        assertEquals(listOf("today", "no-date"), TaskQueries.todayOrUnscheduled(tasks, today).map { it.id })
     }
 
     @Test
