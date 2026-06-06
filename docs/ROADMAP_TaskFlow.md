@@ -1273,8 +1273,8 @@ O MVP só estará pronto quando todos os itens abaixo estiverem concluídos:
 - [ ] Anexar imagem funcionando.
 - [ ] Tirar foto funcionando.
 - [ ] Anexar PDF funcionando.
-- [ ] Links funcionando.
-- [ ] Campos complementares funcionando.
+- [x] Links funcionando.
+- [x] Campos complementares funcionando.
 - [x] Checklist funcionando.
 - [ ] Compartilhamento funcionando.
 - [ ] Convite funcionando.
