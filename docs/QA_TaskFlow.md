@@ -63,6 +63,25 @@ pwsh -NoProfile -File tools/qa/verify-local-mvp.ps1 -SkipFirebaseRules
 
 The GitHub Actions workflow now runs the same full verification path and uploads the APK/AAB artifacts.
 
+External readiness diagnostics:
+
+```powershell
+npm run verify:external-readiness
+```
+
+Latest run: 2026-06-06 23:32 UTC.
+
+Result: passed as an informational diagnostic and reported 5 missing external inputs: GitHub remote, GitHub CLI auth, Firebase `google-services.json`, physical Android device, and production signing variables.
+
+Release signing fallback verification:
+
+```powershell
+.\gradlew.bat --no-daemon --max-workers=1 :app:assembleRelease --console=plain
+npm run release:manifest
+```
+
+Result: passed. The release build still succeeds without production signing variables, using local QA signing.
+
 ## Emulator Smoke QA
 
 Commands executed:

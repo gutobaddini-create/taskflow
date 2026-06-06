@@ -20,6 +20,7 @@ Commands and state inspected on 2026-06-06:
 - `Get-ChildItem -Recurse -File -Filter google-services.json`: no Firebase config found in the project.
 - `C:\TaskFlowAndroidSdk\platform-tools\adb.exe devices -l`: only `emulator-5554` is attached.
 - `npm run verify:local-mvp`: latest documented pass at 2026-06-06 23:13 UTC.
+- `npm run verify:external-readiness`: available to recheck GitHub, Firebase, physical-device, and production signing inputs.
 
 ## Requirement Matrix
 
@@ -39,7 +40,7 @@ Commands and state inspected on 2026-06-06:
 | Git checkpoints | Local Git repo exists with latest commit `2a83c94 Add local release handoff summary` | Complete locally |
 | GitHub publishing/PR | No Git remote configured; `gh` is not authenticated | Blocked by external input |
 | Physical-device acceptance | ADB currently lists only `emulator-5554`; no unlocked physical device is available | Blocked by external input |
-| Production distribution signing | Release uses local development signing; production keystore not provided | Blocked by external input |
+| Production distribution signing | Gradle supports production signing through `TASKFLOW_RELEASE_*` environment variables, but no production keystore or passwords are currently provided | Blocked by external input |
 
 ## External Inputs Needed To Finish The Original Goal
 
@@ -47,6 +48,12 @@ Commands and state inspected on 2026-06-06:
 2. Firebase project configuration, including `google-services.json` and test credentials.
 3. Unlocked physical Android device with USB debugging authorized.
 4. Production signing keystore if public distribution is required.
+
+Run this anytime to refresh the external-input status:
+
+```powershell
+npm run verify:external-readiness
+```
 
 ## Next Completion Steps After Inputs Arrive
 

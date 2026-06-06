@@ -50,6 +50,18 @@ Verificacao local completa do MVP:
 npm run verify:local-mvp
 ```
 
+Diagnostico dos insumos externos ainda necessarios:
+
+```powershell
+npm run verify:external-readiness
+```
+
+Para usar esse diagnostico como gate de release, execute:
+
+```powershell
+pwsh -NoProfile -File tools/qa/verify-external-readiness.ps1 -Strict
+```
+
 O mesmo fluxo esta preparado para GitHub Actions em `.github/workflows/android-ci.yml`.
 O comando tambem atualiza `docs/qa/release-manifest.json` com tamanho e SHA-256 dos APK/AAB.
 
@@ -117,6 +129,19 @@ Para concluir Firebase real, sera necessario fornecer:
 - Manifesto de release: `docs/qa/release-manifest.json`
 
 O release atual usa uma assinatura local de desenvolvimento (`~/.android/debug.keystore`) para permitir validacao. Para distribuicao real, gere e guarde uma keystore de producao.
+
+Para assinatura de producao, defina as variaveis abaixo antes de gerar release:
+
+```powershell
+$env:TASKFLOW_RELEASE_STORE_FILE='C:\caminho\release.keystore'
+$env:TASKFLOW_RELEASE_STORE_PASSWORD='<senha-da-store>'
+$env:TASKFLOW_RELEASE_KEY_ALIAS='<alias-da-chave>'
+$env:TASKFLOW_RELEASE_KEY_PASSWORD='<senha-da-chave>'
+.\gradlew.bat --no-daemon --max-workers=1 :app:assembleRelease :app:bundleRelease --console=plain
+npm run release:manifest
+```
+
+Sem essas variaveis, o Gradle usa a assinatura local de desenvolvimento apenas para QA.
 
 ## Validacao Recente
 

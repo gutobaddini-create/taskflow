@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "verify:local-mvp": "pwsh -NoProfile -File tools/qa/verify-local-mvp.ps1",
+    "verify:external-readiness": "pwsh -NoProfile -File tools/qa/verify-external-readiness.ps1",
     "release:manifest": "pwsh -NoProfile -File tools/qa/write-release-manifest.ps1",
     "test:firestore-rules": "firebase emulators:exec --only firestore --project taskflow-rules-test \"node tools/firebase-rules/firestore-rules.test.mjs\"",
     "test:storage-rules": "firebase emulators:exec --only storage --project taskflow-rules-test \"node tools/firebase-rules/storage-rules.test.mjs\"",

@@ -9,6 +9,17 @@ android {
     namespace = "com.taskflow"
     compileSdk = 35
 
+    val releaseStoreFile = System.getenv("TASKFLOW_RELEASE_STORE_FILE")
+    val releaseStorePassword = System.getenv("TASKFLOW_RELEASE_STORE_PASSWORD")
+    val releaseKeyAlias = System.getenv("TASKFLOW_RELEASE_KEY_ALIAS")
+    val releaseKeyPassword = System.getenv("TASKFLOW_RELEASE_KEY_PASSWORD")
+    val hasProductionSigning = listOf(
+        releaseStoreFile,
+        releaseStorePassword,
+        releaseKeyAlias,
+        releaseKeyPassword
+    ).all { !it.isNullOrBlank() }
+
     defaultConfig {
         applicationId = "com.taskflow"
         minSdk = 26
@@ -28,12 +39,22 @@ android {
             keyAlias = "androiddebugkey"
             keyPassword = "android"
         }
+        if (hasProductionSigning) {
+            create("productionRelease") {
+                storeFile = file(releaseStoreFile!!)
+                storePassword = releaseStorePassword
+                keyAlias = releaseKeyAlias
+                keyPassword = releaseKeyPassword
+            }
+        }
     }
 
     buildTypes {
         release {
             isMinifyEnabled = false
-            signingConfig = signingConfigs.getByName("localRelease")
+            signingConfig = signingConfigs.getByName(
+                if (hasProductionSigning) "productionRelease" else "localRelease"
+            )
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"

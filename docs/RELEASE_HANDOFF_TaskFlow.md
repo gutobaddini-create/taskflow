@@ -14,7 +14,9 @@ Firebase real integration, GitHub publishing, and physical-device acceptance rem
 npm run verify:local-mvp
 ```
 
-Latest verified run: 2026-06-06 23:13 UTC.
+Latest local MVP verified run: 2026-06-06 23:13 UTC.
+
+Latest release signing fallback check: 2026-06-06 23:32 UTC.
 
 Covered checks:
 
@@ -33,7 +35,7 @@ Covered checks:
 | Artifact | Size | SHA-256 |
 | --- | ---: | --- |
 | `app/build/outputs/apk/debug/app-debug.apk` | 18,397,193 bytes | `a63321fb6ad1231e53636099d32da5810c4b19eb8fdbf2c5f43e6301d17d2f80` |
-| `app/build/outputs/apk/release/app-release.apk` | 11,911,970 bytes | `331e5ddc8d0ff9390c7660fa6e1f885b80dae1a7854d9ec6c7c39defd7685318` |
+| `app/build/outputs/apk/release/app-release.apk` | 11,911,970 bytes | `8cd18bda8be744c936f627a4424a034791a1068a9f954f481eb957b6bbd87d9f` |
 | `app/build/outputs/bundle/release/app-release.aab` | 11,534,310 bytes | `e94cca2fdd3b2e7ef7ab8cb4748b47ec5ec0d86e90a4449b508e824707f07bbb` |
 
 Canonical artifact manifest:
@@ -68,6 +70,7 @@ Screenshots:
 - Release mode: local-first MVP
 - Release signing: local development signing through the Android debug keystore, suitable for validation only.
 - Production distribution requires a dedicated production keystore.
+- Production signing is wired through `TASKFLOW_RELEASE_STORE_FILE`, `TASKFLOW_RELEASE_STORE_PASSWORD`, `TASKFLOW_RELEASE_KEY_ALIAS`, and `TASKFLOW_RELEASE_KEY_PASSWORD`; without those variables the build keeps using local QA signing.
 - Android automatic backup is disabled for privacy of local tasks, invites, preferences, and metadata.
 
 ## External Inputs Still Required
