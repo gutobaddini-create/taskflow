@@ -1222,7 +1222,7 @@ Implementar identidade visual moderna, limpa e premium.
 ### Critérios de aceite
 
 - [x] APK/AAB gerado.
-- [ ] Build release instala em aparelho físico.
+- [x] Build release instala em aparelho físico.
 - [x] Login funciona no release.
 - [x] Notificações funcionam no release.
 - [ ] Upload funciona no release.
@@ -1257,7 +1257,7 @@ Implementar identidade visual moderna, limpa e premium.
 
 O MVP só estará pronto quando todos os itens abaixo estiverem concluídos:
 
-- [ ] Projeto compila sem erros.
+- [x] Projeto compila sem erros.
 - [ ] Login/cadastro funcionando.
 - [ ] Home funcionando.
 - [ ] Espaços funcionando.
@@ -1276,16 +1276,16 @@ O MVP só estará pronto quando todos os itens abaixo estiverem concluídos:
 - [x] Links funcionando.
 - [x] Campos complementares funcionando.
 - [x] Checklist funcionando.
-- [ ] Compartilhamento funcionando.
-- [ ] Convite funcionando.
-- [ ] Comentários funcionando.
-- [ ] Histórico básico funcionando.
+- [x] Compartilhamento funcionando.
+- [x] Convite funcionando.
+- [x] Comentários funcionando.
+- [x] Histórico básico funcionando.
 - [ ] Firebase Authentication funcionando.
 - [ ] Firestore funcionando.
 - [ ] Firebase Storage funcionando.
 - [ ] Permissões funcionando.
 - [ ] Regras de segurança básicas funcionando.
-- [ ] Persistência local funcionando.
+- [x] Persistência local funcionando.
 - [ ] App testado em aparelho físico.
 - [x] Build release gerado.
 
