@@ -98,11 +98,11 @@ O TaskFlow deve funcionar como uma lista de tarefas moderna e colaborativa, pare
 
 ## 2.1 Plataforma
 
-- [ ] Android nativo.
-- [ ] Kotlin.
-- [ ] Jetpack Compose.
-- [ ] Arquitetura MVVM.
-- [ ] Gradle Kotlin DSL.
+- [x] Android nativo.
+- [x] Kotlin.
+- [x] Jetpack Compose.
+- [x] Arquitetura MVVM.
+- [x] Gradle Kotlin DSL.
 
 ## 2.2 Persistência local
 
@@ -134,11 +134,11 @@ O TaskFlow deve funcionar como uma lista de tarefas moderna e colaborativa, pare
 |---|---|---|---|
 | M0 | Setup inicial | Projeto compila e abre tela inicial | [x] |
 | M1 | Design system | Componentes visuais base prontos | [ ] |
-| M2 | Navegação | Fluxo de telas principal funcionando | [ ] |
-| M3 | Tarefas locais | Criar, editar, listar e concluir tarefas | [ ] |
-| M4 | Lembretes | Lembretes únicos e recorrentes funcionando | [ ] |
-| M5 | Materiais | Anexos, links e campos extras funcionando | [ ] |
-| M6 | Compartilhamento | WhatsApp, e-mail, link e convite | [ ] |
+| M2 | Navegação | Fluxo de telas principal funcionando | [x] |
+| M3 | Tarefas locais | Criar, editar, listar e concluir tarefas | [x] |
+| M4 | Lembretes | Lembretes únicos e recorrentes funcionando | [x] |
+| M5 | Materiais | Anexos, links e campos extras funcionando | [x] |
+| M6 | Compartilhamento | WhatsApp, e-mail, link e convite | [x] |
 | M7 | Firebase | Login, banco e storage integrados | [ ] |
 | M8 | Sincronização | Offline/online com consistência básica | [ ] |
 | M9 | QA e release | App testado, polido e pronto para distribuição | [ ] |
@@ -294,24 +294,24 @@ Implementar identidade visual moderna, limpa e premium.
 
 ### Tarefas
 
-- [ ] Criar `User`.
-- [ ] Criar `Space`.
-- [ ] Criar `TaskList`.
-- [ ] Criar `Task`.
-- [ ] Criar `Reminder`.
-- [ ] Criar `Attachment`.
-- [ ] Criar `TaskLink`.
-- [ ] Criar `CustomField`.
-- [ ] Criar `Comment`.
-- [ ] Criar `ActivityLog`.
-- [ ] Criar `Invite`.
+- [x] Criar `User`.
+- [x] Criar `Space`.
+- [x] Criar `TaskList`.
+- [x] Criar `Task`.
+- [x] Criar `Reminder`.
+- [x] Criar `Attachment`.
+- [x] Criar `TaskLink`.
+- [x] Criar `CustomField`.
+- [x] Criar `Comment`.
+- [x] Criar `ActivityLog`.
+- [x] Criar `Invite`.
 
 ### Critérios de aceite
 
-- [ ] Todas as entidades possuem identificador único.
-- [ ] Todas as entidades possuem campos de criação/atualização quando necessário.
-- [ ] Entidades não dependem diretamente da UI.
-- [ ] Tipos complexos usam enums ou sealed classes quando adequado.
+- [x] Todas as entidades possuem identificador único.
+- [x] Todas as entidades possuem campos de criação/atualização quando necessário.
+- [x] Entidades não dependem diretamente da UI.
+- [x] Tipos complexos usam enums ou sealed classes quando adequado.
 
 ---
 
@@ -319,24 +319,24 @@ Implementar identidade visual moderna, limpa e premium.
 
 ### Tarefas
 
-- [ ] Criar `TaskStatus`.
-- [ ] Criar `TaskPriority`.
-- [ ] Criar `ReminderType`.
-- [ ] Criar `RecurrenceType`.
-- [ ] Criar `RecurrenceUnit`.
-- [ ] Criar `WeekDay`.
-- [ ] Criar `MonthlyRule`.
-- [ ] Criar `ReminderEndType`.
-- [ ] Criar `AttachmentSource`.
-- [ ] Criar `AttachmentType`.
-- [ ] Criar `CustomFieldType`.
-- [ ] Criar `UserPermission`.
+- [x] Criar `TaskStatus`.
+- [x] Criar `TaskPriority`.
+- [x] Criar `ReminderType`.
+- [x] Criar `RecurrenceType`.
+- [x] Criar `RecurrenceUnit`.
+- [x] Criar `WeekDay`.
+- [x] Criar `MonthlyRule`.
+- [x] Criar `ReminderEndType`.
+- [x] Criar `AttachmentSource`.
+- [x] Criar `AttachmentType`.
+- [x] Criar `CustomFieldType`.
+- [x] Criar `UserPermission`.
 
 ### Critérios de aceite
 
-- [ ] Nenhum status é tratado como string solta na UI.
-- [ ] Recorrência avançada está modelada.
-- [ ] Anexos, links e campos extras têm modelos próprios.
+- [x] Nenhum status é tratado como string solta na UI.
+- [x] Recorrência avançada está modelada.
+- [x] Anexos, links e campos extras têm modelos próprios.
 
 ---
 
@@ -346,30 +346,30 @@ Implementar identidade visual moderna, limpa e premium.
 
 ### Telas obrigatórias
 
-- [ ] Splash / Onboarding.
-- [ ] Login.
-- [ ] Cadastro.
-- [ ] Home / Hoje.
-- [ ] Espaços.
-- [ ] Listas.
-- [ ] Lista de tarefas.
-- [ ] Nova tarefa.
-- [ ] Detalhe da tarefa.
-- [ ] Configurar lembrete.
-- [ ] Materiais da tarefa.
-- [ ] Adicionar anexo.
-- [ ] Adicionar link.
-- [ ] Campos complementares.
-- [ ] Compartilhar / convidar.
-- [ ] Pessoas.
-- [ ] Configurações.
+- [x] Splash / Onboarding.
+- [x] Login.
+- [x] Cadastro.
+- [x] Home / Hoje.
+- [x] Espaços.
+- [x] Listas.
+- [x] Lista de tarefas.
+- [x] Nova tarefa.
+- [x] Detalhe da tarefa.
+- [x] Configurar lembrete.
+- [x] Materiais da tarefa.
+- [x] Adicionar anexo.
+- [x] Adicionar link.
+- [x] Campos complementares.
+- [x] Compartilhar / convidar.
+- [x] Pessoas.
+- [x] Configurações.
 
 ### Critérios de aceite
 
-- [ ] O usuário consegue navegar entre as telas principais.
-- [ ] Bottom navigation aparece apenas nas telas adequadas.
-- [ ] Telas de criação e edição possuem navegação de voltar/cancelar.
-- [ ] Não há telas órfãs.
+- [x] O usuário consegue navegar entre as telas principais.
+- [x] Bottom navigation aparece apenas nas telas adequadas.
+- [x] Telas de criação e edição possuem navegação de voltar/cancelar.
+- [x] Não há telas órfãs.
 
 ---
 
@@ -379,21 +379,21 @@ Implementar identidade visual moderna, limpa e premium.
 
 ### Tarefas
 
-- [ ] Criar usuários mockados.
-- [ ] Criar espaços mockados.
-- [ ] Criar listas mockadas.
-- [ ] Criar tarefas mockadas.
-- [ ] Criar lembretes mockados.
-- [ ] Criar anexos mockados.
-- [ ] Criar links mockados.
-- [ ] Criar campos complementares mockados.
-- [ ] Criar comentários mockados.
+- [x] Criar usuários mockados.
+- [x] Criar espaços mockados.
+- [x] Criar listas mockadas.
+- [x] Criar tarefas mockadas.
+- [x] Criar lembretes mockados.
+- [x] Criar anexos mockados.
+- [x] Criar links mockados.
+- [x] Criar campos complementares mockados.
+- [x] Criar comentários mockados.
 
 ### Critérios de aceite
 
-- [ ] Todas as telas principais exibem dados reais mockados.
-- [ ] Dados mockados demonstram as principais funções.
-- [ ] Não existem textos genéricos demais como `Lorem ipsum` nas telas principais.
+- [x] Todas as telas principais exibem dados reais mockados.
+- [x] Dados mockados demonstram as principais funções.
+- [x] Não existem textos genéricos demais como `Lorem ipsum` nas telas principais.
 
 ---
 
