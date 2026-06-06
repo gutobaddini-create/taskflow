@@ -1,0 +1,94 @@
+# TaskFlow QA Report
+
+Date: 2026-06-06
+
+## Scope
+
+This report records the current local MVP validation evidence for the TaskFlow Android app.
+
+Validated target:
+
+- Android emulator: `emulator-5554`
+- App package: `com.taskflow`
+- Build mode: local-first MVP, without real Firebase credentials
+
+## Automated Verification
+
+Command executed:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File tools/qa/verify-local-mvp.ps1 -SkipFirebaseRules
+```
+
+Result: passed.
+
+Covered by the command:
+
+- `:app:testDebugUnitTest`
+- `:app:compileDebugKotlin`
+- `:app:assembleDebug`
+- `:app:compileDebugAndroidTestKotlin`
+- `:app:assembleRelease`
+- `:app:bundleRelease`
+- artifact existence checks
+
+Artifacts verified:
+
+| Artifact | Size |
+| --- | ---: |
+| `app/build/outputs/apk/debug/app-debug.apk` | 18,397,193 bytes |
+| `app/build/outputs/apk/release/app-release.apk` | 11,911,970 bytes |
+| `app/build/outputs/bundle/release/app-release.aab` | 11,534,273 bytes |
+
+Previous full verification also passed with Firebase rules enabled through:
+
+```powershell
+npm run verify:local-mvp
+```
+
+The GitHub Actions workflow now runs the same full verification path and uploads the APK/AAB artifacts.
+
+## Emulator Smoke QA
+
+Commands executed:
+
+```powershell
+$adb='C:\TaskFlowAndroidSdk\platform-tools\adb.exe'
+& $adb -s emulator-5554 install -r app\build\outputs\apk\debug\app-debug.apk
+& $adb -s emulator-5554 shell pm grant com.taskflow android.permission.POST_NOTIFICATIONS
+& $adb -s emulator-5554 logcat -c
+& $adb -s emulator-5554 shell monkey -p com.taskflow -c android.intent.category.LAUNCHER 1
+```
+
+Result: passed.
+
+Observed evidence:
+
+- APK installed successfully on `emulator-5554`.
+- Launcher opened `com.taskflow/.MainActivity`.
+- App process remained alive after launch.
+- Crash buffer was empty after onboarding/home navigation.
+- Onboarding/local account screen rendered.
+- Home screen rendered after tapping `Comecar`.
+
+Captured screenshots:
+
+- `docs/qa/screenshots/splash-cold-start-emulator-2026-06-06.png`
+- `docs/qa/screenshots/home-emulator-ready-2026-06-06.png`
+- `docs/qa/screenshots/home-after-login-emulator-2026-06-06.png`
+
+Observation:
+
+- The debug cold start on the emulator took about 20 seconds before the first Compose screen was displayed. No crash or ANR was observed. This should be rechecked on release build and physical hardware before public distribution.
+
+## Current External Blockers
+
+These items cannot be completed from the local workspace alone:
+
+- GitHub publishing/PR: no remote is configured in `git remote -v`.
+- Firebase real integration: no Firebase project credentials or `google-services.json` are present.
+- Physical-device QA: no unlocked physical Android device is available for final release acceptance.
+
+## Status
+
+The local-first Android MVP remains buildable, testable, installable on emulator, and ready for the next external integration step once GitHub/Firebase/device inputs are available.

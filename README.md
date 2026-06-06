@@ -131,3 +131,4 @@ Comandos executados com sucesso neste workspace:
 - Sem aparelho fisico desbloqueado e acessivel, entao aceite fisico e instalacao release em aparelho real seguem pendentes.
 
 Consulte `docs/ROADMAP_TaskFlow.md` para o checklist completo e os registros de decisao/bloqueio.
+Consulte `docs/QA_TaskFlow.md` para a evidencia atual de build, artefatos e smoke QA no emulador.
