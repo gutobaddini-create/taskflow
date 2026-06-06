@@ -1,6 +1,5 @@
 package com.taskflow.feature.tasks
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -56,6 +55,7 @@ import com.taskflow.core.design.LoadingFullScreen
 import com.taskflow.core.design.TaskFlowColors
 import com.taskflow.core.notifications.ReminderEngine
 import com.taskflow.core.permissions.PermissionPolicy
+import com.taskflow.core.design.touchFeedback
 import com.taskflow.domain.model.Comment
 import com.taskflow.domain.model.Reminder
 import com.taskflow.domain.model.ReminderType
@@ -178,7 +178,7 @@ fun DetailScreen(vm: TaskFlowViewModel, onBack: () -> Unit, onMaterials: () -> U
                 Row(Modifier.padding(top = 10.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) { StatusPill(task.status); PriorityPill(task.priority) }
             }
             SectionTitle("Proximo lembrete")
-            val reminderModifier = if (canEditTask) Modifier.clickable(onClick = onReminder) else Modifier
+            val reminderModifier = if (canEditTask) Modifier.touchFeedback(onClick = onReminder) else Modifier
             TaskFlowCard(reminderModifier.testTag("open-reminder").semantics { contentDescription = "Configurar lembrete" }) {
                 val taskReminders = reminders.filter { it.taskId == task.id }
                 val nextReminder = taskReminders.mapNotNull { reminder -> ReminderEngine.nextOccurrence(reminder)?.let { reminder to it } }.minByOrNull { it.second }
@@ -203,7 +203,7 @@ fun DetailScreen(vm: TaskFlowViewModel, onBack: () -> Unit, onMaterials: () -> U
                 InfoRow("Participantes", "2 pessoas")
             }
             SectionTitle("Materiais da tarefa")
-            val materialsModifier = if (canViewTask) Modifier.clickable(onClick = onMaterials) else Modifier
+            val materialsModifier = if (canViewTask) Modifier.touchFeedback(onClick = onMaterials) else Modifier
             TaskFlowCard(materialsModifier) {
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     ChipText("${attachments.count { it.taskId == task.id }} anexos", tone = ChipTone.Blue)

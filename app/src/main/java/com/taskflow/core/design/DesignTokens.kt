@@ -1,8 +1,12 @@
 package com.taskflow.core.design
 
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -43,12 +47,15 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -240,8 +247,26 @@ fun TaskFlowCard(modifier: Modifier = Modifier, content: @Composable ColumnScope
 }
 
 @Composable
+fun Modifier.touchFeedback(enabled: Boolean = true, onClick: () -> Unit): Modifier {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+    val scale by animateFloatAsState(if (isPressed && enabled) 0.985f else 1f, label = "touchFeedbackScale")
+    return this
+        .graphicsLayer {
+            scaleX = scale
+            scaleY = scale
+        }
+        .clickable(
+            interactionSource = interactionSource,
+            indication = LocalIndication.current,
+            enabled = enabled,
+            onClick = onClick
+        )
+}
+
+@Composable
 fun TaskCard(title: String, subtitle: String, priorityColor: Color, modifier: Modifier = Modifier, onClick: () -> Unit = {}) {
-    TaskFlowCard(modifier.clickable(onClick = onClick)) {
+    TaskFlowCard(modifier.touchFeedback(onClick = onClick)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Box(Modifier.width(5.dp).height(58.dp).clip(RoundedCornerShape(DesignTokens.pillRadius)).background(priorityColor))
             Spacer(Modifier.width(DesignTokens.itemGap))
@@ -330,7 +355,7 @@ fun SegmentedControl(options: List<String>, selected: String, onSelect: (String)
         options.forEach { option ->
             val active = option == selected
             Box(
-                Modifier.weight(1f).clip(RoundedCornerShape(18.dp)).background(if (active) TaskFlowGradient else Brush.linearGradient(listOf(Color.Transparent, Color.Transparent))).clickable { onSelect(option) }.padding(vertical = 12.dp),
+                Modifier.weight(1f).clip(RoundedCornerShape(18.dp)).background(if (active) TaskFlowGradient else Brush.linearGradient(listOf(Color.Transparent, Color.Transparent))).touchFeedback { onSelect(option) }.padding(vertical = 12.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Text(option, color = if (active) Color.White else TaskFlowColors.Text, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)

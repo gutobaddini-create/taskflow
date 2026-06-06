@@ -1,6 +1,5 @@
 package com.taskflow.feature.reminders
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -42,6 +41,7 @@ import com.taskflow.core.app.TaskFlowViewModel
 import com.taskflow.core.design.TopRow
 import com.taskflow.core.design.LoadingFullScreen
 import com.taskflow.core.design.TaskFlowColors
+import com.taskflow.core.design.touchFeedback
 import com.taskflow.domain.model.MonthlyRule
 import com.taskflow.domain.model.RecurrenceType
 import com.taskflow.domain.model.RecurrenceUnit
@@ -201,7 +201,7 @@ fun <T> ReminderChoiceRow(
         options.chunked(3).forEach { rowOptions ->
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 rowOptions.forEach { (value, label) ->
-                    ChipText(label, active = isSelected(value), modifier = Modifier.clickable { onSelect(value) })
+                    ChipText(label, active = isSelected(value), modifier = Modifier.touchFeedback { onSelect(value) })
                 }
             }
         }

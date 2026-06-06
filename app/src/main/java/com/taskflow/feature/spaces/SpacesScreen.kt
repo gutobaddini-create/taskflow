@@ -1,6 +1,5 @@
 package com.taskflow.feature.spaces
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -54,6 +53,7 @@ import com.taskflow.core.design.TaskFlowCard
 import com.taskflow.core.app.TaskFlowViewModel
 import com.taskflow.core.design.NameDialog
 import com.taskflow.core.design.TaskFlowColors
+import com.taskflow.core.design.touchFeedback
 import com.taskflow.domain.model.Space
 import com.taskflow.domain.model.TaskList
 import com.taskflow.domain.usecase.TaskQueries
@@ -119,7 +119,7 @@ fun SpacesScreen(vm: TaskFlowViewModel, onDetail: (String) -> Unit) {
             TaskFlowCard {
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                     Column(
-                        Modifier.weight(1f).clip(RoundedCornerShape(14.dp)).clickable {
+                        Modifier.weight(1f).clip(RoundedCornerShape(14.dp)).touchFeedback {
                             selectedSpaceId = space.id
                             selectedListId = null
                         }.padding(horizontal = 8.dp, vertical = 6.dp).testTag("open-space-${space.name}").semantics { contentDescription = "Abrir espaco ${space.name}" }
@@ -146,7 +146,7 @@ fun SpacesScreen(vm: TaskFlowViewModel, onDetail: (String) -> Unit) {
                     val siblings = orderedLists(space.id)
                     val listIndex = siblings.indexOfFirst { it.id == list.id }
                     Row(Modifier.fillMaxWidth().padding(vertical = 8.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                        Column(Modifier.weight(1f).clip(RoundedCornerShape(14.dp)).clickable {
+                        Column(Modifier.weight(1f).clip(RoundedCornerShape(14.dp)).touchFeedback {
                             selectedListId = list.id
                             selectedSpaceId = null
                         }.padding(horizontal = 8.dp, vertical = 6.dp).testTag("open-list-${list.name}").semantics { contentDescription = "Filtrar lista ${list.name}" }) {

@@ -1192,7 +1192,7 @@ Implementar identidade visual moderna, limpa e premium.
 - [x] Ajustar contraste.
 - [x] Ajustar animações.
 - [x] Ajustar estados vazios.
-- [ ] Ajustar feedback de toque.
+- [x] Ajustar feedback de toque.
 - [x] Ajustar loading de upload.
 - [x] Ajustar erros de formulário.
 

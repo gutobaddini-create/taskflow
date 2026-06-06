@@ -18,7 +18,6 @@ import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -102,6 +101,7 @@ import com.taskflow.core.permissions.PermissionPolicy
 import com.taskflow.core.utils.attachmentType
 import com.taskflow.core.utils.isAllowedAttachment
 import com.taskflow.core.utils.isValidUrl
+import com.taskflow.core.design.touchFeedback
 import com.taskflow.domain.model.Attachment
 import com.taskflow.domain.model.AttachmentSource
 import com.taskflow.domain.model.AttachmentType
@@ -370,7 +370,7 @@ fun MaterialsScreen(vm: TaskFlowViewModel, onBack: () -> Unit) {
             AttachmentUploadProgress(isAddingAttachment)
             FeedbackBanner(message, materialFeedbackKind(message), Modifier.padding(top = 10.dp))
             Spacer(Modifier.height(16.dp))
-            TaskFlowCard(Modifier.border(1.dp, com.taskflow.core.design.TaskFlowColors.Purple.copy(.35f), RoundedCornerShape(22.dp)).clickable {
+            TaskFlowCard(Modifier.border(1.dp, com.taskflow.core.design.TaskFlowColors.Purple.copy(.35f), RoundedCornerShape(22.dp)).touchFeedback {
                 openFilePicker(arrayOf("*/*"))
             }) {
                 Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
