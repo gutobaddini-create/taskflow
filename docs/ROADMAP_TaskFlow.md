@@ -216,7 +216,7 @@ app/
 ### Critérios de aceite
 
 - [x] A arquitetura inicial está organizada.
-- [ ] Nenhuma feature fica misturada dentro da `MainActivity`.
+- [x] Nenhuma feature fica misturada dentro da `MainActivity`.
 - [x] O projeto mantém separação mínima entre UI, domínio e dados.
 
 ---
