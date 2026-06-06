@@ -222,14 +222,42 @@ fun OnboardingScreen(onStart: () -> Unit) {
 fun HomeScreen(vm: TaskFlowViewModel, onNew: () -> Unit, onDetail: (String) -> Unit) {
     val tasks by vm.tasks.collectAsState()
     val reminders by vm.reminders.collectAsState()
+    val attachments by vm.attachments.collectAsState()
+    val links by vm.links.collectAsState()
+    val fields by vm.customFields.collectAsState()
     val lists by vm.lists.collectAsState()
     val users by vm.users.collectAsState()
     users.firstOrNull()?.let { LaunchedEffect(it.id) { vm.setCurrentUserIfNeeded(it.id) } }
-    val filtered = when (vm.homeFilter) {
+    var searchQuery by remember { mutableStateOf("") }
+    var priorityFilter by remember { mutableStateOf("Todas") }
+    var responsibleFilter by remember { mutableStateOf("Todos") }
+    var materialFilter by remember { mutableStateOf("Todos") }
+    val filteredByTab = when (vm.homeFilter) {
         "Concluidas" -> tasks.filter { it.isCompleted }
         "Proximas" -> tasks.filter { !it.isCompleted && (it.dueDate?.isAfter(LocalDateTime.now()) ?: true) }
         else -> tasks.filter { !it.isCompleted }
     }
+    fun matchesSearch(task: Task): Boolean {
+        val query = searchQuery.trim().lowercase()
+        if (query.isBlank()) return true
+        val assignee = users.firstOrNull { it.id == task.assignedTo }?.name.orEmpty()
+        val taskAttachments = attachments.filter { it.taskId == task.id }.joinToString(" ") { it.fileName }
+        val taskLinks = links.filter { it.taskId == task.id }.joinToString(" ") { "${it.title} ${it.url} ${it.category}" }
+        val taskFields = fields.filter { it.taskId == task.id }.joinToString(" ") { "${it.fieldName} ${it.fieldValue}" }
+        return listOf(task.title, task.description, assignee, taskAttachments, taskLinks, taskFields).any { it.lowercase().contains(query) }
+    }
+    val filtered = filteredByTab
+        .filter(::matchesSearch)
+        .filter { priorityFilter == "Todas" || it.priority.label == priorityFilter }
+        .filter { responsibleFilter == "Todos" || users.firstOrNull { user -> user.id == it.assignedTo }?.name == responsibleFilter }
+        .filter {
+            when (materialFilter) {
+                "Anexos" -> attachments.any { attachment -> attachment.taskId == it.id }
+                "Links" -> links.any { link -> link.taskId == it.id }
+                "Lembretes" -> reminders.any { reminder -> reminder.taskId == it.id && reminder.isActive }
+                else -> true
+            }
+        }
     Box {
         LazyColumn(Modifier.fillMaxSize().statusBarsPadding().padding(horizontal = 24.dp, vertical = 12.dp), contentPadding = PaddingValues(bottom = 120.dp)) {
             item {
@@ -242,6 +270,14 @@ fun HomeScreen(vm: TaskFlowViewModel, onNew: () -> Unit, onDetail: (String) -> U
                 }
                 Spacer(Modifier.height(24.dp))
                 Segmented(listOf("Hoje", "Proximas", "Concluidas"), vm.homeFilter) { vm.updateHomeFilter(it) }
+                Spacer(Modifier.height(12.dp))
+                OutlinedTextField(searchQuery, { searchQuery = it }, label = { Text("Buscar tarefas") }, leadingIcon = { Icon(Icons.Default.Search, null) }, singleLine = true, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(18.dp))
+                Spacer(Modifier.height(12.dp))
+                Segmented(listOf("Todas", "Alta", "Media", "Baixa"), priorityFilter) { priorityFilter = it }
+                Spacer(Modifier.height(8.dp))
+                Segmented(listOf("Todos") + users.map { it.name }, responsibleFilter) { responsibleFilter = it }
+                Spacer(Modifier.height(8.dp))
+                Segmented(listOf("Todos", "Anexos", "Links", "Lembretes"), materialFilter) { materialFilter = it }
                 Spacer(Modifier.height(20.dp))
                 TaskFlowCard {
                     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
@@ -254,6 +290,15 @@ fun HomeScreen(vm: TaskFlowViewModel, onNew: () -> Unit, onDetail: (String) -> U
             items(filtered) { task ->
                 TaskCard(task, lists.firstOrNull { it.id == task.listId }?.name ?: "Lista", reminders.any { it.taskId == task.id && it.isActive }) { onDetail(task.id) }
                 Spacer(Modifier.height(14.dp))
+            }
+            if (filtered.isEmpty()) {
+                item {
+                    TaskFlowCard {
+                        Text("Nenhuma tarefa encontrada.", fontWeight = FontWeight.Bold, color = Text)
+                        Text("Ajuste a busca ou os filtros.", color = Muted, modifier = Modifier.padding(top = 4.dp))
+                    }
+                    Spacer(Modifier.height(14.dp))
+                }
             }
             item {
                 val next = reminders.mapNotNull { r -> ReminderEngine.nextOccurrence(r)?.let { r to it } }.minByOrNull { it.second }

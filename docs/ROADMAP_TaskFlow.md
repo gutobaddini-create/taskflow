@@ -1067,19 +1067,19 @@ Implementar identidade visual moderna, limpa e premium.
 
 ### Tarefas
 
-- [ ] Buscar por título.
-- [ ] Buscar por descrição.
-- [ ] Buscar por responsável.
-- [ ] Buscar por nome de anexo.
-- [ ] Buscar por link.
-- [ ] Buscar por campo complementar.
+- [x] Buscar por título.
+- [x] Buscar por descrição.
+- [x] Buscar por responsável.
+- [x] Buscar por nome de anexo.
+- [x] Buscar por link.
+- [x] Buscar por campo complementar.
 - [ ] Buscar por tag/categoria.
 
 ### Critérios de aceite
 
-- [ ] Busca retorna tarefas corretas.
+- [x] Busca retorna tarefas corretas.
 - [ ] Busca não trava com lista grande.
-- [ ] Busca mostra estado vazio quando não encontra nada.
+- [x] Busca mostra estado vazio quando não encontra nada.
 
 ---
 
@@ -1087,19 +1087,19 @@ Implementar identidade visual moderna, limpa e premium.
 
 ### Tarefas
 
-- [ ] Filtrar por hoje.
-- [ ] Filtrar por próximas.
+- [x] Filtrar por hoje.
+- [x] Filtrar por próximas.
 - [ ] Filtrar por atrasadas.
-- [ ] Filtrar por concluídas.
-- [ ] Filtrar por responsável.
-- [ ] Filtrar por prioridade.
-- [ ] Filtrar por tarefas com anexos.
-- [ ] Filtrar por tarefas com links.
-- [ ] Filtrar por tarefas com lembretes.
+- [x] Filtrar por concluídas.
+- [x] Filtrar por responsável.
+- [x] Filtrar por prioridade.
+- [x] Filtrar por tarefas com anexos.
+- [x] Filtrar por tarefas com links.
+- [x] Filtrar por tarefas com lembretes.
 
 ### Critérios de aceite
 
-- [ ] Filtros funcionam isolados.
+- [x] Filtros funcionam isolados.
 - [ ] Filtros combinados funcionam quando aplicável.
 
 ---
