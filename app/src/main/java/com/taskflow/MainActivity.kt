@@ -71,6 +71,7 @@ import com.taskflow.core.utils.TaskSearch
 import com.taskflow.feature.auth.OnboardingScreen
 import com.taskflow.feature.people.PeopleScreen
 import com.taskflow.feature.settings.SettingsScreen
+import com.taskflow.feature.sharing.AcceptInviteScreen
 import com.taskflow.feature.sharing.ShareScreen
 import com.taskflow.domain.model.*
 import java.io.File
@@ -1148,76 +1149,6 @@ fun MaterialsScreen(vm: TaskFlowViewModel, onBack: () -> Unit) {
             Spacer(Modifier.height(18.dp))
             if (canManageMaterial && vm.materialsTab == "Campos") TextButton({ fieldDialog = true }, Modifier.fillMaxWidth()) { Text("Adicionar campo personalizado") }
             if (canManageMaterial) TextButton({ checklistDialog = true }, Modifier.fillMaxWidth()) { Text("Adicionar item do checklist") }
-        }
-    }
-}
-
-@Composable
-fun AcceptInviteScreen(vm: TaskFlowViewModel, token: String?, onDone: () -> Unit, onCancel: () -> Unit) {
-    val invites by vm.invites.collectAsState()
-    val tasks by vm.tasks.collectAsState()
-    val users by vm.users.collectAsState()
-    val preferences by vm.preferences.collectAsState()
-    val invite = invites.firstOrNull { it.token == token }
-    val task = invite?.let { value -> tasks.firstOrNull { it.id == value.taskId } }
-    val currentUser = users.firstOrNull { it.id == preferences.currentUserId } ?: users.firstOrNull() ?: vm.currentUser()
-    val expired = invite?.expiresAt?.let { it < now() } == true
-    LazyColumn(Modifier.fillMaxSize().statusBarsPadding().padding(24.dp), contentPadding = PaddingValues(bottom = 40.dp)) {
-        item {
-            Text("Convite TaskFlow", fontSize = 30.sp, fontWeight = FontWeight.Bold, color = Text)
-            Text("Revise os detalhes antes de entrar na tarefa.", color = Muted, modifier = Modifier.padding(top = 8.dp))
-            Spacer(Modifier.height(22.dp))
-            when {
-                token.isNullOrBlank() -> {
-                    TaskFlowCard { Text("Link de convite sem token.", color = Color(0xFFEF4444), fontWeight = FontWeight.Bold) }
-                    Spacer(Modifier.height(20.dp))
-                    GradientButton("Voltar", onCancel, Modifier.fillMaxWidth())
-                }
-                invite == null || task == null -> {
-                    TaskFlowCard {
-                        Text("Convite invalido.", color = Color(0xFFEF4444), fontWeight = FontWeight.Bold)
-                        Text("O token nao foi encontrado neste dispositivo.", color = Muted, modifier = Modifier.padding(top = 6.dp))
-                    }
-                    Spacer(Modifier.height(20.dp))
-                    GradientButton("Voltar", onCancel, Modifier.fillMaxWidth())
-                }
-                expired -> {
-                    TaskFlowCard {
-                        Text("Convite expirado.", color = Color(0xFFEF4444), fontWeight = FontWeight.Bold)
-                        Text(task.title, color = Text, modifier = Modifier.padding(top = 8.dp))
-                    }
-                    Spacer(Modifier.height(20.dp))
-                    GradientButton("Voltar", onCancel, Modifier.fillMaxWidth())
-                }
-                invite.acceptedBy != null -> {
-                    TaskFlowCard {
-                        Text("Convite ja aceito.", color = Purple, fontWeight = FontWeight.Bold)
-                        InfoRow("Tarefa", task.title)
-                        InfoRow("Permissao", invite.permission.label)
-                    }
-                    Spacer(Modifier.height(20.dp))
-                    GradientButton("Abrir TaskFlow", onDone, Modifier.fillMaxWidth())
-                }
-                else -> {
-                    TaskFlowCard {
-                        Text(task.title, fontSize = 24.sp, fontWeight = FontWeight.Bold, color = Text)
-                        Text(task.description.ifBlank { "Sem descricao." }, color = Muted, modifier = Modifier.padding(top = 8.dp))
-                        InfoRow("Prazo", task.dueDate?.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")) ?: "Sem prazo")
-                        InfoRow("Permissao", invite.permission.label)
-                        InfoRow("Token", invite.token.take(8))
-                    }
-                    Spacer(Modifier.height(16.dp))
-                    GradientButton("Aceitar convite", {
-                        vm.repo.acceptInvite(invite.token, currentUser.id)
-                        vm.selectedTaskId = task.id
-                        onDone()
-                    }, Modifier.fillMaxWidth())
-                    TextButton({
-                        vm.repo.declineInvite(invite.token)
-                        onCancel()
-                    }, Modifier.fillMaxWidth()) { Text("Recusar", color = Color(0xFFEF4444)) }
-                }
-            }
         }
     }
 }
