@@ -251,7 +251,7 @@ fun TaskFlowRoot(
                 Screen.Spaces -> Shell(screen, { screen = it }) { SpacesScreen(vm, { vm.selectedTaskId = it; screen = Screen.Detail }) }
                 Screen.People -> Shell(screen, { screen = it }) { PeopleScreen(vm) }
                 Screen.Settings -> Shell(screen, { screen = it }) { SettingsScreen(vm) { vm.logoutLocal(); screen = Screen.Onboarding } }
-                Screen.NewTask -> NewTaskScreen(vm, { screen = Screen.Home }, { screen = Screen.Reminder }, { screen = Screen.Materials })
+                Screen.NewTask -> NewTaskScreen(vm, { screen = Screen.Home })
                 Screen.Detail -> DetailScreen(vm, { screen = Screen.Home }, { screen = Screen.Materials }, { screen = Screen.Share }, { screen = Screen.Reminder })
                 Screen.Reminder -> ReminderScreen(vm) { screen = Screen.NewTask }
                 Screen.Materials -> MaterialsScreen(vm) { screen = Screen.Detail }
@@ -384,7 +384,7 @@ fun HomeScreen(vm: TaskFlowViewModel, onNew: () -> Unit, onDetail: (String) -> U
 }
 
 @Composable
-fun NewTaskScreen(vm: TaskFlowViewModel, onCancel: () -> Unit, onReminder: () -> Unit, onMaterials: () -> Unit) {
+fun NewTaskScreen(vm: TaskFlowViewModel, onCancel: () -> Unit) {
     val lists by vm.lists.collectAsState()
     val users by vm.users.collectAsState()
     val user = vm.currentUser()
@@ -393,6 +393,7 @@ fun NewTaskScreen(vm: TaskFlowViewModel, onCancel: () -> Unit, onReminder: () ->
     var priority by remember { mutableStateOf(TaskPriority.Medium) }
     var selectedListId by remember { mutableStateOf<String?>(null) }
     var selectedAssigneeId by remember(user.id) { mutableStateOf(user.id) }
+    var invitePermission by remember { mutableStateOf("Sem convite") }
     var dueDay by remember { mutableStateOf("Hoje") }
     var dueHour by remember { mutableStateOf("09:00") }
     var attemptedSave by remember { mutableStateOf(false) }
@@ -426,24 +427,27 @@ fun NewTaskScreen(vm: TaskFlowViewModel, onCancel: () -> Unit, onReminder: () ->
                 Segmented(assigneeOptions.map { it.name }, selectedAssignee.name) { name ->
                     selectedAssigneeId = assigneeOptions.first { it.name == name }.id
                 }
-                InfoRow("Convidar pessoas", "WhatsApp, e-mail ou link")
+                Text("Convite de pessoas", color = Muted, modifier = Modifier.padding(top = 14.dp))
+                Segmented(listOf("Sem convite", "Comentar", "Ver"), invitePermission) { invitePermission = it }
+                Text("O convite local sera criado ao salvar a tarefa.", color = Muted, fontSize = 13.sp, modifier = Modifier.padding(top = 8.dp))
             }
             SectionTitle("Lembretes")
-            TaskFlowCard(Modifier.clickable(onClick = onReminder)) {
+            TaskFlowCard {
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                    Column { Text("A cada 2 semanas", fontWeight = FontWeight.Bold, color = Text); Text("seg e qui - termina em 31/12/2026", color = Muted) }
-                    Icon(Icons.Default.ChevronRight, null, tint = Muted)
+                    Column { Text("Configurar apos salvar", fontWeight = FontWeight.Bold, color = Text); Text("Evita aplicar lembretes em uma tarefa incorreta.", color = Muted) }
+                    Icon(Icons.Default.NotificationsActive, null, tint = Muted)
                 }
             }
             SectionTitle("Materiais da tarefa")
-            TaskFlowCard(Modifier.clickable(onClick = onMaterials)) {
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) { ChipText("2 anexos"); ChipText("1 link"); ChipText("3 campos") }
+            TaskFlowCard {
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) { ChipText("Anexos"); ChipText("Links"); ChipText("Campos") }
                 Spacer(Modifier.height(14.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                     SmallAction(Icons.Default.AttachFile, "Arquivo")
                     SmallAction(Icons.Default.PhotoCamera, "Foto")
                     SmallAction(Icons.Default.Link, "Link")
                 }
+                Text("Materiais ficam disponiveis no detalhe depois que a tarefa existir.", color = Muted, fontSize = 13.sp, modifier = Modifier.padding(top = 10.dp))
             }
             SectionTitle("Prioridade")
             Segmented(TaskPriority.entries.map { it.label }, priority.label) { priority = TaskPriority.entries.first { p -> p.label == it } }
@@ -455,7 +459,12 @@ fun NewTaskScreen(vm: TaskFlowViewModel, onCancel: () -> Unit, onReminder: () ->
                     if (list != null) {
                         val time = LocalTime.parse(dueHour)
                         val date = if (dueDay == "Amanha") LocalDate.now().plusDays(1) else LocalDate.now()
-                        vm.repo.createTask(Task(spaceId = list.spaceId, listId = list.id, title = title.trim(), description = description, priority = priority, createdBy = user.id, assignedTo = selectedAssignee.id, dueDate = LocalDateTime.of(date, time)))
+                        val task = Task(spaceId = list.spaceId, listId = list.id, title = title.trim(), description = description, priority = priority, createdBy = user.id, assignedTo = selectedAssignee.id, dueDate = LocalDateTime.of(date, time))
+                        vm.repo.createTask(task)
+                        when (invitePermission) {
+                            "Comentar" -> vm.repo.createInvite(Invite(taskId = task.id, createdBy = user.id, permission = UserPermission.Participant))
+                            "Ver" -> vm.repo.createInvite(Invite(taskId = task.id, createdBy = user.id, permission = UserPermission.Viewer))
+                        }
                         onCancel()
                     }
                 }
@@ -1294,8 +1303,12 @@ fun SpacesScreen(vm: TaskFlowViewModel, onDetail: (String) -> Unit) {
     val spaces by vm.spaces.collectAsState()
     val lists by vm.lists.collectAsState()
     val tasks by vm.tasks.collectAsState()
+    val reminders by vm.reminders.collectAsState()
     var dialog by remember { mutableStateOf<CrudDialogState?>(null) }
     var message by remember { mutableStateOf<String?>(null) }
+    var selectedListId by remember { mutableStateOf<String?>(null) }
+    val selectedList = lists.firstOrNull { it.id == selectedListId }
+    val selectedListTasks = selectedList?.let { list -> tasks.filter { it.listId == list.id } } ?: emptyList()
     dialog?.let { state ->
         NameDialog(
             title = state.title,
@@ -1340,9 +1353,11 @@ fun SpacesScreen(vm: TaskFlowViewModel, onDetail: (String) -> Unit) {
                 }
                 lists.filter { it.spaceId == space.id }.forEach { list ->
                     Row(Modifier.fillMaxWidth().padding(vertical = 8.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                        Column(Modifier.weight(1f).clickable { tasks.firstOrNull { it.listId == list.id }?.id?.let(onDetail) }.testTag("open-list-${list.name}").semantics { contentDescription = "Abrir lista ${list.name}" }) {
+                        Column(Modifier.weight(1f).clip(RoundedCornerShape(14.dp)).clickable { selectedListId = list.id }.padding(horizontal = 8.dp, vertical = 6.dp).testTag("open-list-${list.name}").semantics { contentDescription = "Filtrar lista ${list.name}" }) {
                             Text(list.name, color = Text)
-                            Text("${tasks.count { it.listId == list.id && !it.isCompleted }} abertas", color = Muted, fontSize = 13.sp)
+                            val openCount = tasks.count { it.listId == list.id && !it.isCompleted }
+                            val selectedSuffix = if (selectedListId == list.id) " - filtrando" else ""
+                            Text("$openCount abertas$selectedSuffix", color = Muted, fontSize = 13.sp)
                         }
                         IconButton(onClick = { dialog = CrudDialogState(CrudKind.EditList, "Renomear lista", list.name, list = list) }, modifier = Modifier.testTag("edit-list-${list.name}").semantics { contentDescription = "Renomear lista ${list.name}" }) { Icon(Icons.Default.Edit, null, tint = Muted) }
                         IconButton(onClick = {
@@ -1352,6 +1367,22 @@ fun SpacesScreen(vm: TaskFlowViewModel, onDetail: (String) -> Unit) {
                 }
             }
             Spacer(Modifier.height(12.dp))
+        }
+        selectedList?.let { list ->
+            item {
+                SectionTitle("Tarefas em ${list.name}")
+                if (selectedListTasks.isEmpty()) {
+                    TaskFlowCard {
+                        Text("Nenhuma tarefa nesta lista.", fontWeight = FontWeight.Bold, color = Text)
+                        Text("Crie uma tarefa usando esta lista para ela aparecer aqui.", color = Muted, modifier = Modifier.padding(top = 4.dp))
+                    }
+                    Spacer(Modifier.height(12.dp))
+                }
+            }
+            items(selectedListTasks) { task ->
+                TaskCard(task, list.name, reminders.any { it.taskId == task.id && it.isActive }) { onDetail(task.id) }
+                Spacer(Modifier.height(12.dp))
+            }
         }
     }
 }

@@ -458,7 +458,7 @@ Implementar identidade visual moderna, limpa e premium.
 
 ### Critérios de aceite
 
-- [ ] Listas filtram as tarefas corretamente.
+- [x] Listas filtram as tarefas corretamente.
 - [ ] Não é possível criar tarefa sem lista válida.
 
 ---
@@ -474,10 +474,10 @@ Implementar identidade visual moderna, limpa e premium.
 - [x] Seleção de lista.
 - [x] Seleção de prazo.
 - [x] Seleção de responsável.
-- [ ] Convite de pessoas.
+- [x] Convite de pessoas.
 - [x] Seleção de prioridade.
-- [ ] Bloco de lembretes.
-- [ ] Bloco de materiais da tarefa.
+- [x] Bloco de lembretes.
+- [x] Bloco de materiais da tarefa.
 - [x] Botão salvar.
 
 ### Critérios de aceite
@@ -504,7 +504,7 @@ Implementar identidade visual moderna, limpa e premium.
 
 ### Critérios de aceite
 
-- [ ] Alterações aparecem na tela de detalhe.
+- [x] Alterações aparecem na tela de detalhe.
 - [x] Alterações aparecem na lista.
 - [x] Histórico registra alteração relevante.
 
