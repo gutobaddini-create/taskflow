@@ -44,6 +44,14 @@ O Gradle Wrapper esta no repositorio, entao Gradle global nao e necessario.
 
 ## Comandos Principais
 
+Verificacao local completa do MVP:
+
+```powershell
+npm run verify:local-mvp
+```
+
+Comandos individuais:
+
 ```powershell
 .\gradlew.bat --no-daemon --max-workers=1 :app:testDebugUnitTest :app:compileDebugKotlin --console=plain
 .\gradlew.bat --no-daemon --max-workers=1 :app:assembleDebug --console=plain
@@ -111,6 +119,7 @@ Comandos executados com sucesso neste workspace:
 - `.\gradlew.bat --no-daemon --max-workers=1 :app:assembleDebug :app:compileDebugAndroidTestKotlin --console=plain`
 - `.\gradlew.bat --no-daemon --max-workers=1 :app:bundleRelease --console=plain --stacktrace`
 - `npm run test:firebase-rules`
+- `npm run verify:local-mvp`
 - Instalacao e abertura do APK debug no emulador `TaskFlow_API35`, sem crash/ANR do pacote `com.taskflow` no log filtrado.
 
 ## Bloqueios Para Conclusao Total
