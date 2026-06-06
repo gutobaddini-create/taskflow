@@ -68,6 +68,7 @@ import com.taskflow.core.utils.isAllowedAttachment
 import com.taskflow.core.utils.isValidUrl
 import com.taskflow.core.utils.TaskSearch
 import com.taskflow.feature.auth.OnboardingScreen
+import com.taskflow.feature.people.PeopleScreen
 import com.taskflow.feature.settings.SettingsScreen
 import com.taskflow.domain.model.*
 import java.io.File
@@ -1599,38 +1600,6 @@ fun FieldDialog(initialName: String, initialType: CustomFieldType, initialValue:
         confirmButton = { TextButton({ if (name.isNotBlank() && value.isNotBlank()) onSave(name.trim(), type, value.trim()) }) { Text("Salvar") } },
         dismissButton = { TextButton(onDismiss) { Text("Cancelar") } }
     )
-}
-
-@Composable
-fun PeopleScreen(vm: TaskFlowViewModel) {
-    val users by vm.users.collectAsState()
-    val invites by vm.invites.collectAsState()
-    val preferences by vm.preferences.collectAsState()
-    LazyColumn(Modifier.fillMaxSize().statusBarsPadding().padding(24.dp), contentPadding = PaddingValues(bottom = 120.dp)) {
-        item { Text("Pessoas", fontSize = 30.sp, fontWeight = FontWeight.Bold, color = Text); Text("Convites e participantes", color = Muted); Spacer(Modifier.height(16.dp)) }
-        item {
-            SectionTitle("Usuarios locais")
-            users.forEach { user ->
-                TaskFlowCard {
-                    InfoRow(user.name, user.email)
-                    Button(
-                        onClick = { vm.setCurrentUser(user.id) },
-                        enabled = preferences.currentUserId != user.id,
-                        modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
-                        shape = RoundedCornerShape(50)
-                    ) {
-                        Text(if (preferences.currentUserId == user.id) "Usuario atual" else "Tornar atual")
-                    }
-                }
-                Spacer(Modifier.height(12.dp))
-            }
-            SectionTitle("Convites")
-        }
-        items(invites.ifEmpty { listOf(Invite(taskId = "demo", createdBy = "demo", permission = UserPermission.Participant)) }) {
-            TaskFlowCard { InfoRow("Permissao", it.permission.label); InfoRow("Token", it.token.take(8)); InfoRow("Status", if (it.acceptedBy == null) "Pendente" else "Aceito") }
-            Spacer(Modifier.height(12.dp))
-        }
-    }
 }
 
 @Composable
