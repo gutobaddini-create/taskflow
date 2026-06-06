@@ -150,6 +150,10 @@ class TaskFlowViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
+    fun logoutLocal() {
+        viewModelScope.launch { preferencesStore.setCurrentUserId("") }
+    }
+
     fun currentUser() = users.value.firstOrNull() ?: User(name = "Manuel", email = "manuel@taskflow.local")
     fun selectedTask(): Task? = tasks.value.firstOrNull { it.id == selectedTaskId } ?: tasks.value.firstOrNull()
 }
@@ -177,7 +181,7 @@ fun TaskFlowRoot(vm: TaskFlowViewModel = viewModel()) {
                 Screen.Home -> Shell(screen, { screen = it }) { HomeScreen(vm, { screen = Screen.NewTask }, { vm.selectedTaskId = it; screen = Screen.Detail }) }
                 Screen.Spaces -> Shell(screen, { screen = it }) { SpacesScreen(vm, { vm.selectedTaskId = it; screen = Screen.Detail }) }
                 Screen.People -> Shell(screen, { screen = it }) { PeopleScreen(vm) }
-                Screen.Settings -> Shell(screen, { screen = it }) { SettingsScreen(vm) }
+                Screen.Settings -> Shell(screen, { screen = it }) { SettingsScreen(vm) { vm.logoutLocal(); screen = Screen.Onboarding } }
                 Screen.NewTask -> NewTaskScreen(vm, { screen = Screen.Home }, { screen = Screen.Reminder }, { screen = Screen.Materials })
                 Screen.Detail -> DetailScreen(vm, { screen = Screen.Home }, { screen = Screen.Materials }, { screen = Screen.Share }, { screen = Screen.Reminder })
                 Screen.Reminder -> ReminderScreen(vm) { screen = Screen.NewTask }
@@ -978,7 +982,7 @@ fun PeopleScreen(vm: TaskFlowViewModel) {
 }
 
 @Composable
-fun SettingsScreen(vm: TaskFlowViewModel) {
+fun SettingsScreen(vm: TaskFlowViewModel, onLogout: () -> Unit) {
     val preferences by vm.preferences.collectAsState()
     LazyColumn(Modifier.fillMaxSize().statusBarsPadding().padding(24.dp), contentPadding = PaddingValues(bottom = 120.dp)) {
         item {
@@ -994,9 +998,26 @@ fun SettingsScreen(vm: TaskFlowViewModel) {
                 Segmented(listOf("Claro", "Escuro futuro"), preferences.theme) { vm.setTheme(it) }
                 InfoRow("Filtro inicial", preferences.homeFilter)
                 InfoRow("Backups e sincronizacao", "Local-first")
-                InfoRow("Ajuda e suporte", "Disponivel")
             }
-            TextButton(onClick = {}) { Text("Sair da conta", color = Color(0xFFEF4444)) }
+            SectionTitle("Conta")
+            TaskFlowCard {
+                InfoRow("E-mail", vm.currentUser().email)
+                InfoRow("Sessao", if (preferences.currentUserId.isBlank()) "Local" else "Usuario local")
+                InfoRow("Sincronizacao Firebase", "Preparada para credenciais")
+            }
+            SectionTitle("Privacidade")
+            TaskFlowCard {
+                InfoRow("Dados", "Persistencia local Room/DataStore")
+                InfoRow("Compartilhamento", "Tokens locais por convite")
+                InfoRow("Galeria", "Photo Picker sem acesso amplo")
+            }
+            SectionTitle("Ajuda")
+            TaskFlowCard {
+                InfoRow("Suporte", "Disponivel")
+                InfoRow("Versao", "MVP local")
+                InfoRow("Diagnostico", "Logcat sem dados sensiveis")
+            }
+            TextButton(onClick = onLogout, modifier = Modifier.fillMaxWidth()) { Text("Sair da conta", color = Color(0xFFEF4444)) }
         }
     }
 }

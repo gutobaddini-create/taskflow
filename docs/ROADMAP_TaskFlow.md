@@ -1113,15 +1113,15 @@ Implementar identidade visual moderna, limpa e premium.
 - [x] Exibir perfil.
 - [x] Configurar notificações.
 - [x] Configurar tema.
-- [ ] Configurar conta.
-- [ ] Configurar privacidade.
-- [ ] Configurar ajuda e suporte.
-- [ ] Logout.
+- [x] Configurar conta.
+- [x] Configurar privacidade.
+- [x] Configurar ajuda e suporte.
+- [x] Logout.
 
 ### Critérios de aceite
 
 - [x] Configurações principais persistem.
-- [ ] Logout retorna para login.
+- [x] Logout retorna para login.
 - [x] Usuário consegue revisar preferências de notificação.
 
 ---
