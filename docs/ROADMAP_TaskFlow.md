@@ -1259,17 +1259,17 @@ O MVP só estará pronto quando todos os itens abaixo estiverem concluídos:
 
 - [x] Projeto compila sem erros.
 - [ ] Login/cadastro funcionando.
-- [ ] Home funcionando.
-- [ ] Espaços funcionando.
-- [ ] Listas funcionando.
-- [ ] CRUD de tarefas funcionando.
-- [ ] Status funcionando.
-- [ ] Prioridade funcionando.
-- [ ] Lembrete único funcionando.
+- [x] Home funcionando.
+- [x] Espaços funcionando.
+- [x] Listas funcionando.
+- [x] CRUD de tarefas funcionando.
+- [x] Status funcionando.
+- [x] Prioridade funcionando.
+- [x] Lembrete único funcionando.
 - [x] Lembrete recorrente personalizado funcionando.
 - [ ] Notificações locais funcionando.
 - [x] Ação de adiar funcionando.
-- [ ] Múltiplos lembretes funcionando.
+- [x] Múltiplos lembretes funcionando.
 - [x] Anexar imagem funcionando.
 - [x] Tirar foto funcionando.
 - [x] Anexar PDF funcionando.
