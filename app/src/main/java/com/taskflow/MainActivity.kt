@@ -71,6 +71,7 @@ import com.taskflow.core.utils.TaskSearch
 import com.taskflow.feature.auth.OnboardingScreen
 import com.taskflow.feature.people.PeopleScreen
 import com.taskflow.feature.settings.SettingsScreen
+import com.taskflow.feature.sharing.ShareScreen
 import com.taskflow.domain.model.*
 import java.io.File
 import java.time.Instant
@@ -1147,114 +1148,6 @@ fun MaterialsScreen(vm: TaskFlowViewModel, onBack: () -> Unit) {
             Spacer(Modifier.height(18.dp))
             if (canManageMaterial && vm.materialsTab == "Campos") TextButton({ fieldDialog = true }, Modifier.fillMaxWidth()) { Text("Adicionar campo personalizado") }
             if (canManageMaterial) TextButton({ checklistDialog = true }, Modifier.fillMaxWidth()) { Text("Adicionar item do checklist") }
-        }
-    }
-}
-
-@Composable
-fun ShareScreen(vm: TaskFlowViewModel, onBack: () -> Unit) {
-    val context = LocalContext.current
-    val task = vm.selectedTask()
-    val attachments by vm.attachments.collectAsState()
-    val links by vm.links.collectAsState()
-    val invites by vm.invites.collectAsState()
-    var permission by remember { mutableStateOf("Editar") }
-    var message by remember { mutableStateOf<String?>(null) }
-    if (task == null) {
-        LoadingFullScreen("Carregando convite...")
-        return
-    }
-    fun selectedPermission() = when (permission) {
-        "Editar" -> UserPermission.Owner
-        "Ver" -> UserPermission.Viewer
-        else -> UserPermission.Participant
-    }
-    fun buildInviteText(invite: Invite): String {
-        val due = task.dueDate?.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")) ?: "sem prazo"
-        return "Voce foi convidado para participar da tarefa \"${task.title}\" no TaskFlow.\nPrazo: $due\nStatus: ${task.status.label}\nPermissao: ${invite.permission.label}\nLink: taskflow://invite/${invite.token}"
-    }
-    fun createInviteAndText(): Pair<Invite, String> {
-        val invite = Invite(taskId = task.id, createdBy = vm.currentUser().id, permission = selectedPermission())
-        vm.repo.createInvite(invite)
-        return invite to buildInviteText(invite)
-    }
-    fun sendShare(packageName: String? = null) {
-        val (_, text) = createInviteAndText()
-        val send = Intent(Intent.ACTION_SEND).apply {
-            type = "text/plain"
-            putExtra(Intent.EXTRA_SUBJECT, "Convite TaskFlow: ${task.title}")
-            putExtra(Intent.EXTRA_TEXT, text)
-            packageName?.let(::setPackage)
-        }
-        try {
-            context.startActivity(Intent.createChooser(send, "Compartilhar tarefa"))
-            message = "Convite gerado."
-        } catch (_: ActivityNotFoundException) {
-            context.startActivity(Intent.createChooser(send.apply { setPackage(null) }, "Compartilhar tarefa"))
-            message = "App especifico indisponivel; usando seletor."
-        }
-    }
-    fun sendEmail() {
-        val (_, text) = createInviteAndText()
-        val email = Intent(Intent.ACTION_SENDTO).apply {
-            data = Uri.parse("mailto:")
-            putExtra(Intent.EXTRA_SUBJECT, "Convite TaskFlow: ${task.title}")
-            putExtra(Intent.EXTRA_TEXT, text)
-        }
-        try {
-            context.startActivity(email)
-            message = "Convite por e-mail gerado."
-        } catch (_: ActivityNotFoundException) {
-            sendShare()
-        }
-    }
-    fun copyInvite() {
-        val (_, text) = createInviteAndText()
-        val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-        clipboard.setPrimaryClip(ClipData.newPlainText("Convite TaskFlow", text))
-        message = "Link copiado."
-    }
-    LazyColumn(Modifier.fillMaxSize().statusBarsPadding().padding(22.dp), contentPadding = PaddingValues(bottom = 30.dp)) {
-        item {
-            TopRow("<", "Compartilhar", onBack)
-            Text("Convide alguem para esta tarefa", color = Muted, modifier = Modifier.padding(top = 8.dp))
-            SectionTitle("Permissao")
-            Segmented(listOf("Editar", "Comentar", "Ver"), permission) { permission = it }
-            SectionTitle("Compartilhar por")
-            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                SmallAction(Icons.Default.Chat, "WhatsApp") { sendShare("com.whatsapp") }
-                SmallAction(Icons.Default.Email, "E-mail") { sendEmail() }
-                SmallAction(Icons.Default.ContentCopy, "Copiar") { copyInvite() }
-            }
-            message?.let { Text(it, color = Purple, modifier = Modifier.padding(top = 10.dp)) }
-            SectionTitle("Previa da mensagem")
-            TaskFlowCard {
-                Text("Voce foi convidado para participar desta tarefa:", color = Muted)
-                Text(task.title, fontSize = 22.sp, fontWeight = FontWeight.Bold, color = Text, modifier = Modifier.padding(top = 8.dp))
-                Text("Prazo: ${task.dueDate?.format(DateTimeFormatter.ofPattern("dd/MM HH:mm")) ?: "sem prazo"}", color = Muted)
-                Text("Status: ${task.status.label}", color = Muted)
-                Row(Modifier.padding(top = 10.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    ChipText("${attachments.count { it.taskId == task.id }} anexos")
-                    ChipText("${links.count { it.taskId == task.id }} links")
-                }
-                Text("taskflow://invite/${task.shareToken}", color = Purple, modifier = Modifier.padding(top = 12.dp))
-            }
-            val taskInvites = invites.filter { it.taskId == task.id }
-            if (taskInvites.isNotEmpty()) {
-                SectionTitle("Convites locais")
-                taskInvites.take(3).forEach {
-                    TaskFlowCard(Modifier.padding(bottom = 10.dp)) {
-                        InfoRow("Permissao", it.permission.label)
-                        InfoRow("Token", it.token.take(8))
-                        InfoRow("Status", if (it.acceptedBy == null) "Pendente" else "Aceito")
-                    }
-                }
-            }
-            Spacer(Modifier.height(24.dp))
-            GradientButton("Enviar convite", {
-                createInviteAndText()
-                message = "Convite salvo."
-            }, Modifier.fillMaxWidth())
         }
     }
 }
