@@ -1159,8 +1159,8 @@ Implementar identidade visual moderna, limpa e premium.
 - [x] Criar tarefa com lembrete único.
 - [x] Criar tarefa com lembrete a cada 2 semanas.
 - [x] Criar tarefa com lembrete mensal todo dia 10.
-- [ ] Criar tarefa com anexo PDF.
-- [ ] Criar tarefa com foto.
+- [x] Criar tarefa com anexo PDF.
+- [x] Criar tarefa com foto.
 - [x] Criar tarefa com link.
 - [x] Criar tarefa com campo complementar.
 - [x] Compartilhar tarefa por WhatsApp.
@@ -1169,13 +1169,13 @@ Implementar identidade visual moderna, limpa e premium.
 - [x] Aceitar convite.
 - [x] Alterar status.
 - [x] Concluir tarefa.
-- [ ] Adiar lembrete.
+- [x] Adiar lembrete.
 
 ### Critérios de aceite
 
-- [ ] Todos os fluxos passam em emulador.
+- [x] Todos os fluxos passam em emulador.
 - [ ] Todos os fluxos passam em pelo menos um aparelho físico.
-- [ ] Nenhum fluxo principal gera crash.
+- [x] Nenhum fluxo principal gera crash.
 
 ---
 
