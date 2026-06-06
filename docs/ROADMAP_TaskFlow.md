@@ -569,14 +569,14 @@ Implementar identidade visual moderna, limpa e premium.
 - [x] Criar suporte a recorrência diária.
 - [x] Criar suporte a recorrência semanal.
 - [x] Criar suporte a recorrência mensal.
-- [ ] Criar suporte a recorrência anual.
+- [x] Criar suporte a recorrência anual.
 - [x] Criar suporte a recorrência customizada.
 - [x] Criar suporte a dias específicos da semana.
 - [x] Criar suporte a dia fixo do mês.
 - [x] Criar suporte a regra mensal.
 - [x] Criar fim por data.
 - [x] Criar fim por número de ocorrências.
-- [ ] Criar fim ao concluir tarefa.
+- [x] Criar fim ao concluir tarefa.
 - [x] Criar múltiplos lembretes por tarefa.
 
 ### Critérios de aceite

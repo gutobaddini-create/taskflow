@@ -50,6 +50,18 @@ class ReminderEngineTest {
     }
 
     @Test
+    fun yearlyReminderAdvancesToNextYear() {
+        val reminder = Reminder(
+            taskId = "task",
+            userId = "user",
+            recurrenceType = RecurrenceType.Yearly,
+            startDate = LocalDate.of(2026, 6, 1),
+            startTime = LocalTime.of(9, 0)
+        )
+        assertEquals(LocalDateTime.of(2027, 6, 1, 9, 0), ReminderEngine.nextOccurrence(reminder, LocalDateTime.of(2026, 6, 5, 8, 0)))
+    }
+
+    @Test
     fun weeklyReminderUsesSelectedWeekday() {
         val reminder = Reminder(
             taskId = "task",
