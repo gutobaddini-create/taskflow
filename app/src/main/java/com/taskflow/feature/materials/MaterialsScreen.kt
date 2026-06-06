@@ -85,7 +85,6 @@ import com.taskflow.ChipText
 import com.taskflow.GradientButton
 import com.taskflow.IconBubble
 import com.taskflow.InfoRow
-import com.taskflow.NameDialog
 import com.taskflow.SectionTitle
 import com.taskflow.Segmented
 import com.taskflow.SmallAction
@@ -93,6 +92,7 @@ import com.taskflow.TaskFlowCard
 import com.taskflow.TaskFlowViewModel
 import com.taskflow.TopRow
 import com.taskflow.core.design.LoadingFullScreen
+import com.taskflow.core.design.NameDialog
 import com.taskflow.core.permissions.PermissionPolicy
 import com.taskflow.core.utils.attachmentType
 import com.taskflow.core.utils.isAllowedAttachment

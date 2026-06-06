@@ -44,11 +44,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.taskflow.ChipText
 import com.taskflow.InfoRow
-import com.taskflow.NameDialog
 import com.taskflow.SectionTitle
 import com.taskflow.TaskCard
 import com.taskflow.TaskFlowCard
 import com.taskflow.TaskFlowViewModel
+import com.taskflow.core.design.NameDialog
 import com.taskflow.core.design.TaskFlowColors
 import com.taskflow.domain.model.Space
 import com.taskflow.domain.model.TaskList
