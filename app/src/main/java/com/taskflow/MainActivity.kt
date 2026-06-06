@@ -1168,18 +1168,41 @@ fun LinkDialog(initialTitle: String, initialUrl: String, initialDescription: Str
     var url by remember(initialUrl) { mutableStateOf(initialUrl) }
     var description by remember(initialDescription) { mutableStateOf(initialDescription) }
     var category by remember(initialCategory) { mutableStateOf(initialCategory) }
+    var urlError by remember { mutableStateOf(false) }
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text("Novo link", color = Text, fontWeight = FontWeight.Bold) },
         text = {
             Column {
                 OutlinedTextField(title, { title = it }, label = { Text("Titulo") }, singleLine = true, modifier = Modifier.fillMaxWidth())
-                OutlinedTextField(url, { url = it }, label = { Text("URL") }, singleLine = true, modifier = Modifier.fillMaxWidth().padding(top = 8.dp))
+                OutlinedTextField(
+                    value = url,
+                    onValueChange = {
+                        url = it
+                        urlError = false
+                    },
+                    label = { Text("URL") },
+                    singleLine = true,
+                    isError = urlError,
+                    supportingText = { if (urlError) Text("URL invalida.") },
+                    modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
+                )
                 OutlinedTextField(description, { description = it }, label = { Text("Descricao") }, modifier = Modifier.fillMaxWidth().padding(top = 8.dp))
                 OutlinedTextField(category, { category = it }, label = { Text("Categoria") }, singleLine = true, modifier = Modifier.fillMaxWidth().padding(top = 8.dp))
             }
         },
-        confirmButton = { TextButton({ if (title.isNotBlank() && url.isNotBlank()) onSave(title.trim(), url.trim(), description.trim(), category.trim()) }) { Text("Salvar") } },
+        confirmButton = {
+            TextButton({
+                if (title.isNotBlank() && url.isNotBlank()) {
+                    val trimmedUrl = url.trim()
+                    if (isValidUrl(trimmedUrl)) {
+                        onSave(title.trim(), trimmedUrl, description.trim(), category.trim())
+                    } else {
+                        urlError = true
+                    }
+                }
+            }) { Text("Salvar") }
+        },
         dismissButton = { TextButton(onDismiss) { Text("Cancelar") } }
     )
 }
