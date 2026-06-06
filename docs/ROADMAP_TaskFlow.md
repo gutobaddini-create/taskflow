@@ -1210,21 +1210,21 @@ Implementar identidade visual moderna, limpa e premium.
 
 ### Tarefas
 
-- [ ] Definir nome do app.
-- [ ] Definir ícone.
-- [ ] Definir splash screen.
-- [ ] Configurar versão.
-- [ ] Configurar assinatura.
-- [ ] Gerar build debug.
-- [ ] Gerar build release.
-- [ ] Testar build release.
+- [x] Definir nome do app.
+- [x] Definir ícone.
+- [x] Definir splash screen.
+- [x] Configurar versão.
+- [x] Configurar assinatura.
+- [x] Gerar build debug.
+- [x] Gerar build release.
+- [x] Testar build release.
 
 ### Critérios de aceite
 
-- [ ] APK/AAB gerado.
+- [x] APK/AAB gerado.
 - [ ] Build release instala em aparelho físico.
-- [ ] Login funciona no release.
-- [ ] Notificações funcionam no release.
+- [x] Login funciona no release.
+- [x] Notificações funcionam no release.
 - [ ] Upload funciona no release.
 
 ---
@@ -1287,7 +1287,7 @@ O MVP só estará pronto quando todos os itens abaixo estiverem concluídos:
 - [ ] Regras de segurança básicas funcionando.
 - [ ] Persistência local funcionando.
 - [ ] App testado em aparelho físico.
-- [ ] Build release gerado.
+- [x] Build release gerado.
 
 ---
 
