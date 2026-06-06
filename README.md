@@ -50,6 +50,8 @@ Verificacao local completa do MVP:
 npm run verify:local-mvp
 ```
 
+O mesmo fluxo esta preparado para GitHub Actions em `.github/workflows/android-ci.yml`.
+
 Comandos individuais:
 
 ```powershell

@@ -33,17 +33,18 @@ function Assert-File {
 
 $root = Resolve-Path (Join-Path $PSScriptRoot "..\..")
 Set-Location $root
+$gradle = if ($IsWindows -or $env:OS -eq "Windows_NT") { ".\gradlew.bat" } else { "./gradlew" }
 
 Invoke-Step "Gradle unit tests and debug Kotlin compile" {
-    .\gradlew.bat --no-daemon --max-workers=1 :app:testDebugUnitTest :app:compileDebugKotlin --console=plain
+    & $gradle --no-daemon --max-workers=1 :app:testDebugUnitTest :app:compileDebugKotlin --console=plain
 }
 
 Invoke-Step "Debug APK and Android test compile" {
-    .\gradlew.bat --no-daemon --max-workers=1 :app:assembleDebug :app:compileDebugAndroidTestKotlin --console=plain
+    & $gradle --no-daemon --max-workers=1 :app:assembleDebug :app:compileDebugAndroidTestKotlin --console=plain
 }
 
 Invoke-Step "Release APK and AAB" {
-    .\gradlew.bat --no-daemon --max-workers=1 :app:assembleRelease :app:bundleRelease --console=plain
+    & $gradle --no-daemon --max-workers=1 :app:assembleRelease :app:bundleRelease --console=plain
 }
 
 if (-not $SkipFirebaseRules) {

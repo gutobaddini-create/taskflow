@@ -1,0 +1,58 @@
+name: Android CI
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
+
+jobs:
+  verify-local-mvp:
+    name: Verify local MVP
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Mirror local Gradle JDK path
+        shell: bash
+        run: |
+          mkdir -p .tools
+          ln -s "$JAVA_HOME" .tools/jdk-17
+          chmod +x gradlew
+
+      - name: Install Android packages
+        shell: bash
+        run: |
+          sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"
+
+      - name: Install Firebase rule test dependencies
+        run: npm ci
+
+      - name: Verify local MVP
+        shell: pwsh
+        run: ./tools/qa/verify-local-mvp.ps1
+
+      - name: Upload APK and AAB artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: taskflow-android-artifacts
+          path: |
+            app/build/outputs/apk/debug/app-debug.apk
+            app/build/outputs/apk/release/app-release.apk
+            app/build/outputs/bundle/release/app-release.aab
