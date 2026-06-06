@@ -1155,19 +1155,19 @@ Implementar identidade visual moderna, limpa e premium.
 
 ### Fluxos mínimos
 
-- [ ] Criar tarefa simples.
+- [x] Criar tarefa simples.
 - [ ] Criar tarefa com lembrete único.
 - [ ] Criar tarefa com lembrete a cada 2 semanas.
 - [ ] Criar tarefa com lembrete mensal todo dia 10.
 - [ ] Criar tarefa com anexo PDF.
 - [ ] Criar tarefa com foto.
-- [ ] Criar tarefa com link.
-- [ ] Criar tarefa com campo complementar.
+- [x] Criar tarefa com link.
+- [x] Criar tarefa com campo complementar.
 - [x] Compartilhar tarefa por WhatsApp.
 - [x] Compartilhar tarefa por e-mail.
 - [x] Copiar link de convite.
 - [x] Aceitar convite.
-- [ ] Alterar status.
+- [x] Alterar status.
 - [x] Concluir tarefa.
 - [ ] Adiar lembrete.
 
