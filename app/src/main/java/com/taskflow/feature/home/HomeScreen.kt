@@ -46,6 +46,7 @@ import androidx.compose.ui.unit.sp
 import com.taskflow.core.design.IconBubble
 import com.taskflow.core.design.IconTile
 import com.taskflow.core.design.NextReminderCard
+import com.taskflow.core.design.ScreenTitle
 import com.taskflow.core.design.Segmented
 import com.taskflow.core.design.TaskCard
 import com.taskflow.core.design.TaskFlowCard
@@ -104,7 +105,7 @@ fun HomeScreen(vm: TaskFlowViewModel, onNew: () -> Unit, onDetail: (String) -> U
             item {
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                     Column {
-                        Text("Bom dia, ${currentUser.name}", fontSize = 30.sp, fontWeight = FontWeight.Bold, color = TaskFlowColors.Text)
+                        ScreenTitle("Bom dia, ${currentUser.name}")
                         Text(today.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")), color = TaskFlowColors.Muted, fontSize = 18.sp)
                     }
                     Row {

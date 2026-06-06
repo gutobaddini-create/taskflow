@@ -109,6 +109,18 @@ fun SectionTitle(text: String) =
     Text(text, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = TaskFlowColors.Text, modifier = Modifier.padding(top = 22.dp, bottom = 10.dp))
 
 @Composable
+fun ScreenTitle(text: String, modifier: Modifier = Modifier) =
+    Text(
+        text,
+        fontSize = 28.sp,
+        fontWeight = FontWeight.Bold,
+        color = TaskFlowColors.Text,
+        maxLines = 2,
+        overflow = TextOverflow.Ellipsis,
+        modifier = modifier
+    )
+
+@Composable
 fun ChipText(text: String, active: Boolean = true, modifier: Modifier = Modifier, tone: ChipTone = ChipTone.Purple) {
     val color = if (active) chipToneColor(tone) else TaskFlowColors.Muted
     Text(

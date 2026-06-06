@@ -47,6 +47,7 @@ import com.taskflow.core.design.EmptyState
 import com.taskflow.core.design.FeedbackBanner
 import com.taskflow.core.design.FeedbackKind
 import com.taskflow.core.design.InfoRow
+import com.taskflow.core.design.ScreenTitle
 import com.taskflow.core.design.SectionTitle
 import com.taskflow.core.design.TaskCard
 import com.taskflow.core.design.TaskFlowCard
@@ -103,7 +104,7 @@ fun SpacesScreen(vm: TaskFlowViewModel, onDetail: (String) -> Unit) {
     LazyColumn(Modifier.fillMaxSize().statusBarsPadding().padding(24.dp), contentPadding = PaddingValues(bottom = 120.dp)) {
         item {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                Text("Espacos e listas", fontSize = 30.sp, fontWeight = FontWeight.Bold, color = TaskFlowColors.Text)
+                ScreenTitle("Espacos e listas")
                 FloatingActionButton(
                     onClick = { dialog = CrudDialogState(CrudKind.CreateSpace, "Novo espaco") },
                     containerColor = TaskFlowColors.Purple,

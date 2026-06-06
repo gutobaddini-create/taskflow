@@ -23,6 +23,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.taskflow.core.design.InfoRow
+import com.taskflow.core.design.ScreenTitle
 import com.taskflow.core.design.SectionTitle
 import com.taskflow.core.design.Segmented
 import com.taskflow.core.app.TaskFlowViewModel
@@ -36,7 +37,7 @@ fun SettingsScreen(vm: TaskFlowViewModel, onLogout: () -> Unit) {
 
     LazyColumn(Modifier.fillMaxSize().statusBarsPadding().padding(24.dp), contentPadding = PaddingValues(bottom = 120.dp)) {
         item {
-            Text("Ajustes", fontSize = 30.sp, fontWeight = FontWeight.Bold, color = TaskFlowColors.Text)
+            ScreenTitle("Ajustes")
             Spacer(Modifier.height(16.dp))
             TaskFlowCard {
                 InfoRow("Meu perfil", "Manuel")

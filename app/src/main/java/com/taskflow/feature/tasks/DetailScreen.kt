@@ -45,6 +45,7 @@ import com.taskflow.core.design.EmptyState
 import com.taskflow.core.design.GradientButton
 import com.taskflow.core.design.InfoRow
 import com.taskflow.core.design.PriorityPill
+import com.taskflow.core.design.ScreenTitle
 import com.taskflow.core.design.SectionTitle
 import com.taskflow.core.design.Segmented
 import com.taskflow.core.design.StatusPill
@@ -173,7 +174,7 @@ fun DetailScreen(vm: TaskFlowViewModel, onBack: () -> Unit, onMaterials: () -> U
                 }, Modifier.fillMaxWidth().testTag("save-task-edits").semantics { contentDescription = "Salvar alteracoes da tarefa" }, enabled = editTitle.isNotBlank())
                 TextButton(onClick = { vm.repo.deleteTask(task.id); onBack() }, modifier = Modifier.fillMaxWidth()) { Text("Excluir tarefa", color = Color(0xFFEF4444)) }
             } else {
-                Text(task.title, fontSize = 30.sp, fontWeight = FontWeight.Bold, color = TaskFlowColors.Text, modifier = Modifier.padding(top = 18.dp))
+                ScreenTitle(task.title, Modifier.padding(top = 18.dp))
                 Row(Modifier.padding(top = 10.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) { StatusPill(task.status); PriorityPill(task.priority) }
             }
             SectionTitle("Proximo lembrete")
