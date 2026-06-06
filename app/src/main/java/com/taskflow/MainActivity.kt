@@ -56,6 +56,7 @@ import com.taskflow.data.local.TaskFlowPreferences
 import com.taskflow.data.local.TaskFlowUserPreferences
 import com.taskflow.data.local.TaskFlowDatabase
 import com.taskflow.data.repository.LocalTaskFlowRepository
+import com.taskflow.core.design.LoadingFullScreen
 import com.taskflow.core.design.SegmentedControl as DesignSegmentedControl
 import com.taskflow.core.design.TaskFlowButton as DesignTaskFlowButton
 import com.taskflow.core.design.TaskFlowCard as DesignTaskFlowCard
@@ -1600,17 +1601,6 @@ fun FieldDialog(initialName: String, initialType: CustomFieldType, initialValue:
         confirmButton = { TextButton({ if (name.isNotBlank() && value.isNotBlank()) onSave(name.trim(), type, value.trim()) }) { Text("Salvar") } },
         dismissButton = { TextButton(onDismiss) { Text("Cancelar") } }
     )
-}
-
-@Composable
-fun LoadingFullScreen(label: String) {
-    Box(Modifier.fillMaxSize().background(OffWhite), contentAlignment = Alignment.Center) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            CircularProgressIndicator(color = Purple)
-            Spacer(Modifier.height(12.dp))
-            Text(label, color = Muted)
-        }
-    }
 }
 
 @Composable

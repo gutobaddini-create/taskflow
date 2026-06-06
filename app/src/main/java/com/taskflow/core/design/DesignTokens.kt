@@ -385,6 +385,17 @@ fun LoadingState(label: String, modifier: Modifier = Modifier) {
 }
 
 @Composable
+fun LoadingFullScreen(label: String) {
+    Box(Modifier.fillMaxSize().background(TaskFlowThemeValues.colors.background), contentAlignment = Alignment.Center) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            CircularProgressIndicator(color = TaskFlowThemeValues.colors.secondary)
+            Spacer(Modifier.height(12.dp))
+            Text(label, color = TaskFlowThemeValues.colors.muted)
+        }
+    }
+}
+
+@Composable
 fun ErrorState(title: String, message: String, modifier: Modifier = Modifier) {
     StateMessage(Icons.Default.ErrorOutline, title, message, modifier, iconColor = TaskFlowColors.Danger)
 }
@@ -431,10 +442,10 @@ private fun TaskFlowPreviewContent() {
             TaskFlowOutlinedButton("Cancelar", {})
             SegmentedControl(listOf("Hoje", "Semana"), "Hoje", {})
             TaskCard("Enviar contrato", "Hoje - Juridico", colors.danger)
-            ReminderCard("Renovar documento", "06/06/2026 - 09:00")
-            AttachmentCard("Comprovante.pdf", "PDF - 240 KB")
-            CustomFieldRow("Processo", "12345")
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                ReminderCard("Renovar documento", "06/06/2026 - 09:00")
+                AttachmentCard("Comprovante.pdf", "PDF - 240 KB")
+                CustomFieldRow("Processo", "12345")
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 StatusPill("Em andamento")
                 PriorityChip("Alta", colors.danger)
             }
