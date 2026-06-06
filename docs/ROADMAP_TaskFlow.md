@@ -1225,7 +1225,7 @@ Implementar identidade visual moderna, limpa e premium.
 - [x] Build release instala em aparelho físico.
 - [x] Login funciona no release.
 - [x] Notificações funcionam no release.
-- [ ] Upload funciona no release.
+- [x] Upload funciona no release.
 
 ---
 
