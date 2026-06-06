@@ -8,8 +8,9 @@ import java.time.LocalDateTime
 
 class InMemoryTaskFlowRepository : TaskFlowRepository {
     private val manuel = User(name = "Manuel", email = "manuel@taskflow.local")
-    private val trabalho = Space(name = "Trabalho", ownerId = manuel.id, members = listOf(manuel.id))
-    private val pessoal = Space(name = "Pessoal", ownerId = manuel.id, members = listOf(manuel.id))
+    private val ana = User(name = "Ana", email = "ana@taskflow.local")
+    private val trabalho = Space(name = "Trabalho", ownerId = manuel.id, members = listOf(manuel.id, ana.id))
+    private val pessoal = Space(name = "Pessoal", ownerId = manuel.id, members = listOf(manuel.id, ana.id))
     private val prazos = TaskList(spaceId = trabalho.id, name = "Prazos", order = 0)
     private val compras = TaskList(spaceId = pessoal.id, name = "Compras", order = 1)
 
@@ -21,7 +22,7 @@ class InMemoryTaskFlowRepository : TaskFlowRepository {
         Task(spaceId = pessoal.id, listId = compras.id, title = "Ler relatorio", description = "Anotar pontos principais.", priority = TaskPriority.Low, createdBy = manuel.id, assignedTo = manuel.id, dueDate = LocalDateTime.now().withHour(16).withMinute(30))
     )
 
-    override val users = MutableStateFlow(listOf(manuel))
+    override val users = MutableStateFlow(listOf(manuel, ana))
     override val spaces = MutableStateFlow(listOf(trabalho, pessoal))
     override val lists = MutableStateFlow(listOf(prazos, compras))
     override val tasks = MutableStateFlow(seedTasks)
@@ -49,8 +50,14 @@ class InMemoryTaskFlowRepository : TaskFlowRepository {
     }
 
     override fun updateTask(task: Task) {
+        val previous = tasks.value.firstOrNull { it.id == task.id }
         tasks.value = tasks.value.map { if (it.id == task.id) task.copy(updatedAt = now()) else it }
         activity.value = activity.value + ActivityLog(taskId = task.id, userId = task.createdBy, action = "Tarefa atualizada")
+        if (previous != null) {
+            if (previous.status != task.status) activity.value = activity.value + ActivityLog(taskId = task.id, userId = task.createdBy, action = "Status alterado: ${task.status.label}")
+            if (previous.dueDate != task.dueDate) activity.value = activity.value + ActivityLog(taskId = task.id, userId = task.createdBy, action = "Prazo alterado")
+            if (previous.assignedTo != task.assignedTo) activity.value = activity.value + ActivityLog(taskId = task.id, userId = task.createdBy, action = "Responsavel alterado")
+        }
     }
 
     override fun completeTask(taskId: String) {

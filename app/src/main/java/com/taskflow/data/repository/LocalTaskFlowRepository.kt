@@ -63,8 +63,9 @@ class LocalTaskFlowRepository(
         if (dao.taskCount() > 0) return
 
         val manuel = User(name = "Manuel", email = "manuel@taskflow.local")
-        val trabalho = Space(name = "Trabalho", ownerId = manuel.id, members = listOf(manuel.id))
-        val pessoal = Space(name = "Pessoal", ownerId = manuel.id, members = listOf(manuel.id))
+        val ana = User(name = "Ana", email = "ana@taskflow.local")
+        val trabalho = Space(name = "Trabalho", ownerId = manuel.id, members = listOf(manuel.id, ana.id))
+        val pessoal = Space(name = "Pessoal", ownerId = manuel.id, members = listOf(manuel.id, ana.id))
         val prazos = TaskList(spaceId = trabalho.id, name = "Prazos", order = 0)
         val compras = TaskList(spaceId = pessoal.id, name = "Compras", order = 1)
         val seedTasks = listOf(
@@ -75,7 +76,7 @@ class LocalTaskFlowRepository(
             Task(spaceId = pessoal.id, listId = compras.id, title = "Ler relatorio", description = "Anotar pontos principais.", priority = TaskPriority.Low, createdBy = manuel.id, assignedTo = manuel.id, dueDate = LocalDateTime.now().withHour(16).withMinute(30))
         )
         val firstTask = seedTasks.first()
-        dao.upsertUsers(listOf(manuel.toEntity()))
+        dao.upsertUsers(listOf(manuel, ana).map { it.toEntity() })
         dao.upsertSpaces(listOf(trabalho, pessoal).map { it.toEntity() })
         dao.upsertLists(listOf(prazos, compras).map { it.toEntity() })
         dao.upsertTasks(seedTasks.map { it.toEntity() })
@@ -104,8 +105,15 @@ class LocalTaskFlowRepository(
 
     override fun updateTask(task: Task) {
         scope.launch(Dispatchers.IO) {
+            val previous = dao.taskById(task.id)?.toDomain()
             dao.upsertTasks(listOf(task.copy(updatedAt = now()).toEntity()))
-            dao.upsertActivity(listOf(ActivityLog(taskId = task.id, userId = task.createdBy, action = "Tarefa atualizada").toEntity()))
+            val events = mutableListOf(ActivityLog(taskId = task.id, userId = task.createdBy, action = "Tarefa atualizada"))
+            if (previous != null) {
+                if (previous.status != task.status) events += ActivityLog(taskId = task.id, userId = task.createdBy, action = "Status alterado: ${task.status.label}")
+                if (previous.dueDate != task.dueDate) events += ActivityLog(taskId = task.id, userId = task.createdBy, action = "Prazo alterado")
+                if (previous.assignedTo != task.assignedTo) events += ActivityLog(taskId = task.id, userId = task.createdBy, action = "Responsavel alterado")
+            }
+            dao.upsertActivity(events.map { it.toEntity() })
         }
     }
 

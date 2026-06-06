@@ -496,10 +496,10 @@ Implementar identidade visual moderna, limpa e premium.
 
 - [x] Editar título.
 - [x] Editar descrição.
-- [ ] Editar prazo.
+- [x] Editar prazo.
 - [x] Editar prioridade.
-- [ ] Editar responsável.
-- [ ] Editar status.
+- [x] Editar responsável.
+- [x] Editar status.
 - [x] Salvar alterações.
 
 ### Critérios de aceite
@@ -848,9 +848,9 @@ Implementar identidade visual moderna, limpa e premium.
 ### Tarefas
 
 - [x] Registrar criação da tarefa.
-- [ ] Registrar alteração de status.
-- [ ] Registrar alteração de prazo.
-- [ ] Registrar alteração de responsável.
+- [x] Registrar alteração de status.
+- [x] Registrar alteração de prazo.
+- [x] Registrar alteração de responsável.
 - [x] Registrar anexo adicionado.
 - [x] Registrar anexo removido.
 - [x] Registrar link adicionado.
