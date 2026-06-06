@@ -235,7 +235,7 @@ Implementar identidade visual moderna, limpa e premium.
 - [x] Definir raio dos cards.
 - [x] Definir estilo dos botões.
 - [x] Definir tema claro.
-- [ ] Preparar estrutura para tema escuro futuro.
+- [x] Preparar estrutura para tema escuro futuro.
 
 ### Direção visual
 

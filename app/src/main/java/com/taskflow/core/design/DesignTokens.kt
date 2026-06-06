@@ -39,8 +39,11 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.Typography
+import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -73,6 +76,52 @@ object TaskFlowColors {
     val Success = Color(0xFF22C55E)
     val Danger = Color(0xFFEF4444)
     val Warning = Color(0xFFF59E0B)
+}
+
+data class TaskFlowPalette(
+    val background: Color,
+    val surface: Color,
+    val text: Color,
+    val muted: Color,
+    val border: Color,
+    val primary: Color,
+    val secondary: Color,
+    val success: Color,
+    val danger: Color,
+    val warning: Color
+)
+
+private val LightTaskFlowPalette = TaskFlowPalette(
+    background = TaskFlowColors.OffWhite,
+    surface = TaskFlowColors.Surface,
+    text = TaskFlowColors.Text,
+    muted = TaskFlowColors.Muted,
+    border = TaskFlowColors.Border,
+    primary = TaskFlowColors.Blue,
+    secondary = TaskFlowColors.Purple,
+    success = TaskFlowColors.Success,
+    danger = TaskFlowColors.Danger,
+    warning = TaskFlowColors.Warning
+)
+
+private val DarkTaskFlowPalette = TaskFlowPalette(
+    background = Color(0xFF0B1020),
+    surface = Color(0xFF141A2E),
+    text = Color(0xFFF8FAFC),
+    muted = Color(0xFFB7C0D1),
+    border = Color(0xFF27324A),
+    primary = Color(0xFF7AA2FF),
+    secondary = Color(0xFFA78BFA),
+    success = Color(0xFF4ADE80),
+    danger = Color(0xFFF87171),
+    warning = Color(0xFFFBBF24)
+)
+
+private val LocalTaskFlowPalette = staticCompositionLocalOf { LightTaskFlowPalette }
+
+object TaskFlowThemeValues {
+    val colors: TaskFlowPalette
+        @Composable get() = LocalTaskFlowPalette.current
 }
 
 val TaskFlowGradient = Brush.horizontalGradient(listOf(TaskFlowColors.Blue, TaskFlowColors.Purple))
@@ -108,22 +157,40 @@ private val TaskFlowType = Typography(
 )
 
 @Composable
-fun TaskFlowTheme(content: @Composable () -> Unit) {
-    MaterialTheme(
-        colorScheme = lightColorScheme(
-            primary = TaskFlowColors.Blue,
-            secondary = TaskFlowColors.Purple,
-            background = TaskFlowColors.OffWhite,
-            surface = TaskFlowColors.Surface,
-            error = TaskFlowColors.Danger,
+fun TaskFlowTheme(darkTheme: Boolean = false, content: @Composable () -> Unit) {
+    val palette = if (darkTheme) DarkTaskFlowPalette else LightTaskFlowPalette
+    val scheme = if (darkTheme) {
+        darkColorScheme(
+            primary = palette.primary,
+            secondary = palette.secondary,
+            background = palette.background,
+            surface = palette.surface,
+            error = palette.danger,
             onPrimary = Color.White,
             onSecondary = Color.White,
-            onBackground = TaskFlowColors.Text,
-            onSurface = TaskFlowColors.Text
-        ),
-        typography = TaskFlowType,
-        content = content
-    )
+            onBackground = palette.text,
+            onSurface = palette.text
+        )
+    } else {
+        lightColorScheme(
+            primary = palette.primary,
+            secondary = palette.secondary,
+            background = palette.background,
+            surface = palette.surface,
+            error = palette.danger,
+            onPrimary = Color.White,
+            onSecondary = Color.White,
+            onBackground = palette.text,
+            onSurface = palette.text
+        )
+    }
+    CompositionLocalProvider(LocalTaskFlowPalette provides palette) {
+        MaterialTheme(
+            colorScheme = scheme,
+            typography = TaskFlowType,
+            content = content
+        )
+    }
 }
 
 @Composable
@@ -343,27 +410,41 @@ private fun IconBubble(icon: ImageVector, bg: Color, tint: Color) {
 @Composable
 private fun TaskFlowComponentsPreview() {
     TaskFlowTheme {
-        Surface(color = TaskFlowColors.OffWhite) {
-            Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                TaskFlowButton("Salvar", {})
-                TaskFlowOutlinedButton("Cancelar", {})
-                SegmentedControl(listOf("Hoje", "Semana"), "Hoje", {})
-                TaskCard("Enviar contrato", "Hoje - Juridico", TaskFlowColors.Danger)
-                ReminderCard("Renovar documento", "06/06/2026 - 09:00")
-                AttachmentCard("Comprovante.pdf", "PDF - 240 KB")
-                CustomFieldRow("Processo", "12345")
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    StatusPill("Em andamento")
-                    PriorityChip("Alta", TaskFlowColors.Danger)
-                }
-                EmptyState("Sem tarefas", "Crie a primeira tarefa para comecar.")
-                ErrorState("Erro ao carregar", "Tente novamente em alguns instantes.")
-                BottomNavigationBar(
-                    items = listOf(NavigationItem("home", "Hoje", Icons.Default.Home), NavigationItem("agenda", "Agenda", Icons.Default.Schedule)),
-                    selectedRoute = "home",
-                    onSelect = {}
-                )
+        TaskFlowPreviewContent()
+    }
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF0B1020)
+@Composable
+private fun TaskFlowComponentsDarkPreview() {
+    TaskFlowTheme(darkTheme = true) {
+        TaskFlowPreviewContent()
+    }
+}
+
+@Composable
+private fun TaskFlowPreviewContent() {
+    val colors = TaskFlowThemeValues.colors
+    Surface(color = colors.background) {
+        Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            TaskFlowButton("Salvar", {})
+            TaskFlowOutlinedButton("Cancelar", {})
+            SegmentedControl(listOf("Hoje", "Semana"), "Hoje", {})
+            TaskCard("Enviar contrato", "Hoje - Juridico", colors.danger)
+            ReminderCard("Renovar documento", "06/06/2026 - 09:00")
+            AttachmentCard("Comprovante.pdf", "PDF - 240 KB")
+            CustomFieldRow("Processo", "12345")
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                StatusPill("Em andamento")
+                PriorityChip("Alta", colors.danger)
             }
+            EmptyState("Sem tarefas", "Crie a primeira tarefa para comecar.")
+            ErrorState("Erro ao carregar", "Tente novamente em alguns instantes.")
+            BottomNavigationBar(
+                items = listOf(NavigationItem("home", "Hoje", Icons.Default.Home), NavigationItem("agenda", "Agenda", Icons.Default.Schedule)),
+                selectedRoute = "home",
+                onSelect = {}
+            )
         }
     }
 }
