@@ -52,6 +52,7 @@ import com.taskflow.core.design.NameDialog
 import com.taskflow.core.design.TaskFlowColors
 import com.taskflow.domain.model.Space
 import com.taskflow.domain.model.TaskList
+import com.taskflow.domain.usecase.TaskQueries
 
 @Composable
 fun SpacesScreen(vm: TaskFlowViewModel, onDetail: (String) -> Unit) {
@@ -59,6 +60,7 @@ fun SpacesScreen(vm: TaskFlowViewModel, onDetail: (String) -> Unit) {
     val lists by vm.lists.collectAsState()
     val tasks by vm.tasks.collectAsState()
     val reminders by vm.reminders.collectAsState()
+    val invites by vm.invites.collectAsState()
     val users by vm.users.collectAsState()
     val preferences by vm.preferences.collectAsState()
     var dialog by remember { mutableStateOf<CrudDialogState?>(null) }
@@ -66,10 +68,11 @@ fun SpacesScreen(vm: TaskFlowViewModel, onDetail: (String) -> Unit) {
     var selectedSpaceId by remember { mutableStateOf<String?>(null) }
     var selectedListId by remember { mutableStateOf<String?>(null) }
     val currentUser = users.firstOrNull { it.id == preferences.currentUserId } ?: users.firstOrNull() ?: vm.currentUser()
+    val visibleTasks = TaskQueries.visibleForUser(tasks, currentUser.id, invites)
     val selectedSpace = spaces.firstOrNull { it.id == selectedSpaceId }
-    val selectedSpaceTasks = selectedSpace?.let { space -> tasks.filter { it.spaceId == space.id } } ?: emptyList()
+    val selectedSpaceTasks = selectedSpace?.let { space -> TaskQueries.inSpace(visibleTasks, space.id) } ?: emptyList()
     val selectedList = lists.firstOrNull { it.id == selectedListId }
-    val selectedListTasks = selectedList?.let { list -> tasks.filter { it.listId == list.id } } ?: emptyList()
+    val selectedListTasks = selectedList?.let { list -> TaskQueries.inList(visibleTasks, list.id) } ?: emptyList()
     fun orderedLists(spaceId: String) = lists.filter { it.spaceId == spaceId }.sortedBy { it.order }
     fun moveList(list: TaskList, delta: Int) {
         val siblings = orderedLists(list.spaceId)
@@ -123,7 +126,7 @@ fun SpacesScreen(vm: TaskFlowViewModel, onDetail: (String) -> Unit) {
                             ChipText(if (shared) "Compartilhado" else "Meu espaco", active = shared)
                         }
                         val listCount = lists.count { it.spaceId == space.id }
-                        val taskCount = tasks.count { it.spaceId == space.id }
+                        val taskCount = TaskQueries.inSpace(visibleTasks, space.id).size
                         val selectedSuffix = if (selectedSpaceId == space.id) " - aberto" else ""
                         Text("$listCount listas - $taskCount tarefas - ${space.members.size} membros$selectedSuffix", color = TaskFlowColors.Muted, fontSize = 13.sp)
                     }
@@ -144,7 +147,7 @@ fun SpacesScreen(vm: TaskFlowViewModel, onDetail: (String) -> Unit) {
                             selectedSpaceId = null
                         }.padding(horizontal = 8.dp, vertical = 6.dp).testTag("open-list-${list.name}").semantics { contentDescription = "Filtrar lista ${list.name}" }) {
                             Text(list.name, color = TaskFlowColors.Text)
-                            val openCount = tasks.count { it.listId == list.id && !it.isCompleted }
+                            val openCount = TaskQueries.inList(visibleTasks, list.id).count { !it.isCompleted }
                             val selectedSuffix = if (selectedListId == list.id) " - filtrando" else ""
                             Text("$openCount abertas$selectedSuffix", color = TaskFlowColors.Muted, fontSize = 13.sp)
                         }

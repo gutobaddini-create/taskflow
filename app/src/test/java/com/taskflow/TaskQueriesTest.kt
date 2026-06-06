@@ -72,6 +72,13 @@ class TaskQueriesTest {
         assertEquals(listOf("a"), TaskQueries.inList(tasks, "prazos").map { it.id })
     }
 
+    @Test
+    fun inSpaceKeepsOnlyRequestedSpace() {
+        val tasks = listOf(task("a"), task("b").copy(spaceId = "other-space"))
+
+        assertEquals(listOf("a"), TaskQueries.inSpace(tasks, "space").map { it.id })
+    }
+
     private fun task(
         id: String,
         createdBy: String = "ana",

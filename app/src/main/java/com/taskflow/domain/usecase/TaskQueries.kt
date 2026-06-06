@@ -48,4 +48,7 @@ object TaskQueries {
 
     fun inList(tasks: List<Task>, listId: String): List<Task> =
         tasks.filter { it.listId == listId }
+
+    fun inSpace(tasks: List<Task>, spaceId: String): List<Task> =
+        tasks.filter { it.spaceId == spaceId }
 }
