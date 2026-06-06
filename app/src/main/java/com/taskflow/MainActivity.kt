@@ -429,6 +429,8 @@ fun DetailScreen(vm: TaskFlowViewModel, onBack: () -> Unit, onMaterials: () -> U
     }
     var editing by remember(task.id) { mutableStateOf(false) }
     var commentText by remember(task.id) { mutableStateOf("") }
+    var editingCommentId by remember(task.id) { mutableStateOf<String?>(null) }
+    var editingCommentText by remember(task.id) { mutableStateOf("") }
     var editTitle by remember(task.id) { mutableStateOf(task.title) }
     var editDescription by remember(task.id) { mutableStateOf(task.description) }
     var editStatus by remember(task.id) { mutableStateOf(task.status) }
@@ -437,6 +439,8 @@ fun DetailScreen(vm: TaskFlowViewModel, onBack: () -> Unit, onMaterials: () -> U
     var editDueHour by remember(task.id) { mutableStateOf(task.dueDate?.toLocalTime()?.format(DateTimeFormatter.ofPattern("HH:mm")) ?: "09:00") }
     var editAssignedTo by remember(task.id) { mutableStateOf(task.assignedTo ?: vm.currentUser().id) }
     val userOptions = users.ifEmpty { listOf(vm.currentUser()) }
+    val currentUser = vm.currentUser()
+    val canComment = task.createdBy == currentUser.id || task.assignedTo == currentUser.id || currentUser.id in task.participants
     val assigneeName = userOptions.firstOrNull { it.id == task.assignedTo }?.name ?: "Manuel"
     LazyColumn(Modifier.fillMaxSize().statusBarsPadding().padding(22.dp), contentPadding = PaddingValues(bottom = 30.dp)) {
         item {
@@ -510,20 +514,50 @@ fun DetailScreen(vm: TaskFlowViewModel, onBack: () -> Unit, onMaterials: () -> U
                     Text("Nenhum comentario.", color = Muted)
                 } else {
                     taskComments.forEach {
-                        Text(users.firstOrNull { user -> user.id == it.authorId }?.name ?: "Usuario", fontWeight = FontWeight.Bold, color = Text)
-                        Text(it.text, color = Muted, modifier = Modifier.padding(bottom = 4.dp))
-                        Text(formatTimestamp(it.createdAt), color = Muted, fontSize = 12.sp, modifier = Modifier.padding(bottom = 12.dp))
+                        val isOwnComment = it.authorId == currentUser.id
+                        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                            Text(users.firstOrNull { user -> user.id == it.authorId }?.name ?: "Usuario", fontWeight = FontWeight.Bold, color = Text, modifier = Modifier.weight(1f))
+                            if (isOwnComment && editingCommentId != it.id) {
+                                TextButton(onClick = {
+                                    editingCommentId = it.id
+                                    editingCommentText = it.text
+                                }, modifier = Modifier.semantics { contentDescription = "Editar comentario" }) { Text("Editar") }
+                                TextButton(onClick = { vm.repo.deleteComment(it.id) }, modifier = Modifier.semantics { contentDescription = "Excluir comentario" }) { Text("Excluir", color = Color(0xFFEF4444)) }
+                            }
+                        }
+                        if (editingCommentId == it.id) {
+                            OutlinedTextField(editingCommentText, { editingCommentText = it }, label = { Text("Editar comentario") }, shape = RoundedCornerShape(18.dp), singleLine = true, modifier = Modifier.fillMaxWidth())
+                            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                                TextButton(onClick = {
+                                    editingCommentId = null
+                                    editingCommentText = ""
+                                }, modifier = Modifier.weight(1f)) { Text("Cancelar") }
+                                Button(onClick = {
+                                    if (editingCommentText.isNotBlank()) {
+                                        vm.repo.updateComment(it.copy(text = editingCommentText.trim()))
+                                        editingCommentId = null
+                                        editingCommentText = ""
+                                    }
+                                }, modifier = Modifier.weight(1f).semantics { contentDescription = "Salvar comentario" }, enabled = editingCommentText.isNotBlank(), shape = RoundedCornerShape(50)) { Text("Salvar") }
+                            }
+                        } else {
+                            Text(it.text, color = Muted, modifier = Modifier.padding(bottom = 4.dp))
+                        }
+                        Text(formatTimestamp(it.updatedAt), color = Muted, fontSize = 12.sp, modifier = Modifier.padding(bottom = 12.dp))
                     }
                 }
-                OutlinedTextField(commentText, { commentText = it }, label = { Text("Novo comentario") }, shape = RoundedCornerShape(18.dp), singleLine = true, modifier = Modifier.fillMaxWidth())
+                OutlinedTextField(commentText, { commentText = it }, label = { Text("Novo comentario") }, shape = RoundedCornerShape(18.dp), singleLine = true, modifier = Modifier.fillMaxWidth(), enabled = canComment)
                 Spacer(Modifier.height(10.dp))
                 Button(onClick = {
                     if (commentText.isNotBlank()) {
-                        vm.repo.addComment(Comment(taskId = task.id, authorId = vm.currentUser().id, text = commentText.trim()))
+                        vm.repo.addComment(Comment(taskId = task.id, authorId = currentUser.id, text = commentText.trim()))
                         commentText = ""
                     }
-                }, modifier = Modifier.fillMaxWidth().height(54.dp).semantics { contentDescription = "Adicionar comentario" }, enabled = commentText.isNotBlank(), shape = RoundedCornerShape(50)) {
+                }, modifier = Modifier.fillMaxWidth().height(54.dp).semantics { contentDescription = "Adicionar comentario" }, enabled = canComment && commentText.isNotBlank(), shape = RoundedCornerShape(50)) {
                     Text("Adicionar comentario", fontWeight = FontWeight.Bold)
+                }
+                if (!canComment) {
+                    Text("Sem permissao para comentar.", color = Muted, fontSize = 12.sp, modifier = Modifier.padding(top = 8.dp))
                 }
             }
             SectionTitle("Historico")

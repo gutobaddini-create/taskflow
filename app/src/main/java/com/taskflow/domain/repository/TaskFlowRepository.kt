@@ -41,6 +41,8 @@ interface TaskFlowRepository {
     fun toggleChecklistItem(itemId: String)
     fun deleteChecklistItem(itemId: String)
     fun addComment(comment: Comment)
+    fun updateComment(comment: Comment)
+    fun deleteComment(commentId: String)
     fun createInvite(invite: Invite)
     fun acceptInvite(token: String, userId: String)
     fun declineInvite(token: String)

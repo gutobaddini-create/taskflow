@@ -830,8 +830,8 @@ Implementar identidade visual moderna, limpa e premium.
 
 - [x] Exibir comentários na tarefa.
 - [x] Adicionar comentário.
-- [ ] Editar comentário próprio.
-- [ ] Excluir comentário próprio.
+- [x] Editar comentário próprio.
+- [x] Excluir comentário próprio.
 - [x] Mostrar autor.
 - [x] Mostrar data/hora.
 

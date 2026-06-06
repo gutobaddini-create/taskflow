@@ -117,6 +117,9 @@ interface TaskFlowDao {
     @Query("SELECT * FROM checklist_items WHERE id = :itemId LIMIT 1")
     suspend fun checklistItemById(itemId: String): ChecklistItemEntity?
 
+    @Query("SELECT * FROM comments WHERE id = :commentId LIMIT 1")
+    suspend fun commentById(commentId: String): CommentEntity?
+
     @Query("DELETE FROM tasks WHERE id = :taskId")
     suspend fun deleteTask(taskId: String)
 
@@ -134,6 +137,9 @@ interface TaskFlowDao {
 
     @Query("DELETE FROM checklist_items WHERE id = :itemId")
     suspend fun deleteChecklistItem(itemId: String)
+
+    @Query("DELETE FROM comments WHERE id = :commentId")
+    suspend fun deleteComment(commentId: String)
 
     @Query("DELETE FROM invites WHERE token = :token")
     suspend fun deleteInviteByToken(token: String)

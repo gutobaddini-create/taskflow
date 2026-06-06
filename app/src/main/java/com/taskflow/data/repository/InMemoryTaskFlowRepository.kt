@@ -155,6 +155,16 @@ class InMemoryTaskFlowRepository : TaskFlowRepository {
         comments.value = comments.value + comment
         activity.value = activity.value + ActivityLog(taskId = comment.taskId, userId = comment.authorId, action = "Comentario adicionado")
     }
+    override fun updateComment(comment: Comment) {
+        val previous = comments.value.firstOrNull { it.id == comment.id } ?: return
+        comments.value = comments.value.map { if (it.id == comment.id) comment.copy(updatedAt = now()) else it }
+        activity.value = activity.value + ActivityLog(taskId = previous.taskId, userId = previous.authorId, action = "Comentario editado")
+    }
+    override fun deleteComment(commentId: String) {
+        val comment = comments.value.firstOrNull { it.id == commentId } ?: return
+        comments.value = comments.value.filterNot { it.id == commentId }
+        activity.value = activity.value + ActivityLog(taskId = comment.taskId, userId = users.value.first().id, action = "Comentario removido")
+    }
     override fun createInvite(invite: Invite) {
         invites.value = invites.value + invite
         activity.value = activity.value + ActivityLog(taskId = invite.taskId, userId = invite.createdBy, action = "Convite criado: ${invite.permission.label}")

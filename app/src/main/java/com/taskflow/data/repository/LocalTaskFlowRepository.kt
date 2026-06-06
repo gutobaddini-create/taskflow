@@ -283,6 +283,22 @@ class LocalTaskFlowRepository(
         }
     }
 
+    override fun updateComment(comment: Comment) {
+        scope.launch(Dispatchers.IO) {
+            val previous = dao.commentById(comment.id)?.toDomain() ?: return@launch
+            dao.upsertComments(listOf(comment.copy(updatedAt = now()).toEntity()))
+            logActivity(previous.taskId, previous.authorId, "Comentario editado")
+        }
+    }
+
+    override fun deleteComment(commentId: String) {
+        scope.launch(Dispatchers.IO) {
+            val comment = dao.commentById(commentId)?.toDomain() ?: return@launch
+            dao.deleteComment(commentId)
+            logActivity(comment.taskId, users.value.firstOrNull()?.id ?: comment.authorId, "Comentario removido")
+        }
+    }
+
     override fun createInvite(invite: Invite) {
         scope.launch(Dispatchers.IO) {
             dao.upsertInvites(listOf(invite.toEntity()))
