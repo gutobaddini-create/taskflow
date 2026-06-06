@@ -22,6 +22,8 @@ powershell -NoProfile -ExecutionPolicy Bypass -File tools/qa/verify-local-mvp.ps
 
 Result: passed.
 
+Latest run: 2026-06-06 22:50 UTC.
+
 Covered by the command:
 
 - `:app:testDebugUnitTest`
@@ -39,7 +41,7 @@ Artifacts verified:
 | --- | ---: |
 | `app/build/outputs/apk/debug/app-debug.apk` | 18,397,193 bytes |
 | `app/build/outputs/apk/release/app-release.apk` | 11,911,970 bytes |
-| `app/build/outputs/bundle/release/app-release.aab` | 11,534,312 bytes |
+| `app/build/outputs/bundle/release/app-release.aab` | 11,534,309 bytes |
 
 Release integrity manifest:
 

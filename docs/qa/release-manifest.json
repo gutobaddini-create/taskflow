@@ -1,5 +1,5 @@
 ﻿{
-    "generatedAtUtc":  "2026-06-06T22:25:34Z",
+    "generatedAtUtc":  "2026-06-06T22:50:35Z",
     "appId":  "com.taskflow",
     "version":  "0.1.0",
     "mode":  "local-first-mvp",
@@ -13,14 +13,14 @@
                       {
                           "path":  "app/build/outputs/apk/release/app-release.apk",
                           "bytes":  11911970,
-                          "sha256":  "7585aa724edce78cd1c68e697ad521970eab66eec4f4b4e6dc5eefb04b2186db",
-                          "lastModifiedUtc":  "2026-06-06T22:25:25Z"
+                          "sha256":  "cc68d41e3b046503771e2033019cec93960aa568b9d23acf102e765f130f1665",
+                          "lastModifiedUtc":  "2026-06-06T22:48:34Z"
                       },
                       {
                           "path":  "app/build/outputs/bundle/release/app-release.aab",
-                          "bytes":  11534312,
-                          "sha256":  "d54677a6160f52340dc565042576fa94c4729c688a9fe2a1e04a282a367e0c54",
-                          "lastModifiedUtc":  "2026-06-06T22:25:33Z"
+                          "bytes":  11534309,
+                          "sha256":  "523cec29c8aa4f951d1411fba0923866454e0342991bf28872a129950f5f9540",
+                          "lastModifiedUtc":  "2026-06-06T22:48:43Z"
                       }
                   ]
 }
