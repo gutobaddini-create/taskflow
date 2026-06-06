@@ -62,7 +62,7 @@ class InMemoryTaskFlowRepository : TaskFlowRepository {
 
     override fun completeTask(taskId: String) {
         tasks.value = tasks.value.map { if (it.id == taskId) it.copy(status = TaskStatus.Done, isCompleted = true, completedAt = now(), updatedAt = now()) else it }
-        reminders.value = reminders.value.map { if (it.taskId == taskId && it.endType == ReminderEndType.OnTaskDone) it.copy(isActive = false) else it }
+        reminders.value = reminders.value.map { if (it.taskId == taskId) it.copy(isActive = false) else it }
         activity.value = activity.value + ActivityLog(taskId = taskId, userId = users.value.first().id, action = "Tarefa concluida")
     }
 

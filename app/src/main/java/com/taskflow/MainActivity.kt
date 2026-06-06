@@ -488,6 +488,7 @@ fun DetailScreen(vm: TaskFlowViewModel, onBack: () -> Unit, onMaterials: () -> U
     var editDescription by remember(task.id) { mutableStateOf(task.description) }
     var editStatus by remember(task.id) { mutableStateOf(task.status) }
     var editPriority by remember(task.id) { mutableStateOf(task.priority) }
+    var confirmComplete by remember(task.id) { mutableStateOf(false) }
     var editDueDay by remember(task.id) { mutableStateOf(if (task.dueDate?.toLocalDate() == LocalDate.now().plusDays(1)) "Amanha" else "Hoje") }
     var editDueHour by remember(task.id) { mutableStateOf(task.dueDate?.toLocalTime()?.format(DateTimeFormatter.ofPattern("HH:mm")) ?: "09:00") }
     val currentUser = users.firstOrNull { it.id == preferences.currentUserId } ?: users.firstOrNull() ?: vm.currentUser()
@@ -498,6 +499,22 @@ fun DetailScreen(vm: TaskFlowViewModel, onBack: () -> Unit, onMaterials: () -> U
     val canEditTask = PermissionPolicy.canEditTask(task, currentUser.id, effectivePermission)
     val canComment = PermissionPolicy.canCommentOnTask(task, currentUser.id, effectivePermission)
     val assigneeName = userOptions.firstOrNull { it.id == task.assignedTo }?.name ?: "Manuel"
+    val hasActiveReminders = reminders.any { it.taskId == task.id && it.isActive }
+    if (confirmComplete) {
+        AlertDialog(
+            onDismissRequest = { confirmComplete = false },
+            title = { Text("Concluir tarefa?") },
+            text = { Text(if (hasActiveReminders) "Esta tarefa possui lembretes ativos. Ao concluir, os lembretes serao desativados." else "A tarefa sera marcada como concluida.") },
+            confirmButton = {
+                TextButton(onClick = {
+                    confirmComplete = false
+                    vm.repo.completeTask(task.id)
+                    onBack()
+                }) { Text("Concluir") }
+            },
+            dismissButton = { TextButton(onClick = { confirmComplete = false }) { Text("Cancelar") } }
+        )
+    }
     if (!canViewTask) {
         LazyColumn(Modifier.fillMaxSize().statusBarsPadding().padding(22.dp), contentPadding = PaddingValues(bottom = 30.dp)) {
             item {
@@ -656,7 +673,7 @@ fun DetailScreen(vm: TaskFlowViewModel, onBack: () -> Unit, onMaterials: () -> U
             Spacer(Modifier.height(20.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 OutlinedButton(onClick = onShare, modifier = Modifier.weight(1f), shape = RoundedCornerShape(50)) { Text("Compartilhar") }
-                GradientButton("Concluir", { vm.repo.completeTask(task.id); onBack() }, Modifier.weight(1f), enabled = canEditTask)
+                GradientButton("Concluir", { confirmComplete = true }, Modifier.weight(1f), enabled = canEditTask)
             }
         }
     }

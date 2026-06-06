@@ -123,7 +123,6 @@ class LocalTaskFlowRepository(
             dao.upsertTasks(listOf(task.copy(status = TaskStatus.Done, isCompleted = true, completedAt = now(), updatedAt = now()).toEntity()))
             dao.remindersByTaskId(taskId)
                 .map { it.toDomain() }
-                .filter { it.endType == ReminderEndType.OnTaskDone }
                 .forEach { reminder ->
                     reminderScheduler.cancel(reminder.id, reminder.taskId)
                     dao.upsertReminders(listOf(reminder.copy(isActive = false, updatedAt = now()).toEntity()))

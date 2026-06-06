@@ -517,13 +517,13 @@ Implementar identidade visual moderna, limpa e premium.
 - [x] Botão concluir.
 - [x] Alterar status para concluída.
 - [x] Registrar data de conclusão.
-- [ ] Perguntar sobre recorrências ativas, quando aplicável.
+- [x] Perguntar sobre recorrências ativas, quando aplicável.
 
 ### Critérios de aceite
 
 - [x] Tarefa concluída sai da lista de abertas.
 - [x] Pode ser exibida em `Concluídas`.
-- [ ] Recorrência não fica gerando notificações indesejadas.
+- [x] Recorrência não fica gerando notificações indesejadas.
 
 ---
 
@@ -1168,7 +1168,7 @@ Implementar identidade visual moderna, limpa e premium.
 - [x] Copiar link de convite.
 - [x] Aceitar convite.
 - [ ] Alterar status.
-- [ ] Concluir tarefa.
+- [x] Concluir tarefa.
 - [ ] Adiar lembrete.
 
 ### Critérios de aceite
