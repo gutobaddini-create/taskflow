@@ -33,6 +33,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.taskflow.core.design.ChipText
+import com.taskflow.core.design.FeedbackBanner
+import com.taskflow.core.design.FeedbackKind
 import com.taskflow.core.design.GradientButton
 import com.taskflow.core.design.InfoRow
 import com.taskflow.core.design.SectionTitle
@@ -130,7 +132,7 @@ fun ShareScreen(vm: TaskFlowViewModel, onBack: () -> Unit) {
                 SmallAction(Icons.Default.Email, "E-mail") { sendEmail() }
                 SmallAction(Icons.Default.ContentCopy, "Copiar") { copyInvite() }
             }
-            message?.let { Text(it, color = TaskFlowColors.Purple, modifier = Modifier.padding(top = 10.dp)) }
+            FeedbackBanner(message, FeedbackKind.Success, Modifier.padding(top = 10.dp))
             SectionTitle("Previa da mensagem")
             TaskFlowCard {
                 Text("Voce foi convidado para participar desta tarefa:", color = TaskFlowColors.Muted)

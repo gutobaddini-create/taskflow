@@ -1189,12 +1189,12 @@ Implementar identidade visual moderna, limpa e premium.
 - [ ] Ajustar alinhamentos.
 - [ ] Ajustar tamanhos de fonte.
 - [ ] Ajustar cores dos chips.
-- [ ] Ajustar contraste.
-- [ ] Ajustar animações.
+- [x] Ajustar contraste.
+- [x] Ajustar animações.
 - [ ] Ajustar estados vazios.
 - [ ] Ajustar feedback de toque.
 - [ ] Ajustar loading de upload.
-- [ ] Ajustar erros de formulário.
+- [x] Ajustar erros de formulário.
 
 ### Critérios de aceite
 
@@ -1222,7 +1222,7 @@ Implementar identidade visual moderna, limpa e premium.
 ### Critérios de aceite
 
 - [x] APK/AAB gerado.
-- [x] Build release instala em aparelho físico.
+- [ ] Build release instala em aparelho físico.
 - [x] Login funciona no release.
 - [x] Notificações funcionam no release.
 - [x] Upload funciona no release.

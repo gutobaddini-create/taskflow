@@ -28,6 +28,8 @@ import androidx.compose.ui.unit.sp
 import com.taskflow.core.design.GradientButton
 import com.taskflow.core.design.Segmented
 import com.taskflow.core.app.TaskFlowViewModel
+import com.taskflow.core.design.FeedbackBanner
+import com.taskflow.core.design.FeedbackKind
 import com.taskflow.core.design.TaskFlowColors
 
 @Composable
@@ -75,9 +77,7 @@ fun OnboardingScreen(vm: TaskFlowViewModel, onStart: () -> Unit) {
             modifier = Modifier.fillMaxWidth(),
             singleLine = true
         )
-        if (message.isNotBlank()) {
-            Text(message, color = TaskFlowColors.Purple, modifier = Modifier.padding(top = 12.dp))
-        }
+        FeedbackBanner(message.takeIf { it.isNotBlank() }, FeedbackKind.Error, Modifier.padding(top = 12.dp))
         Spacer(Modifier.height(24.dp))
         GradientButton(
             "Comecar",

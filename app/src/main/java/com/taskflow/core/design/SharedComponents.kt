@@ -1,5 +1,9 @@
 package com.taskflow.core.design
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -17,8 +21,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material.icons.filled.Event
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.Icon
@@ -172,6 +179,42 @@ fun MaterialRow(icon: ImageVector, title: String, subtitle: String) =
             Icon(Icons.Default.MoreVert, null, tint = TaskFlowColors.Muted)
         }
     }
+
+enum class FeedbackKind { Info, Success, Warning, Error }
+
+@Composable
+fun FeedbackBanner(message: String?, kind: FeedbackKind, modifier: Modifier = Modifier) {
+    AnimatedVisibility(
+        visible = !message.isNullOrBlank(),
+        enter = fadeIn() + expandVertically(),
+        exit = fadeOut()
+    ) {
+        val color = when (kind) {
+            FeedbackKind.Info -> TaskFlowColors.Blue
+            FeedbackKind.Success -> TaskFlowColors.Success
+            FeedbackKind.Warning -> TaskFlowColors.Warning
+            FeedbackKind.Error -> TaskFlowColors.Danger
+        }
+        val icon = when (kind) {
+            FeedbackKind.Error -> Icons.Default.ErrorOutline
+            FeedbackKind.Success -> Icons.Default.CheckCircle
+            else -> Icons.Default.Info
+        }
+        Row(
+            modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(18.dp))
+                .background(color.copy(.10f))
+                .border(1.dp, color.copy(.24f), RoundedCornerShape(18.dp))
+                .padding(horizontal = 14.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(icon, null, tint = color, modifier = Modifier.size(20.dp))
+            Spacer(Modifier.width(10.dp))
+            Text(message ?: "", color = TaskFlowColors.Text, fontWeight = FontWeight.SemiBold)
+        }
+    }
+}
 
 fun priorityColor(priority: TaskPriority) = when (priority) {
     TaskPriority.High -> TaskFlowColors.Danger

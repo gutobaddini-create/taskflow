@@ -43,6 +43,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.taskflow.core.design.ChipText
+import com.taskflow.core.design.FeedbackBanner
+import com.taskflow.core.design.FeedbackKind
 import com.taskflow.core.design.InfoRow
 import com.taskflow.core.design.SectionTitle
 import com.taskflow.core.design.TaskCard
@@ -108,7 +110,7 @@ fun SpacesScreen(vm: TaskFlowViewModel, onDetail: (String) -> Unit) {
                     modifier = Modifier.size(48.dp).testTag("create-space").semantics { contentDescription = "Criar espaco" }
                 ) { Icon(Icons.Default.Add, null) }
             }
-            message?.let { Text(it, color = Color(0xFFEF4444), modifier = Modifier.padding(top = 8.dp)) }
+            FeedbackBanner(message, FeedbackKind.Error, Modifier.padding(top = 8.dp))
             Spacer(Modifier.height(16.dp))
         }
         items(spaces) { space ->

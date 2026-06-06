@@ -82,6 +82,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.FileProvider
 import com.taskflow.core.design.ChipText
+import com.taskflow.core.design.FeedbackBanner
+import com.taskflow.core.design.FeedbackKind
 import com.taskflow.core.design.GradientButton
 import com.taskflow.core.design.IconBubble
 import com.taskflow.core.design.InfoRow
@@ -326,7 +328,7 @@ fun MaterialsScreen(vm: TaskFlowViewModel, onBack: () -> Unit) {
                     }
                 }
             }
-            message?.let { Text(it, color = if (it.contains("invalida", true) || it.contains("invalido", true)) Color(0xFFEF4444) else com.taskflow.core.design.TaskFlowColors.Purple, modifier = Modifier.padding(top = 10.dp)) }
+            FeedbackBanner(message, materialFeedbackKind(message), Modifier.padding(top = 10.dp))
             Spacer(Modifier.height(16.dp))
             TaskFlowCard(Modifier.border(1.dp, com.taskflow.core.design.TaskFlowColors.Purple.copy(.35f), RoundedCornerShape(22.dp)).clickable {
                 if (canManageMaterial) filePicker.launch(arrayOf("*/*")) else message = "Sem permissao para alterar materiais."
@@ -640,6 +642,22 @@ fun ItemActionMenu(contentDescription: String, actions: List<ItemAction>) {
 }
 
 data class AttachmentMetadata(val name: String, val sizeBytes: Long, val mimeType: String)
+
+private fun materialFeedbackKind(message: String?): FeedbackKind {
+    val value = message ?: return FeedbackKind.Info
+    return if (
+        value.contains("invalida", ignoreCase = true) ||
+        value.contains("invalido", ignoreCase = true) ||
+        value.contains("negada", ignoreCase = true) ||
+        value.contains("Sem permissao", ignoreCase = true) ||
+        value.contains("Nao foi possivel", ignoreCase = true) ||
+        value.contains("Nenhum app", ignoreCase = true)
+    ) {
+        FeedbackKind.Error
+    } else {
+        FeedbackKind.Success
+    }
+}
 
 fun Context.attachmentMetadata(uri: Uri): AttachmentMetadata {
     var name = uri.lastPathSegment?.substringAfterLast('/') ?: "anexo-${System.currentTimeMillis()}"
