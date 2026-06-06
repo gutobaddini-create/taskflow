@@ -1007,10 +1007,10 @@ Implementar identidade visual moderna, limpa e premium.
 - [x] Criar fila de operações pendentes.
 - [x] Sincronizar criação de tarefa.
 - [x] Sincronizar edição de tarefa.
-- [ ] Sincronizar anexos pendentes.
+- [x] Sincronizar anexos pendentes.
 - [x] Sincronizar links.
 - [x] Sincronizar campos complementares.
-- [ ] Resolver conflitos simples.
+- [x] Resolver conflitos simples.
 
 ### Critérios de aceite
 

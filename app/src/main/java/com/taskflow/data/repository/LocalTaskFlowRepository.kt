@@ -221,6 +221,7 @@ class LocalTaskFlowRepository(
         scope.launch(Dispatchers.IO) {
             val attachment = dao.attachmentById(attachmentId)?.toDomain() ?: return@launch
             dao.upsertAttachments(listOf(attachment.copy(isDeleted = true, updatedAt = now()).toEntity()))
+            enqueue(PendingEntityType.Attachment, attachment.id, PendingOperationType.Delete)
             logActivity(attachment.taskId, users.value.firstOrNull()?.id ?: attachment.uploadedBy, "Anexo removido: ${attachment.fileName}")
         }
     }

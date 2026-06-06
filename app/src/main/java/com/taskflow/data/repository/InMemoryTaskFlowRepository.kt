@@ -124,6 +124,7 @@ class InMemoryTaskFlowRepository : TaskFlowRepository {
         val attachment = attachments.value.firstOrNull { it.id == attachmentId } ?: return
         attachments.value = attachments.value.filterNot { it.id == attachmentId }
         activity.value = activity.value + ActivityLog(taskId = attachment.taskId, userId = users.value.first().id, action = "Anexo removido: ${attachment.fileName}")
+        enqueue(PendingEntityType.Attachment, attachment.id, PendingOperationType.Delete)
     }
     override fun addLink(link: TaskLink) {
         links.value = links.value + link

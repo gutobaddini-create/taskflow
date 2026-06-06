@@ -44,4 +44,17 @@ class PendingOperationsTest {
         assertTrue(repo.pendingOperations.value.any { it.entity == PendingEntityType.Link && it.entityId == link.id && it.operation == PendingOperationType.Create })
         assertTrue(repo.pendingOperations.value.any { it.entity == PendingEntityType.CustomField && it.entityId == field.id && it.operation == PendingOperationType.Create })
     }
+
+    @Test
+    fun attachmentDeleteIsQueuedForFutureSync() {
+        val repo = InMemoryTaskFlowRepository()
+        val task = repo.tasks.value.first()
+        val user = repo.users.value.first()
+        val attachment = Attachment(taskId = task.id, uploadedBy = user.id, fileName = "delete.pdf", originalFileName = "delete.pdf", fileType = AttachmentType.Pdf, mimeType = "application/pdf", fileSize = 42, storagePath = "local/delete.pdf")
+
+        repo.addAttachment(attachment)
+        repo.deleteAttachment(attachment.id)
+
+        assertTrue(repo.pendingOperations.value.any { it.entity == PendingEntityType.Attachment && it.entityId == attachment.id && it.operation == PendingOperationType.Delete })
+    }
 }
