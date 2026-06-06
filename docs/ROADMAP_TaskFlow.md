@@ -281,7 +281,7 @@ Implementar identidade visual moderna, limpa e premium.
 
 ### Critérios de aceite
 
-- [ ] Componentes reutilizados em mais de uma tela quando aplicável.
+- [x] Componentes reutilizados em mais de uma tela quando aplicável.
 - [x] Componentes têm previews do Compose.
 - [x] Componentes aceitam estados principais.
 - [x] Componentes não contêm regra de negócio.

@@ -38,7 +38,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -57,6 +56,9 @@ import com.taskflow.data.local.TaskFlowPreferences
 import com.taskflow.data.local.TaskFlowUserPreferences
 import com.taskflow.data.local.TaskFlowDatabase
 import com.taskflow.data.repository.LocalTaskFlowRepository
+import com.taskflow.core.design.SegmentedControl as DesignSegmentedControl
+import com.taskflow.core.design.TaskFlowButton as DesignTaskFlowButton
+import com.taskflow.core.design.TaskFlowCard as DesignTaskFlowCard
 import com.taskflow.core.design.TaskFlowTheme
 import com.taskflow.core.notifications.ReminderEngine
 import com.taskflow.core.notifications.ReminderReceiver
@@ -83,7 +85,6 @@ private val Muted = Color(0xFF667085)
 private val Blue = Color(0xFF2563FF)
 private val Purple = Color(0xFF7C3AED)
 private val Border = Color(0xFFE5E7EB)
-private val Gradient = Brush.horizontalGradient(listOf(Blue, Purple))
 private val CustomFieldTypeLabels = listOf(
     CustomFieldType.Text to "Texto",
     CustomFieldType.Number to "Numero",
@@ -1720,9 +1721,7 @@ fun LoadingFullScreen(label: String) {
 
 @Composable
 fun TaskFlowCard(modifier: Modifier = Modifier, content: @Composable ColumnScope.() -> Unit) {
-    Card(modifier.fillMaxWidth(), shape = RoundedCornerShape(24.dp), colors = CardDefaults.cardColors(containerColor = Color.White), elevation = CardDefaults.cardElevation(3.dp)) {
-        Column(Modifier.padding(18.dp), content = content)
-    }
+    DesignTaskFlowCard(modifier, content)
 }
 
 @Composable
@@ -1757,21 +1756,12 @@ fun NextReminderCard(title: String, date: LocalDateTime) {
 
 @Composable
 fun Segmented(options: List<String>, selected: String, onSelect: (String) -> Unit) {
-    Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(22.dp)).background(Color.White).border(1.dp, Border, RoundedCornerShape(22.dp)).padding(4.dp)) {
-        options.forEach { option ->
-            val active = option == selected
-            Box(Modifier.weight(1f).clip(RoundedCornerShape(18.dp)).background(if (active) Gradient else Brush.linearGradient(listOf(Color.Transparent, Color.Transparent))).clickable { onSelect(option) }.padding(vertical = 12.dp), contentAlignment = Alignment.Center) {
-                Text(option, color = if (active) Color.White else Text, fontWeight = FontWeight.SemiBold)
-            }
-        }
-    }
+    DesignSegmentedControl(options, selected, onSelect)
 }
 
 @Composable
 fun GradientButton(text: String, onClick: () -> Unit, modifier: Modifier = Modifier, enabled: Boolean = true) {
-    Button(onClick = onClick, modifier = modifier.height(54.dp), enabled = enabled, shape = RoundedCornerShape(50), colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent), contentPadding = PaddingValues()) {
-        Box(Modifier.fillMaxSize().background(if (enabled) Gradient else Brush.linearGradient(listOf(Border, Border))), contentAlignment = Alignment.Center) { Text(text, color = Color.White, fontWeight = FontWeight.Bold) }
-    }
+    DesignTaskFlowButton(text, onClick, modifier, enabled)
 }
 
 @Composable
