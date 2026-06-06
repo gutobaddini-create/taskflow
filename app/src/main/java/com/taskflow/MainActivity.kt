@@ -254,7 +254,7 @@ fun TaskFlowRoot(
                 Screen.Settings -> Shell(screen, { screen = it }) { SettingsScreen(vm) { vm.logoutLocal(); screen = Screen.Onboarding } }
                 Screen.NewTask -> NewTaskScreen(vm, { screen = Screen.Home })
                 Screen.Detail -> DetailScreen(vm, { screen = Screen.Home }, { screen = Screen.Materials }, { screen = Screen.Share }, { screen = Screen.Reminder })
-                Screen.Reminder -> ReminderScreen(vm) { screen = Screen.NewTask }
+                Screen.Reminder -> ReminderScreen(vm) { screen = Screen.Detail }
                 Screen.Materials -> MaterialsScreen(vm) { screen = Screen.Detail }
                 Screen.Share -> ShareScreen(vm) { screen = Screen.Detail }
                 Screen.AcceptInvite -> AcceptInviteScreen(vm, inviteToken, { onInviteHandled(); screen = Screen.Home }, { onInviteHandled(); screen = Screen.Onboarding })
@@ -585,9 +585,12 @@ fun DetailScreen(vm: TaskFlowViewModel, onBack: () -> Unit, onMaterials: () -> U
             val reminderModifier = if (canEditTask) Modifier.clickable(onClick = onReminder) else Modifier
             TaskFlowCard(reminderModifier.testTag("open-reminder").semantics { contentDescription = "Configurar lembrete" }) {
                 val taskReminders = reminders.filter { it.taskId == task.id }
-                val next = taskReminders.mapNotNull { ReminderEngine.nextOccurrence(it) }.minOrNull()
+                val nextReminder = taskReminders.mapNotNull { reminder -> ReminderEngine.nextOccurrence(reminder)?.let { reminder to it } }.minByOrNull { it.second }
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                    Column { Text("Recorrencia personalizada", fontWeight = FontWeight.Bold, color = Text); Text(next?.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")) ?: "Nenhum lembrete", color = Muted) }
+                    Column {
+                        Text(nextReminder?.first?.displaySummary() ?: "Nenhum lembrete", fontWeight = FontWeight.Bold, color = Text)
+                        Text(nextReminder?.second?.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")) ?: "Sem disparo agendado", color = Muted)
+                    }
                     Switch(
                         checked = taskReminders.any { it.isActive },
                         onCheckedChange = { active -> taskReminders.forEach { vm.repo.saveReminder(it.copy(isActive = active)) } },
@@ -813,6 +816,22 @@ fun ReminderScreen(vm: TaskFlowViewModel, onSave: () -> Unit) {
                 onSave()
             }, Modifier.fillMaxWidth(), enabled = enabled)
         }
+    }
+}
+
+private fun Reminder.displaySummary(): String {
+    if (type == ReminderType.OneTime || recurrenceType == RecurrenceType.None) return "Lembrete unico"
+    return when (recurrenceUnit) {
+        RecurrenceUnit.Days -> if (recurrenceInterval == 1) "Todo dia" else "A cada $recurrenceInterval dias"
+        RecurrenceUnit.Weeks -> {
+            val days = selectedWeekDays.sortedBy { it.value }.joinToString { it.short }
+            (if (recurrenceInterval == 1) "Toda semana" else "A cada $recurrenceInterval semanas") + if (days.isBlank()) "" else " - $days"
+        }
+        RecurrenceUnit.Months -> {
+            val monthly = selectedMonthDay?.let { "dia $it" } ?: monthlyRule.label.lowercase()
+            (if (recurrenceInterval == 1) "Todo mes" else "A cada $recurrenceInterval meses") + " - $monthly"
+        }
+        RecurrenceUnit.Years -> if (recurrenceInterval == 1) "Todo ano" else "A cada $recurrenceInterval anos"
     }
 }
 

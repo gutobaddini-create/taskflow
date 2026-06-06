@@ -1156,9 +1156,9 @@ Implementar identidade visual moderna, limpa e premium.
 ### Fluxos mínimos
 
 - [x] Criar tarefa simples.
-- [ ] Criar tarefa com lembrete único.
-- [ ] Criar tarefa com lembrete a cada 2 semanas.
-- [ ] Criar tarefa com lembrete mensal todo dia 10.
+- [x] Criar tarefa com lembrete único.
+- [x] Criar tarefa com lembrete a cada 2 semanas.
+- [x] Criar tarefa com lembrete mensal todo dia 10.
 - [ ] Criar tarefa com anexo PDF.
 - [ ] Criar tarefa com foto.
 - [x] Criar tarefa com link.
