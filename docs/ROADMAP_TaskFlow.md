@@ -817,7 +817,7 @@ Implementar identidade visual moderna, limpa e premium.
 ### Critérios de aceite
 
 - [x] Convite válido permite entrar na tarefa.
-- [ ] Convite expirado mostra mensagem adequada.
+- [x] Convite expirado mostra mensagem adequada.
 - [x] Usuário sem permissão não edita tarefa.
 
 ---
@@ -838,7 +838,7 @@ Implementar identidade visual moderna, limpa e premium.
 ### Critérios de aceite
 
 - [x] Comentário aparece em tempo real local/mockado.
-- [ ] Participantes autorizados podem comentar.
+- [x] Participantes autorizados podem comentar.
 - [x] Visualizadores sem permissão não comentam.
 
 ---
