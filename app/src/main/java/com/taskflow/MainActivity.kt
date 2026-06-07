@@ -33,6 +33,7 @@ import com.taskflow.core.design.NavigationItem
 import com.taskflow.core.design.TaskFlowColors
 import com.taskflow.core.design.TaskFlowTheme
 import com.taskflow.core.notifications.ReminderReceiver
+import com.taskflow.core.sharing.InviteLinks
 import com.taskflow.feature.auth.OnboardingScreen
 import com.taskflow.feature.home.HomeScreen
 import com.taskflow.feature.materials.MaterialsScreen
@@ -51,7 +52,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        pendingInviteToken.value = intent.inviteToken()
+        pendingInviteToken.value = InviteLinks.tokenFromIntent(intent)
         pendingTaskId.value = intent.notificationTaskId()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), 1001)
@@ -68,12 +69,11 @@ class MainActivity : ComponentActivity() {
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-        pendingInviteToken.value = intent.inviteToken()
+        pendingInviteToken.value = InviteLinks.tokenFromIntent(intent)
         pendingTaskId.value = intent.notificationTaskId()
     }
 }
 
-private fun Intent.inviteToken(): String? = data?.takeIf { it.scheme == "taskflow" && it.host == "invite" }?.lastPathSegment
 private fun Intent.notificationTaskId(): String? = getStringExtra(ReminderReceiver.EXTRA_TASK_ID)
 
 sealed class Screen(val label: String) {
@@ -100,8 +100,17 @@ fun TaskFlowRoot(
 ) {
     var screen by remember { mutableStateOf<Screen>(Screen.Onboarding) }
     val tasks by vm.tasks.collectAsState()
+    val preferences by vm.preferences.collectAsState()
     LaunchedEffect(inviteToken) {
-        if (!inviteToken.isNullOrBlank()) screen = Screen.AcceptInvite
+        if (!inviteToken.isNullOrBlank()) {
+            vm.pendingInviteToken = inviteToken
+            screen = if (preferences.currentUserId.isBlank()) Screen.Onboarding else Screen.AcceptInvite
+        }
+    }
+    LaunchedEffect(preferences.currentUserId, vm.pendingInviteToken) {
+        if (preferences.currentUserId.isNotBlank() && !vm.pendingInviteToken.isNullOrBlank()) {
+            screen = Screen.AcceptInvite
+        }
     }
     LaunchedEffect(notificationTaskId, tasks) {
         if (!notificationTaskId.isNullOrBlank() && tasks.any { it.id == notificationTaskId }) {
@@ -123,7 +132,7 @@ fun TaskFlowRoot(
                 Screen.Reminder -> ReminderScreen(vm) { screen = Screen.Detail }
                 Screen.Materials -> MaterialsScreen(vm) { screen = Screen.Detail }
                 Screen.Share -> ShareScreen(vm) { screen = Screen.Detail }
-                Screen.AcceptInvite -> AcceptInviteScreen(vm, inviteToken, { onInviteHandled(); screen = Screen.Home }, { onInviteHandled(); screen = Screen.Onboarding })
+                Screen.AcceptInvite -> AcceptInviteScreen(vm, inviteToken ?: vm.pendingInviteToken, { onInviteHandled(); vm.pendingInviteToken = null; screen = Screen.Home }, { onInviteHandled(); vm.pendingInviteToken = null; screen = Screen.Onboarding })
             }
         }
     }

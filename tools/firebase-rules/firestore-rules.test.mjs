@@ -136,5 +136,62 @@ await run("unknown collections are denied", async () => {
   await assertFails(setDoc(doc(manuelDb, "publicLeaks", "leak-1"), { value: true }));
 });
 
+await run("invite links are created by owner and read by authenticated users", async () => {
+  const manuelDb = testEnv.authenticatedContext("manuel").firestore();
+  const anaDb = testEnv.authenticatedContext("ana").firestore();
+  const anonDb = testEnv.unauthenticatedContext().firestore();
+  const payload = {
+    token: "token-1",
+    createdBy: "manuel",
+    createdAt: Date.now(),
+    permission: "Viewer",
+    task: {
+      id: "task-1",
+      title: "Tarefa compartilhada",
+      description: "",
+      status: "Todo",
+      priority: "Medium",
+      createdBy: "manuel",
+      assignedTo: null,
+      dueDateEpochMillis: null,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    },
+  };
+
+  await assertSucceeds(setDoc(doc(manuelDb, "inviteLinks", "token-1"), payload));
+  await assertSucceeds(getDoc(doc(anaDb, "inviteLinks", "token-1")));
+  await assertFails(getDoc(doc(anonDb, "inviteLinks", "token-1")));
+});
+
+await run("invite links accept only once by authenticated user", async () => {
+  await seedFirestore(async (db) => {
+    await setDoc(doc(db, "inviteLinks", "token-2"), {
+      token: "token-2",
+      createdBy: "manuel",
+      createdAt: Date.now(),
+      permission: "Participant",
+      task: {
+        id: "task-2",
+        title: "Tarefa compartilhada",
+        description: "",
+        status: "Todo",
+        priority: "Medium",
+        createdBy: "manuel",
+        assignedTo: null,
+        dueDateEpochMillis: null,
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      },
+    });
+  });
+
+  const anaDb = testEnv.authenticatedContext("ana").firestore();
+  const strangerDb = testEnv.authenticatedContext("stranger").firestore();
+
+  await assertSucceeds(updateDoc(doc(anaDb, "inviteLinks", "token-2"), { acceptedBy: "ana", acceptedAt: Date.now() }));
+  await assertFails(updateDoc(doc(strangerDb, "inviteLinks", "token-2"), { acceptedBy: "stranger", acceptedAt: Date.now() }));
+});
+
 await testEnv.cleanup();
 assert.equal(process.exitCode ?? 0, 0);

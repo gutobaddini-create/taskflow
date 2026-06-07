@@ -26,6 +26,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -47,8 +48,10 @@ import com.taskflow.core.design.TaskFlowCard
 import com.taskflow.core.design.TopRow
 import com.taskflow.core.design.LoadingFullScreen
 import com.taskflow.core.design.TaskFlowColors
+import com.taskflow.core.sharing.InviteLinks
 import com.taskflow.domain.model.Invite
 import com.taskflow.domain.model.UserPermission
+import kotlinx.coroutines.launch
 import java.time.format.DateTimeFormatter
 
 @Composable
@@ -58,8 +61,10 @@ fun ShareScreen(vm: TaskFlowViewModel, onBack: () -> Unit) {
     val attachments by vm.attachments.collectAsState()
     val links by vm.links.collectAsState()
     val invites by vm.invites.collectAsState()
+    val scope = rememberCoroutineScope()
     var permission by remember { mutableStateOf("Editar") }
     var message by remember { mutableStateOf<String?>(null) }
+    var lastInviteUrl by remember { mutableStateOf<String?>(null) }
 
     if (task == null) {
         LoadingFullScreen("Carregando convite...")
@@ -74,52 +79,72 @@ fun ShareScreen(vm: TaskFlowViewModel, onBack: () -> Unit) {
 
     fun buildInviteText(invite: Invite): String {
         val due = task.dueDate?.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")) ?: "sem prazo"
-        return "Voce foi convidado para participar da tarefa \"${task.title}\" no TaskFlow.\nPrazo: $due\nStatus: ${task.status.label}\nPermissao: ${invite.permission.label}\nLink: taskflow://invite/${invite.token}"
+        val link = InviteLinks.urlForToken(invite.token)
+        return "Voce foi convidado para participar da tarefa \"${task.title}\" no TaskFlow.\nPrazo: $due\nStatus: ${task.status.label}\nPermissao: ${invite.permission.label}\nLink: $link"
     }
 
-    fun createInviteAndText(): Pair<Invite, String> {
+    suspend fun createInviteAndText(): Pair<Invite, String> {
         val invite = Invite(taskId = task.id, createdBy = vm.currentUser().id, permission = selectedPermission())
-        vm.repo.createInvite(invite)
+        vm.createRemoteInvite(invite, task).getOrThrow()
+        lastInviteUrl = InviteLinks.urlForToken(invite.token)
         return invite to buildInviteText(invite)
     }
 
     fun sendShare(packageName: String? = null) {
-        val (_, text) = createInviteAndText()
-        val send = Intent(Intent.ACTION_SEND).apply {
-            type = "text/plain"
-            putExtra(Intent.EXTRA_SUBJECT, "Convite TaskFlow: ${task.title}")
-            putExtra(Intent.EXTRA_TEXT, text)
-            packageName?.let(::setPackage)
-        }
-        try {
-            context.startActivity(Intent.createChooser(send, "Compartilhar tarefa"))
-            message = "Convite gerado."
-        } catch (_: ActivityNotFoundException) {
-            context.startActivity(Intent.createChooser(send.apply { setPackage(null) }, "Compartilhar tarefa"))
-            message = "App especifico indisponivel; usando seletor."
+        scope.launch {
+            runCatching {
+                val (_, text) = createInviteAndText()
+                val send = Intent(Intent.ACTION_SEND).apply {
+                    type = "text/plain"
+                    putExtra(Intent.EXTRA_SUBJECT, "Convite TaskFlow: ${task.title}")
+                    putExtra(Intent.EXTRA_TEXT, text)
+                    packageName?.let(::setPackage)
+                }
+                try {
+                    context.startActivity(Intent.createChooser(send, "Compartilhar tarefa"))
+                    message = "Convite real gerado."
+                } catch (_: ActivityNotFoundException) {
+                    context.startActivity(Intent.createChooser(send.apply { setPackage(null) }, "Compartilhar tarefa"))
+                    message = "App especifico indisponivel; usando seletor."
+                }
+            }.onFailure {
+                message = "Nao foi possivel gerar link real. Verifique login e internet."
+            }
         }
     }
 
     fun sendEmail() {
-        val (_, text) = createInviteAndText()
-        val email = Intent(Intent.ACTION_SENDTO).apply {
-            data = Uri.parse("mailto:")
-            putExtra(Intent.EXTRA_SUBJECT, "Convite TaskFlow: ${task.title}")
-            putExtra(Intent.EXTRA_TEXT, text)
-        }
-        try {
-            context.startActivity(email)
-            message = "Convite por e-mail gerado."
-        } catch (_: ActivityNotFoundException) {
-            sendShare()
+        scope.launch {
+            runCatching {
+                val (_, text) = createInviteAndText()
+                val email = Intent(Intent.ACTION_SENDTO).apply {
+                    data = Uri.parse("mailto:")
+                    putExtra(Intent.EXTRA_SUBJECT, "Convite TaskFlow: ${task.title}")
+                    putExtra(Intent.EXTRA_TEXT, text)
+                }
+                try {
+                    context.startActivity(email)
+                    message = "Convite por e-mail gerado."
+                } catch (_: ActivityNotFoundException) {
+                    sendShare()
+                }
+            }.onFailure {
+                message = "Nao foi possivel gerar link real. Verifique login e internet."
+            }
         }
     }
 
     fun copyInvite() {
-        val (_, text) = createInviteAndText()
-        val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-        clipboard.setPrimaryClip(ClipData.newPlainText("Convite TaskFlow", text))
-        message = "Link copiado."
+        scope.launch {
+            runCatching {
+                val (_, text) = createInviteAndText()
+                val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                clipboard.setPrimaryClip(ClipData.newPlainText("Convite TaskFlow", text))
+                message = "Link copiado."
+            }.onFailure {
+                message = "Nao foi possivel gerar link real. Verifique login e internet."
+            }
+        }
     }
 
     LazyColumn(Modifier.fillMaxSize().statusBarsPadding().padding(DesignTokens.screenPadding), contentPadding = PaddingValues(bottom = DesignTokens.screenBottomPadding)) {
@@ -145,7 +170,7 @@ fun ShareScreen(vm: TaskFlowViewModel, onBack: () -> Unit) {
                     ChipText("${attachments.count { it.taskId == task.id }} anexos", tone = ChipTone.Blue)
                     ChipText("${links.count { it.taskId == task.id }} links", tone = ChipTone.Success)
                 }
-                Text("taskflow://invite/${task.shareToken}", color = TaskFlowColors.Purple, modifier = Modifier.padding(top = 12.dp))
+                Text(lastInviteUrl ?: "O link HTTPS sera gerado ao enviar.", color = TaskFlowColors.Purple, modifier = Modifier.padding(top = 12.dp))
             }
             val taskInvites = invites.filter { it.taskId == task.id }
             if (taskInvites.isNotEmpty()) {
@@ -162,8 +187,7 @@ fun ShareScreen(vm: TaskFlowViewModel, onBack: () -> Unit) {
             GradientButton(
                 "Enviar convite",
                 onClick = {
-                    createInviteAndText()
-                    message = "Convite salvo."
+                    copyInvite()
                 },
                 modifier = Modifier.fillMaxWidth()
             )

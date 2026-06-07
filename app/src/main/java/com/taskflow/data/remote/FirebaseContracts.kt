@@ -2,6 +2,9 @@ package com.taskflow.data.remote
 
 import com.taskflow.domain.model.Attachment
 import com.taskflow.domain.model.PendingOperation
+import com.taskflow.domain.model.TaskPriority
+import com.taskflow.domain.model.TaskStatus
+import com.taskflow.domain.model.UserPermission
 
 object FirebaseCollections {
     const val Users = "users"
@@ -16,6 +19,7 @@ object FirebaseCollections {
     const val Comments = "comments"
     const val ActivityLog = "activityLog"
     const val Invites = "invites"
+    const val InviteLinks = "inviteLinks"
     const val PendingOperations = "pendingOperations"
 
     val all = listOf(
@@ -31,6 +35,7 @@ object FirebaseCollections {
         Comments,
         ActivityLog,
         Invites,
+        InviteLinks,
         PendingOperations
     )
 }
@@ -61,6 +66,9 @@ interface RemoteTaskFlowDataSource {
     suspend fun uploadAttachment(userId: String, attachment: Attachment): RemoteUploadResult
     suspend fun deleteAttachment(userId: String, attachment: Attachment)
     suspend fun registerFcmToken(userId: String, token: String)
+    suspend fun createInviteLink(invite: RemoteInviteLink): RemoteInviteLink
+    suspend fun resolveInviteLink(token: String): RemoteInviteLink?
+    suspend fun acceptInviteLink(token: String, userId: String): RemoteInviteLink
 }
 
 sealed class RemoteSyncResult {
@@ -72,4 +80,28 @@ data class RemoteUploadResult(
     val storagePath: String,
     val secureUrl: String? = null,
     val thumbnailPath: String? = null
+)
+
+data class RemoteInviteTaskSnapshot(
+    val id: String,
+    val title: String,
+    val description: String,
+    val status: TaskStatus,
+    val priority: TaskPriority,
+    val createdBy: String,
+    val assignedTo: String?,
+    val dueDateEpochMillis: Long?,
+    val createdAt: Long,
+    val updatedAt: Long
+)
+
+data class RemoteInviteLink(
+    val token: String,
+    val task: RemoteInviteTaskSnapshot,
+    val permission: UserPermission,
+    val createdBy: String,
+    val createdAt: Long,
+    val expiresAt: Long? = null,
+    val acceptedBy: String? = null,
+    val acceptedAt: Long? = null
 )

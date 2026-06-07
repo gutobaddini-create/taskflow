@@ -12,6 +12,7 @@ captures/
 node_modules/
 npm-debug.log*
 firebase-debug.log
+.firebase/
 firestore-debug.log
 storage-debug.log
 ui-debug.log

@@ -43,9 +43,9 @@ Covered checks:
 
 | Artifact | Size | SHA-256 |
 | --- | ---: | --- |
-| `app/build/outputs/apk/debug/app-debug.apk` | 23,158,235 bytes | `81ce55faf49527b6e206c26ccba6fa24b9de3526653195f7b0bc6c126cb52037` |
-| `app/build/outputs/apk/release/app-release.apk` | 16,008,936 bytes | `6610a7171f5805c039bd09bc885212142f1e854218a027eb108aec064dd0fd08` |
-| `app/build/outputs/bundle/release/app-release.aab` | 15,535,420 bytes | `2514d9f5c6e28c6a1a6b5f10023326437b6255e33f21173db17234513c609ffb` |
+| `app/build/outputs/apk/debug/app-debug.apk` | 23,246,182 bytes | `da1fb730517f8738fac2920849879f46d4c65b8e5afa278b3ddb3997fcea4b29` |
+| `app/build/outputs/apk/release/app-release.apk` | 16,041,840 bytes | `69e6d9d46bde65a52911ad61a9c43c5161fc22b02b448f60d414f035432adb03` |
+| `app/build/outputs/bundle/release/app-release.aab` | 15,573,911 bytes | `65d410333d671dad2d71fa5f82f8d6941c58e64d4acb31e78d3c0057fabafda5` |
 
 Canonical artifact manifest:
 
@@ -71,6 +71,10 @@ Screenshots:
 - `docs/qa/screenshots/visual-reminder-release-2026-06-06.png`
 - `docs/qa/screenshots/visual-materials-release-2026-06-06.png`
 - `docs/qa/screenshots/visual-share-release-2026-06-06.png`
+- `docs/qa/screenshots/v012-release-home-clean-2026-06-07.png`
+- `docs/qa/screenshots/v012-release-new-task-draft-2026-06-07.png`
+- `docs/qa/screenshots/v012-release-new-task-draft-lower-2026-06-07.png`
+- `docs/qa/screenshots/v012-release-https-invite-2026-06-07.png`
 
 ## Physical Evidence
 
@@ -85,12 +89,14 @@ Screenshots:
 ## Release Notes
 
 - Package: `com.taskflow`
-- Version: `0.1.1`
+- Version: `0.1.2`
 - Release mode: local-first MVP
 - Firebase project: `gen-lang-client-0780081219`
 - Firebase Android App ID: `1:209004797664:android:ef4fc149b5b033f782ba85`
 - Firebase Auth e-mail/senha: validated through `npm run verify:firebase-real`
-- Firebase Firestore/Storage rules: validated through `npm run verify:firebase-real` and deployed with `npx firebase deploy --only firestore:rules,storage --project gen-lang-client-0780081219`
+- Firebase Firestore/Storage rules: validated through `npm run verify:firebase-real`.
+- Firebase Firestore/Hosting: invite link rules and fallback web page deployed with `npx firebase deploy --only firestore:rules,hosting --project gen-lang-client-0780081219`.
+- Invite URL format: `https://gen-lang-client-0780081219.web.app/invite/{token}` with legacy `taskflow://invite/{token}` parser fallback.
 - Firebase runtime smoke: Auth, Firestore pending operation, attachment metadata, Storage upload/delete, and FCM token document validated through REST smoke and physical Android instrumented test.
 - Release signing: production keystore at `C:\Users\gutol\.taskflow\release\taskflow-release.keystore`.
 - Production signing env file: `C:\Users\gutol\.taskflow\release\taskflow-release-signing.env.ps1`.
@@ -100,6 +106,7 @@ Screenshots:
 
 ## External Inputs Still Required
 
+- Physical-device rerun for `0.1.2` requires the USB device to appear in `adb devices -l`; only `emulator-5554` was visible during the final pass.
 - Google Play publication requires access to a Google Play developer account/listing.
 
 ## Recommended Next Step

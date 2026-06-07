@@ -283,9 +283,44 @@ Captured screenshots:
 
 - `docs/qa/screenshots/polish-physical-v011-clean-onboarding-2026-06-07.png`
 
+## Invite and UX QA 0.1.2
+
+Commands executed:
+
+```powershell
+.\gradlew.bat --no-daemon --max-workers=1 :app:testDebugUnitTest :app:compileDebugKotlin --console=plain
+npm run test:firebase-rules
+npx firebase deploy --only firestore:rules,hosting --project gen-lang-client-0780081219
+.\gradlew.bat --no-daemon --max-workers=1 :app:testDebugUnitTest :app:assembleRelease :app:bundleRelease --console=plain
+npm run release:manifest
+$adb='C:\Users\gutol\AppData\Local\Android\Sdk\platform-tools\adb.exe'
+& $adb -s emulator-5554 install app\build\outputs\apk\release\app-release.apk
+& $adb -s emulator-5554 shell am start -n com.taskflow/.MainActivity
+& $adb -s emulator-5554 shell am start -a android.intent.action.VIEW -d "https://gen-lang-client-0780081219.web.app/invite/smoke-token" com.taskflow
+```
+
+Result: passed on emulator; physical-device rerun blocked because `adb devices -l` exposed only `emulator-5554` during this pass.
+
+Observed evidence:
+
+- Version `0.1.2`, versionCode `3`, production SHA-256 certificate `9B:EF:1A:82:0F:6E:5D:71:86:CF:B5:3B:70:04:E8:BB:D5:12:6D:80:50:96:88:9B:A2:C1:A7:DC:E5:6E:B5:10`.
+- Firebase Hosting served `/.well-known/assetlinks.json` and `/invite/smoke-token`.
+- Clean onboarding created `QA012`; Home showed `Nenhuma tarefa encontrada`, confirming no seeded tasks leaked into a new user.
+- Nova tarefa displayed actionable date `07/06/2026`, time `09:00`, draft materials (`Arquivo`, `Foto`, `Link`, `Campo`), `Checklist`, and `Convite` before saving.
+- HTTPS invite App Link opened TaskFlow directly into `Convite TaskFlow`; the smoke token correctly showed invalid/not found because no Firestore invite existed for that token.
+- Logcat samples did not show TaskFlow `FATAL EXCEPTION` or ANR.
+
+Captured screenshots:
+
+- `docs/qa/screenshots/v012-release-after-permission-2026-06-07.png`
+- `docs/qa/screenshots/v012-release-home-clean-2026-06-07.png`
+- `docs/qa/screenshots/v012-release-new-task-draft-2026-06-07.png`
+- `docs/qa/screenshots/v012-release-new-task-draft-lower-2026-06-07.png`
+- `docs/qa/screenshots/v012-release-https-invite-2026-06-07.png`
+
 ## Current External Blockers
 
-No external blockers remain for the requested Firebase setup, physical QA, and production-signed artifact generation. Play Store publication still requires access to a Google Play developer account/listing, which is outside this repository.
+Physical rerun for `0.1.2` requires the USB device to be visible in `adb devices -l`; only the emulator was visible during this pass. Play Store publication still requires access to a Google Play developer account/listing, which is outside this repository.
 
 ## Status
 

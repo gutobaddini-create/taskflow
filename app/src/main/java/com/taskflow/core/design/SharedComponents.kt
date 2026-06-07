@@ -52,12 +52,12 @@ import java.time.format.DateTimeFormatter
 fun TaskCard(task: Task, listName: String, hasReminder: Boolean, onClick: () -> Unit) {
     TaskFlowCard(Modifier.touchFeedback(onClick = onClick)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Box(Modifier.width(5.dp).height(66.dp).clip(RoundedCornerShape(20.dp)).background(priorityColor(task.priority)))
-            Spacer(Modifier.width(14.dp))
-            Box(Modifier.size(34.dp).border(2.dp, TaskFlowColors.Border, CircleShape).clip(CircleShape))
-            Spacer(Modifier.width(14.dp))
+            Box(Modifier.width(4.dp).height(58.dp).clip(RoundedCornerShape(18.dp)).background(priorityColor(task.priority)))
+            Spacer(Modifier.width(12.dp))
+            Box(Modifier.size(30.dp).border(2.dp, TaskFlowColors.Border, CircleShape).clip(CircleShape))
+            Spacer(Modifier.width(12.dp))
             Column(Modifier.weight(1f)) {
-                Text(task.title, fontSize = 21.sp, fontWeight = FontWeight.Bold, color = TaskFlowColors.Text, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                Text(task.title, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = TaskFlowColors.Text, maxLines = 2, overflow = TextOverflow.Ellipsis)
                 Text("${task.dueDate?.format(DateTimeFormatter.ofPattern("HH:mm")) ?: "--:--"}  -  $listName", color = TaskFlowColors.Muted, maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
             PriorityPill(task.priority)
@@ -71,10 +71,10 @@ fun NextReminderCard(title: String, date: LocalDateTime) {
     TaskFlowCard {
         Row(verticalAlignment = Alignment.CenterVertically) {
             IconBubble(Icons.Default.Event, TaskFlowColors.Purple.copy(.14f), TaskFlowColors.Purple)
-            Spacer(Modifier.width(14.dp))
+            Spacer(Modifier.width(12.dp))
             Column(Modifier.weight(1f)) {
                 Text("Proximo lembrete", color = TaskFlowColors.Purple, fontWeight = FontWeight.Bold)
-                Text(title, fontSize = 22.sp, fontWeight = FontWeight.Bold, color = TaskFlowColors.Text, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                Text(title, fontSize = 19.sp, fontWeight = FontWeight.Bold, color = TaskFlowColors.Text, maxLines = 2, overflow = TextOverflow.Ellipsis)
                 Text(date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy - HH:mm")), color = TaskFlowColors.Muted)
             }
             Icon(Icons.Default.ChevronRight, null, tint = TaskFlowColors.Text)
@@ -106,13 +106,13 @@ fun IconBubble(icon: ImageVector, bg: Color = TaskFlowColors.Blue.copy(.12f), ti
 
 @Composable
 fun SectionTitle(text: String) =
-    Text(text, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = TaskFlowColors.Text, modifier = Modifier.padding(top = 22.dp, bottom = 10.dp))
+    Text(text, fontSize = 17.sp, fontWeight = FontWeight.Bold, color = TaskFlowColors.Text, modifier = Modifier.padding(top = 18.dp, bottom = 8.dp))
 
 @Composable
 fun ScreenTitle(text: String, modifier: Modifier = Modifier) =
     Text(
         text,
-        fontSize = 28.sp,
+        fontSize = 24.sp,
         fontWeight = FontWeight.Bold,
         color = TaskFlowColors.Text,
         maxLines = 2,
@@ -132,7 +132,7 @@ fun ChipText(text: String, active: Boolean = true, modifier: Modifier = Modifier
         modifier = modifier
             .clip(RoundedCornerShape(50))
             .background(if (active) color.copy(.10f) else TaskFlowColors.Border.copy(.45f))
-            .padding(horizontal = 12.dp, vertical = 8.dp)
+            .padding(horizontal = 10.dp, vertical = 6.dp)
     )
 }
 
@@ -156,7 +156,7 @@ fun PriorityPill(priority: TaskPriority) =
         modifier = Modifier
             .clip(RoundedCornerShape(50))
             .background(priorityColor(priority).copy(.12f))
-            .padding(horizontal = 12.dp, vertical = 8.dp)
+            .padding(horizontal = 10.dp, vertical = 6.dp)
     )
 
 @Composable
@@ -174,7 +174,7 @@ fun StatusPill(status: TaskStatus) =
 
 @Composable
 fun SmallAction(icon: ImageVector, label: String, modifier: Modifier = Modifier, onClick: () -> Unit = {}) =
-    OutlinedButton(onClick = onClick, modifier = modifier, shape = RoundedCornerShape(18.dp), contentPadding = PaddingValues(10.dp)) {
+    OutlinedButton(onClick = onClick, modifier = modifier, shape = RoundedCornerShape(16.dp), contentPadding = PaddingValues(horizontal = 8.dp, vertical = 8.dp)) {
         Icon(icon, null)
         Spacer(Modifier.width(6.dp))
         Text(label, maxLines = 1, overflow = TextOverflow.Ellipsis)

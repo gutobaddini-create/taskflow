@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Convite TaskFlow</title>
+    <style>
+      body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #f7f8fc;
+        color: #07132f;
+        display: grid;
+        min-height: 100vh;
+        place-items: center;
+      }
+      main {
+        width: min(88vw, 420px);
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 18px;
+        padding: 24px;
+        box-shadow: 0 18px 40px rgba(7, 19, 47, .10);
+      }
+      a {
+        display: block;
+        margin-top: 18px;
+        padding: 14px 16px;
+        border-radius: 999px;
+        background: linear-gradient(90deg, #2563ff, #7c3aed);
+        color: #fff;
+        text-align: center;
+        text-decoration: none;
+        font-weight: 700;
+      }
+      p {
+        color: #667085;
+        line-height: 1.45;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Convite TaskFlow</h1>
+      <p>Abra este convite no app TaskFlow para visualizar e aceitar a tarefa compartilhada.</p>
+      <a id="open-app" href="#">Abrir no TaskFlow</a>
+    </main>
+    <script>
+      const token = location.pathname.split("/").filter(Boolean).pop() || "";
+      const deepLink = `taskflow://invite/${encodeURIComponent(token)}`;
+      document.getElementById("open-app").href = deepLink;
+      setTimeout(() => { location.href = deepLink; }, 500);
+    </script>
+  </body>
+</html>

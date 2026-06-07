@@ -136,6 +136,20 @@ service cloud.firestore {
         && isTaskMember(get(/databases/$(database)/documents/tasks/$(resource.data.taskId)).data);
     }
 
+    match /inviteLinks/{token} {
+      allow create: if signedIn()
+        && request.resource.data.token == token
+        && request.resource.data.createdBy == uid()
+        && request.resource.data.task.createdBy == uid();
+      allow read: if signedIn();
+      allow update: if signedIn()
+        && (!resource.data.keys().hasAny(["acceptedBy"]) || resource.data.acceptedBy == null)
+        && (!resource.data.keys().hasAny(["expiresAt"]) || resource.data.expiresAt == null || resource.data.expiresAt > request.time.toMillis())
+        && request.resource.data.diff(resource.data).changedKeys().hasOnly(["acceptedBy", "acceptedAt"])
+        && request.resource.data.acceptedBy == uid();
+      allow delete: if signedIn() && resource.data.createdBy == uid();
+    }
+
     match /pendingOperations/{operationId} {
       allow create: if signedIn() && request.resource.data.userId == uid();
       allow read, update, delete: if signedIn() && resource.data.userId == uid();

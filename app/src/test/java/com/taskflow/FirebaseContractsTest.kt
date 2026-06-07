@@ -31,6 +31,7 @@ class FirebaseContractsTest {
                 "comments",
                 "activityLog",
                 "invites",
+                "inviteLinks",
                 "pendingOperations"
             )
         ))

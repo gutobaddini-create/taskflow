@@ -1,0 +1,258 @@
+--------- beginning of system
+06-07 18:09:46.491   633  2095 W ActivityTaskManager: callingPackage for (uid=2000, pid=15607) has no WPC
+06-07 18:09:46.498   633  2095 W OptProp : Cannot read opt property android.window.PROPERTY_COMPAT_ALLOW_USER_ASPECT_RATIO_OVERRIDE
+06-07 18:09:46.498   633  2095 W OptProp : Cannot read opt property android.window.PROPERTY_COMPAT_ALLOW_USER_ASPECT_RATIO_FULLSCREEN_OVERRIDE
+06-07 18:09:46.498   633  2095 W OptProp : Cannot read opt property android.window.PROPERTY_COMPAT_ALLOW_ORIENTATION_OVERRIDE
+--------- beginning of main
+06-07 18:09:46.499   633  2095 V GrammaticalInflectionUtils: AttributionSource: AttributionSource { uid = 10224, packageName = null, attributionTag = null, token = android.os.Binder@c7ef8d1, deviceId = 0, next = null } does not have READ_SYSTEM_GRAMMATICAL_GENDER permission.
+06-07 18:09:46.508   633  2095 W OptProp : Cannot read opt property android.window.PROPERTY_COMPAT_ALLOW_RESIZEABLE_ACTIVITY_OVERRIDES
+06-07 18:09:46.514   633  2095 W OptProp : Cannot read opt property android.window.PROPERTY_COMPAT_ALLOW_MIN_ASPECT_RATIO_OVERRIDE
+06-07 18:09:46.586   633  2095 I ActivityTaskManager: START u0 {act=android.intent.action.VIEW dat=https://gen-lang-client-0780081219.web.app/... flg=0x10000000 pkg=com.taskflow cmp=com.taskflow/.MainActivity} with LAUNCH_MULTIPLE from uid 2000 (BAL_ALLOW_PERMISSION) result code=0
+06-07 18:09:46.608   969  1017 V WindowManagerShell: Transition requested (#50): android.os.BinderProxy@c8770fc TransitionRequestInfo { type = OPEN, triggerTask = TaskInfo{userId=0 taskId=26 displayId=0 isRunning=true baseIntent=Intent { flg=0x10000000 cmp=com.taskflow/.MainActivity } baseActivity=ComponentInfo{com.taskflow/com.taskflow.MainActivity} topActivity=ComponentInfo{com.taskflow/com.taskflow.MainActivity} origActivity=null realActivity=ComponentInfo{com.taskflow/com.taskflow.MainActivity} numActivities=2 lastActiveTime=79822976 supportsMultiWindow=true resizeMode=1 isResizeable=true minWidth=-1 minHeight=-1 defaultMinSize=220 token=WCT{android.window.IWindowContainerToken$Stub$Proxy@9001385} topActivityType=1 pictureInPictureParams=null shouldDockBigOverlays=false launchIntoPipHostTaskId=-1 lastParentTaskIdBeforePip=-1 displayCutoutSafeInsets=null topActivityInfo=ActivityInfo{8d905da com.taskflow.MainActivity} launchCookies=[] positionInParent=Point(0, 0) parentTaskId=-1 isFocused=true isVisible=true isVisibleRequested=true isSleeping=false locusId=null displayAreaFeatureId=1 isTopActivityTransparent=false appCompatTaskInfo=AppCompatTaskInfo { topActivityInSizeCompat=false topActivityEligibleForLetterboxEducation= falseisLetterboxEducationEnabled= true isLetterboxDoubleTapEnabled= false topActivityEligibleForUserAspectRatioButton= false topActivityBoundsLetterboxed= false isFromLetterboxDoubleTap= false topActivityLetterboxVerticalPosition= -1 topActivityLetterboxHorizontalPosition= -1 topActivityLetterboxWidth=1080 topActivityLetterboxHeight=2340 isUserFullscreenOverrideEnabled=false isSystemFullscreenOverrideEnabled=false cameraCompatTaskInfo=CameraCompatTaskInfo { cameraCompatControlState=hidden freeformCameraCompatMode=inactive}}}, pipTask = null, remoteTransition = null, displayChange = null, flags = 0, debugId = 50 }
+06-07 18:09:46.681   474   474 I BpBinder: onLastStrongRef automatically unlinking death recipients: 
+06-07 18:09:46.711   969  1017 W Looper  : Slow dispatch took 126ms wmshell.main h=android.os.Handler c=com.android.wm.shell.transition.Transitions$TransitionPlayerImpl$$ExternalSyntheticLambda1@4cc1a0b m=0
+06-07 18:09:46.804   633  2095 W OptProp : Cannot read opt property android.window.PROPERTY_COMPAT_ENABLE_FAKE_FOCUS
+06-07 18:09:46.983   969  1017 W Looper  : Slow delivery took 35ms wmshell.main h=android.os.Handler c=null m=19
+06-07 18:09:46.994   969  1017 W Looper  : Drained
+06-07 18:09:47.056 15298 15298 D AutofillManager: Fill dialog is enabled:false, hints=[password, passwordAuto, creditCardNumber, creditCardSecurityCode, creditCardExpirationDate]
+06-07 18:09:47.124  2254  2314 W Bugle   : TextClassifierLibManagerImpl: Reclaiming memory at level: 40
+06-07 18:09:47.200   633   851 D ConnectivityService: NetReassign [no changes] [c 7] [a 10] [i 2]
+06-07 18:09:47.247   633  2095 D CoreBackPreview: Window{cc2a1d0 u0 com.taskflow/com.taskflow.MainActivity}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@e054fef, mPriority=0, mIsAnimationCallback=false}
+06-07 18:09:47.433   946   946 I wpa_supplicant: wlan0: CTRL-EVENT-BEACON-LOSS 
+06-07 18:09:47.648 15298 15298 I Choreographer: Skipped 35 frames!  The application may be doing too much work on its main thread.
+06-07 18:09:47.682   633   671 I ActivityTaskManager: Displayed com.taskflow/.MainActivity for user 0: +1s167ms
+06-07 18:09:47.685   969  1948 V WindowManagerShell: onTransitionReady(transaction=2718714301333)
+06-07 18:09:47.685   633   671 V WindowManager: Sent Transition (#50) createdAt=06-07 18:09:46.522 via request=TransitionRequestInfo { type = OPEN, triggerTask = TaskInfo{userId=0 taskId=26 displayId=0 isRunning=true baseIntent=Intent { flg=0x10000000 cmp=com.taskflow/.MainActivity } baseActivity=ComponentInfo{com.taskflow/com.taskflow.MainActivity} topActivity=ComponentInfo{com.taskflow/com.taskflow.MainActivity} origActivity=null realActivity=ComponentInfo{com.taskflow/com.taskflow.MainActivity} numActivities=2 lastActiveTime=79822976 supportsMultiWindow=true resizeMode=1 isResizeable=true minWidth=-1 minHeight=-1 defaultMinSize=220 token=WCT{RemoteToken{7557852 Task{6038ff4 #26 type=standard A=10224:com.taskflow}}} topActivityType=1 pictureInPictureParams=null shouldDockBigOverlays=false launchIntoPipHostTaskId=-1 lastParentTaskIdBeforePip=-1 displayCutoutSafeInsets=null topActivityInfo=ActivityInfo{f2d6fa6 com.taskflow.MainActivity} launchCookies=[] positionInParent=Point(0, 0) parentTaskId=-1 isFocused=true isVisible=true isVisibleRequested=true isSleeping=false locusId=null displayAreaFeatureId=1 isTopActivityTransparent=false appCompatTaskInfo=AppCompatTaskInfo { topActivityInSizeCompat=false topActivityEligibleForLetterboxEducation= falseisLetterboxEducationEnabled= true isLetterboxDoubleTapEnabled= false topActivityEligibleForUserAspectRatioButton= false topActivityBoundsLetterboxed= false isFromLetterboxDoubleTap= false topActivityLetterboxVerticalPosition= -1 topActivityLetterboxHorizontalPosition= -1 topActivityLetterboxWidth=1080 topActivityLetterboxHeight=2340 isUserFullscreenOverrideEnabled=false isSystemFullscreenOverrideEnabled=false cameraCompatTaskInfo=CameraCompatTaskInfo { cameraCompatControlState=hidden freeformCameraCompatMode=inactive}}}, pipTask = null, remoteTransition = null, displayChange = null, flags = 0, debugId = 50 }
+06-07 18:09:47.685   633   671 V WindowManager:     startWCT=WindowContainerTransaction { changes = {} hops = [] errorCallbackToken=null taskFragmentOrganizer=null }
+06-07 18:09:47.705   969  1017 V WindowManagerShell: onTransitionReady (#50) android.os.BinderProxy@c8770fc: {id=50 t=OPEN f=0x0 trk=0 opt={t=FROM_STYLE} r=[0@Point(0, 0)] c=[{null m=OPEN f=FILLS_TASK leash=Surface(name=ActivityRecord{74bb364 u0 com.taskflow/.MainActivity)/@0xa58a0e8 sb=Rect(0, 0 - 0, 0) eb=Rect(0, 0 - 1080, 2340) d=-1->0 r=-1->0:-1 bc=fffafafa component=com.taskflow/.MainActivity},{null m=TO_BACK f=FILLS_TASK leash=Surface(name=ActivityRecord{98bd3cf u0 com.taskflow/.MainActivity)/@0x4336301 sb=Rect(0, 0 - 1080, 2340) eb=Rect(0, 0 - 1080, 2340) d=0 bc=fffafafa component=com.taskflow/.MainActivity}]}
+06-07 18:09:47.724   969  1017 V WindowManagerShell: Playing animation for (#50) android.os.BinderProxy@c8770fc@0
+06-07 18:09:47.736   969  1017 V WindowManagerShell:  try handler com.android.wm.shell.transition.DefaultMixedHandler@2e377c1
+06-07 18:09:47.738   969  1017 V WindowManagerShell:  try handler com.android.wm.shell.keyguard.KeyguardTransitionHandler@99cfb66
+06-07 18:09:47.739   969  1017 V WindowManagerShell:  try handler com.android.wm.shell.pip.PipTransition@3544ea7
+06-07 18:09:47.746   633   671 V WindowManager:     info={id=50 t=OPEN f=0x0 trk=0 opt={t=FROM_STYLE} r=[0@Point(0, 0)] c=[
+06-07 18:09:47.746   633   671 V WindowManager:         {null m=OPEN f=FILLS_TASK leash=Surface(name=ActivityRecord{74bb364 u0 com.taskflow/.MainActivity)/@0xdb8dae8 sb=Rect(0, 0 - 0, 0) eb=Rect(0, 0 - 1080, 2340) d=-1->0 r=-1->0:-1 bc=fffafafa component=com.taskflow/.MainActivity},
+06-07 18:09:47.746   633   671 V WindowManager:         {null m=TO_BACK f=FILLS_TASK leash=Surface(name=ActivityRecord{98bd3cf u0 com.taskflow/.MainActivity)/@0xbd5fd1c sb=Rect(0, 0 - 1080, 2340) eb=Rect(0, 0 - 1080, 2340) d=0 bc=fffafafa component=com.taskflow/.MainActivity}
+06-07 18:09:47.746   633   671 V WindowManager:     ]}
+06-07 18:09:47.757   969  1017 V WindowManagerShell:  try handler com.android.wm.shell.activityembedding.ActivityEmbeddingController@7068f54
+06-07 18:09:47.757   969  1017 V WindowManagerShell:  try handler com.android.wm.shell.recents.RecentsTransitionHandler@c6ecefd
+06-07 18:09:47.767   969  1017 V ShellRecents: RecentsTransitionHandler.startAnimation: no controller found
+06-07 18:09:47.768   969  1017 V WindowManagerShell:  try handler com.android.wm.shell.splitscreen.StageCoordinator@2e74cc0
+06-07 18:09:47.770   969  1017 V WindowManagerShell:  try handler com.android.wm.shell.transition.RemoteTransitionHandler@a66113e
+06-07 18:09:47.773   969  1017 V WindowManagerShell: Transition doesn't have explicit remote, search filters for match for {id=50 t=OPEN f=0x0 trk=0 opt={t=FROM_STYLE} r=[0@Point(0, 0)] c=[{null m=OPEN f=FILLS_TASK leash=Surface(name=ActivityRecord{74bb364 u0 com.taskflow/.MainActivity)/@0xa58a0e8 sb=Rect(0, 0 - 0, 0) eb=Rect(0, 0 - 1080, 2340) d=-1->0 r=-1->0:-1 bc=fffafafa component=com.taskflow/.MainActivity},{null m=TO_BACK f=FILLS_TASK leash=Surface(name=ActivityRecord{98bd3cf u0 com.taskflow/.MainActivity)/@0x4336301 sb=Rect(0, 0 - 1080, 2340) eb=Rect(0, 0 - 1080, 2340) d=0 bc=fffafafa component=com.taskflow/.MainActivity}]}
+06-07 18:09:47.774   969  1017 V WindowManagerShell:  Checking filter Pair{{types=[] flags=0x0] notFlags=0x0 checks=[{atype=undefined independent=true modes=[OPEN,TO_FRONT] flags=IN_TASK_WITH_EMBEDDED_ACTIVITY mustBeTask=false order=ANY topActivity=ComponentInfo{com.google.android.apps.nexuslauncher/com.google.android.apps.nexuslauncher.NexusLauncherActivity} launchCookie=null},{atype=undefined independent=true modes=[CLOSE,TO_BACK] flags=IN_TASK_WITH_EMBEDDED_ACTIVITY mustBeTask=false order=ANY topActivity=null launchCookie=null}]} RemoteTransition { remoteTransition = android.window.IRemoteTransition$Stub$Proxy@311e6d8, appThread = android.app.IApplicationThread$Stub$Proxy@6054a31, debugName = OverlaySwipeBack }}
+06-07 18:09:47.776   969  1017 V WindowManagerShell:  Checking filter Pair{{types=[] flags=0x0] notFlags=0x0 checks=[{atype=dream independent=true modes=[OPEN,TO_FRONT] flags=NONE mustBeTask=false order=ANY topActivity=null launchCookie=null},{atype=home independent=true modes=[CLOSE,TO_BACK] flags=NONE mustBeTask=false order=ANY topActivity=null launchCookie=null}]} RemoteTransition { remoteTransition = android.window.IRemoteTransition$Stub$Proxy@fc1b516, appThread = android.app.IApplicationThread$Stub$Proxy@faafe97, debugName = LauncherToDream }}
+06-07 18:09:47.786   969  1017 V WindowManagerShell:  Checking filter Pair{{types=[] flags=0x0] notFlags=0x100 checks=[{atype=home independent=true modes=[OPEN,TO_FRONT] flags=NONE mustBeTask=false order=TOP topActivity=ComponentInfo{com.google.android.apps.nexuslauncher/com.google.android.apps.nexuslauncher.NexusLauncherActivity} launchCookie=null},{atype=standard independent=true modes=[CLOSE,TO_BACK] flags=NONE mustBeTask=false order=ANY topActivity=null launchCookie=null}]} RemoteTransition { remoteTransition = android.window.IRemoteTransition$Stub$Proxy@52a9884, appThread = android.app.IApplicationThread$Stub$Proxy@7b3586d, debugName = QuickstepLaunchHome }}
+06-07 18:09:47.794   969  1017 V WindowManagerShell:  Checking filter Pair{{types=[] flags=0x0] notFlags=0x0 checks=[{atype=undefined independent=true modes=[OPEN,TO_FRONT] flags=IN_TASK_WITH_EMBEDDED_ACTIVITY mustBeTask=false order=ANY topActivity=ComponentInfo{com.google.android.apps.nexuslauncher/com.google.android.apps.nexuslauncher.NexusLauncherActivity} launchCookie=null},{atype=undefined independent=true modes=[CLOSE,TO_BACK] flags=IN_TASK_WITH_EMBEDDED_ACTIVITY mustBeTask=false order=ANY topActivity=null launchCookie=null}]} RemoteTransition { remoteTransition = android.window.IRemoteTransition$Stub$Proxy@b8d899d, appThread = android.app.IApplicationThread$Stub$Proxy@79f9e12, debugName = OverlaySwipeBack }}
+06-07 18:09:47.794   969  1017 V WindowManagerShell:  Checking filter Pair{{types=[] flags=0x0] notFlags=0x0 checks=[{atype=dream independent=true modes=[OPEN,TO_FRONT] flags=NONE mustBeTask=false order=ANY topActivity=null launchCookie=null},{atype=home independent=true modes=[CLOSE,TO_BACK] flags=NONE mustBeTask=false order=ANY topActivity=null launchCookie=null}]} RemoteTransition { remoteTransition = android.window.IRemoteTransition$Stub$Proxy@50bf9e3, appThread = android.app.IApplicationThread$Stub$Proxy@4cebfe0, debugName = LauncherToDream }}
+06-07 18:09:47.800   969  1017 V WindowManagerShell:  Checking filter Pair{{types=[] flags=0x0] notFlags=0x100 checks=[{atype=home independent=true modes=[OPEN,TO_FRONT] flags=NONE mustBeTask=false order=TOP topActivity=ComponentInfo{com.google.android.apps.nexuslauncher/com.google.android.apps.nexuslauncher.NexusLauncherActivity} launchCookie=null},{atype=standard independent=true modes=[CLOSE,TO_BACK] flags=NONE mustBeTask=false order=ANY topActivity=null launchCookie=null}]} RemoteTransition { remoteTransition = android.window.IRemoteTransition$Stub$Proxy@1be2299, appThread = android.app.IApplicationThread$Stub$Proxy@7d5895e, debugName = QuickstepLaunchHome }}
+06-07 18:09:47.807   969  1017 V WindowManagerShell:  Delegate animation for (#50) to null
+06-07 18:09:47.808   969  1017 V WindowManagerShell:  try handler com.android.wm.shell.transition.DefaultTransitionHandler@aaa6b9f
+06-07 18:09:47.809   969  1017 V WindowManagerShell: start default transition animation, info = {id=50 t=OPEN f=0x0 trk=0 opt={t=FROM_STYLE} r=[0@Point(0, 0)] c=[{null m=OPEN f=FILLS_TASK leash=Surface(name=ActivityRecord{74bb364 u0 com.taskflow/.MainActivity)/@0xa58a0e8 sb=Rect(0, 0 - 0, 0) eb=Rect(0, 0 - 1080, 2340) d=-1->0 r=-1->0:-1 bc=fffafafa component=com.taskflow/.MainActivity},{null m=TO_BACK f=FILLS_TASK leash=Surface(name=ActivityRecord{98bd3cf u0 com.taskflow/.MainActivity)/@0x4336301 sb=Rect(0, 0 - 1080, 2340) eb=Rect(0, 0 - 1080, 2340) d=0 bc=fffafafa component=com.taskflow/.MainActivity}]}
+06-07 18:09:47.826   969  1017 V WindowManagerShell: loadAnimation: anim=android.view.animation.AnimationSet@627632 animAttr=0x5 type=OPEN isEntrance=false
+06-07 18:09:47.869   474   483 D PermissionCache: checking android.permission.READ_FRAME_BUFFER for uid=10181 => granted (11331 us)
+06-07 18:09:47.869   474   483 D PermissionCache: checking android.permission.CAPTURE_BLACKOUT_CONTENT for uid=10181 => granted (334 us)
+06-07 18:09:47.880   633   763 W UserManagerService: Requested status bar icon for non-badged user 0
+06-07 18:09:47.965 15298 15320 D EGL_emulation: app_time_stats: avg=3024.37ms min=11.20ms max=44907.96ms count=15
+06-07 18:09:48.012 15298 15388 I HWUI    : Davey! duration=888ms; Flags=0, FrameTimelineVsyncId=380006, IntendedVsync=79823471184822, Vsync=79824054518132, InputEventId=0, HandleInputStart=79824071492300, AnimationStart=79824071554000, PerformTraversalsStart=79824084656800, DrawStart=79824153041800, FrameDeadline=79823487851488, FrameInterval=79824062750300, FrameStartTime=16666666, SyncQueued=79824157733600, SyncStart=79824190532900, IssueDrawCommandsStart=79824192090800, SwapBuffers=79824360439600, FrameCompleted=79824392928600, DequeueBufferDuration=119700, QueueBufferDuration=15081200, GpuCompleted=79824380083700, SwapBuffersCompleted=79824392928600, DisplayPresentTime=0, CommandSubmissionCompleted=79824360439600, 
+06-07 18:09:48.400   969  1017 V WindowManagerShell: loadAnimation: anim=android.view.animation.AnimationSet@1d0d0df animAttr=0x4 type=OPEN isEntrance=true
+06-07 18:09:48.801   969  1017 V WindowManagerShell:  animated by com.android.wm.shell.transition.DefaultTransitionHandler@aaa6b9f
+06-07 18:09:48.801   969  1017 W Looper  : Slow dispatch took 1108ms wmshell.main h=android.os.Handler c=com.android.wm.shell.transition.Transitions$TransitionPlayerImpl$$ExternalSyntheticLambda0@41b9bfb m=0
+06-07 18:09:48.872   969  1026 W Looper  : Slow dispatch took 48ms wmshell.anim h=android.view.Choreographer$FrameHandler c=android.view.Choreographer$FrameDisplayEventReceiver@4044f5f m=0
+06-07 18:09:49.074   969  1026 W Looper  : Slow dispatch took 126ms wmshell.anim h=android.view.Choreographer$FrameHandler c=android.view.Choreographer$FrameDisplayEventReceiver@4044f5f m=0
+06-07 18:09:49.101   633   814 I ImeTracker: com.taskflow:4b7473a2: onRequestHide at ORIGIN_SERVER reason HIDE_UNSPECIFIED_WINDOW fromUser false
+06-07 18:09:49.102   633   814 I ImeTracker: com.taskflow:4b7473a2: onCancelled at PHASE_SERVER_SHOULD_HIDE
+06-07 18:09:49.113   969  1026 W Looper  : Slow delivery took 44ms wmshell.anim h=android.view.Choreographer$FrameHandler c=android.view.Choreographer$FrameDisplayEventReceiver@4044f5f m=0
+06-07 18:09:49.162  3806  3806 I GoogleInputMethodService: GoogleInputMethodService.onFinishInput():3157 
+06-07 18:09:49.205 15298 15320 D EGL_emulation: app_time_stats: avg=299.60ms min=79.14ms max=780.81ms count=5
+06-07 18:09:49.225   969  1026 W Looper  : Slow dispatch took 44ms wmshell.anim h=android.view.Choreographer$FrameHandler c=android.view.Choreographer$FrameDisplayEventReceiver@4044f5f m=0
+06-07 18:09:49.269  3806  3806 I GoogleInputMethodService: GoogleInputMethodService.updateDeviceLockedStatus():2248 repeatCheckTimes = 0, locked = false
+06-07 18:09:49.272  3806  3806 I GoogleInputMethodService: GoogleInputMethodService.onStartInput():1986 onStartInput(EditorInfo{EditorInfo{packageName=com.taskflow, inputType=0, inputTypeString=NULL, enableLearning=false, autoCorrection=false, autoComplete=false, imeOptions=0, privateImeOptions=null, actionName=UNSPECIFIED, actionLabel=null, initialSelStart=-1, initialSelEnd=-1, initialCapsMode=0, label=null, fieldId=0, fieldName=null, extras=null, hintText=null, hintLocales=[]}}, false)
+06-07 18:09:49.273  3806  3806 I GoogleInputMethodService: GoogleInputMethodService.updateDeviceLockedStatus():2248 repeatCheckTimes = 1, locked = false
+06-07 18:09:49.286  3806  3806 I AndroidIME: InputBundleManager.loadActiveInputBundleId():450 loadActiveInputBundleId: und-Latn-x-password, password
+06-07 18:09:49.328   633  2193 W PackageConfigPersister: App-specific configuration not found for packageName: com.taskflow and userId: 0
+06-07 18:09:49.344  3806  3806 W NotificationCenter: NotificationCenter$ListenerData.notifyOnExecutor():672 Heavy notify work detected on UI thread: |kga->jjc| takes 26ms
+06-07 18:09:49.362   969  1026 W Looper  : Drained
+06-07 18:09:49.394   969  1026 W Looper  : Slow dispatch took 96ms wmshell.anim h=android.view.Choreographer$FrameHandler c=android.view.Choreographer$FrameDisplayEventReceiver@4044f5f m=0
+06-07 18:09:49.421   969  1017 V WindowManagerShell: Transition animation finished (aborted=false), notifying core (#50) android.os.BinderProxy@c8770fc@0
+06-07 18:09:49.448   633   671 V WindowManager: Finish Transition (#50): created at 06-07 18:09:46.522 collect-started=0.196ms request-sent=58.172ms started=113.892ms ready=304.367ms sent=1146.38ms finished=2917.9ms
+06-07 18:09:49.453 15298 15298 D VRI[MainActivity]: visibilityChanged oldVisibility=true newVisibility=false
+06-07 18:09:49.507   969  1017 V WindowManagerShell: Track 0 became idle
+06-07 18:09:49.509   969  1017 V WindowManagerShell: All active transition animations finished
+06-07 18:09:49.509   969  1017 W Looper  : Slow dispatch took 88ms wmshell.main h=android.os.Handler c=com.android.wm.shell.transition.DefaultTransitionHandler$$ExternalSyntheticLambda0@ea4c456 m=0
+06-07 18:09:49.610   633  2093 W UserManagerService: Requested status bar icon for non-badged user 0
+06-07 18:09:49.664   633  2093 W UserManagerService: Requested status bar icon for non-badged user 0
+06-07 18:09:49.789   969  1017 W Looper  : Slow delivery took 51ms wmshell.main h=android.os.Handler c=com.android.wm.shell.pip.PinnedStackListenerForwarder$PinnedTaskListenerImpl$$ExternalSyntheticLambda1@7dfcd7 m=0
+06-07 18:09:51.058   969  1077 D EGL_emulation: app_time_stats: avg=30042.47ms min=30042.47ms max=30042.47ms count=1
+06-07 18:09:53.351 15622 15622 W BpBinder: Linking to death on android.gui.ISurfaceComposer but there are no threads (yet?) listening to incoming transactions. See ProcessState::startThreadPool and ProcessState::setThreadPoolMaxThreadCount. Generally you should setup the binder threadpool before other initialization steps.
+06-07 18:09:53.356 15622 15622 W ProcessState: Extra binder thread started, but 0 threads requested. Do not use *startThreadPool when zero threads are requested.
+06-07 18:09:53.459   193   193 I hwservicemanager: getTransport: Cannot find entry android.hardware.graphics.mapper@4.0::IMapper/default in either framework or device VINTF manifest.
+--------- beginning of kernel
+06-07 18:09:53.392     0     0 I servicemanager: Caller(pid=15622,uid=2000,sid=u:r:shell:s0) Could not find android.hardware.graphics.allocator.IAllocator/default in the VINTF manifest. No alternative instances declared in VINTF.
+06-07 18:09:53.467 15622 15623 I Gralloc4: mapper 4.x is not supported
+06-07 18:09:54.424 15626 15626 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+06-07 18:09:54.435 15626 15626 I AndroidRuntime: Using default boot image
+06-07 18:09:54.436 15626 15626 I AndroidRuntime: Leaving lock profiling enabled
+06-07 18:09:54.443 15626 15626 I app_process: Core platform API reporting enabled, enforcing=false
+06-07 18:09:54.450 15626 15626 I app_process: Using CollectorTypeCMC GC.
+06-07 18:09:54.655 15626 15626 D nativeloader: InitDefaultPublicLibraries for_preload=1: libandroid.so:libaaudio.so:libamidi.so:libbinder_ndk.so:libc.so:libcamera2ndk.so:libdl.so:libEGL.so:libGLESv1_CM.so:libGLESv2.so:libGLESv3.so:libicu.so:libicui18n.so:libicuuc.so:libjnigraphics.so:liblog.so:libmediandk.so:libm.so:libnativehelper.so:libnativewindow.so:libOpenMAXAL.so:libOpenSLES.so:libRS.so:libstdc++.so:libsync.so:libvulkan.so:libwebviewchromium_plat_support.so:libz.so
+06-07 18:09:54.684 15626 15626 D nativeloader: Load libicu_jni.so using APEX ns com_android_art for caller /apex/com.android.art/javalib/core-oj.jar: ok
+06-07 18:09:54.684 15626 15626 D app_process: u_setTimeZoneFilesDirectory("/apex/com.android.tzdata/etc/tz/versioned/8/icu") succeeded. 
+06-07 18:09:54.685 15626 15626 D app_process: I18n APEX ICU file found: /apex/com.android.i18n/etc/icu/icudt75l.dat
+06-07 18:09:54.690 15626 15626 D nativeloader: Load libjavacore.so using APEX ns com_android_art for caller /apex/com.android.art/javalib/core-oj.jar: ok
+06-07 18:09:54.695 15626 15626 D nativeloader: Load libopenjdk.so using APEX ns com_android_art for caller /apex/com.android.art/javalib/core-oj.jar: ok
+06-07 18:09:54.704 15626 15626 W app_process: Unexpected CPU variant for x86: x86_64.
+06-07 18:09:54.704 15626 15626 W app_process: Known variants: atom, sandybridge, silvermont, goldmont, goldmont-plus, goldmont-without-sha-xsaves, tremont, kabylake, default
+06-07 18:09:54.710 15626 15626 W app_process: ClassLoaderContext shared library size mismatch. Expected=2, found=0 (PCL[]{PCL[/system/framework/android.test.base.jar*724373495]#PCL[/system/framework/android.test.mock.jar*1452759902]} | PCL[])
+06-07 18:09:54.714 15626 15626 W app_process: ClassLoaderContext classpath size mismatch. expected=0, found=1 (PCL[]{PCL[/system/framework/android.test.runner.jar*2496447986]#PCL[/system/framework/android.test.base.jar*724373495]} | PCL[/system/framework/android.test.runner.jar*2496447986])
+06-07 18:09:54.805 15626 15626 D nativeloader: Load libframework-connectivity-tiramisu-jni.so using APEX ns com_android_tethering for caller /apex/com.android.tethering/javalib/framework-connectivity-t.jar: ok
+06-07 18:09:54.808 15626 15626 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+06-07 18:09:54.834 15626 15626 D UiAutomationConnection: Created on user UserHandle{0}
+06-07 18:09:54.834 15626 15626 I UiAutomation: Initialized for user 0 on display 0
+06-07 18:09:54.834 15626 15626 W UiAutomation: Created with deprecatead constructor, assumes DEFAULT_DISPLAY
+06-07 18:09:54.855   633   763 D AccessibilityManagerService: changeCurrentUserForTestAutomationIfNeededLocked(0): ignoring because device doesn't support visible background users
+06-07 18:09:54.864   633   763 I UiAutomationManager: Registering UiTestAutomationService (id=com.android.server.accessibility/UiAutomation, flags=0x0) when called by user 0
+06-07 18:09:54.876   633   763 W MagnificationConnectionManager: requestConnection duplicated request: connect=false, mConnectionState=DISCONNECTED
+06-07 18:09:54.882  3300  4058 I AiAiEcho: Settings changed for uri: content://settings/secure/accessibility_enabled
+06-07 18:09:54.884  3300  3492 I AiAiEcho: Predicting[0]:  [CONTEXT sampling_count=5 ]
+06-07 18:09:54.889  3300  3492 I AiAiEcho: EchoTargets: 
+06-07 18:09:54.889  3300  3492 I AiAiEcho: Filtered by AiAi flag check: 
+06-07 18:09:54.889  3300  3492 I AiAiEcho: [CONTEXT ratelimit_period="10 SECONDS" ]
+06-07 18:09:54.889   633   633 W IPCThreadState: Sending oneway calls to frozen process.
+06-07 18:09:54.889  3300  3492 I AiAiEcho: Ranked targets strategy: SORT, count: 0, ranking metadata:  [CONTEXT ratelimit_period="10 SECONDS" ]
+06-07 18:09:54.889   633   633 W IPCThreadState: Sending oneway calls to frozen process.
+06-07 18:09:54.890  3300  3492 I AiAiEcho: #remoteViewsTwiddler: feature disabled.
+06-07 18:09:54.890   633   633 W IPCThreadState: Sending oneway calls to frozen process.
+06-07 18:09:54.890   633   633 W IPCThreadState: Sending oneway calls to frozen process.
+06-07 18:09:54.890   633   633 W IPCThreadState: Sending oneway calls to frozen process.
+06-07 18:09:54.892 15626 15637 V UiAutomation: Init UiAutomation@64cbf71[id=37, displayId=0, flags=0]
+06-07 18:09:54.893  3300  3492 I AiAiEcho: Predicting[0]:  [CONTEXT sampling_count=5 ]
+06-07 18:09:54.899  3300  3492 I AiAiEcho: EchoTargets: 
+06-07 18:09:54.899  3300  3492 I AiAiEcho: Filtered by AiAi flag check: 
+06-07 18:09:54.899  3300  3492 I AiAiEcho: [CONTEXT ratelimit_period="10 SECONDS" ]
+06-07 18:09:54.900  3300  3492 I AiAiEcho: Ranked targets strategy: SORT, count: 0, ranking metadata:  [CONTEXT ratelimit_period="10 SECONDS" ]
+06-07 18:09:54.900   633   633 W IPCThreadState: Sending oneway calls to frozen process.
+06-07 18:09:54.901  3300  3492 I AiAiEcho: #remoteViewsTwiddler: feature disabled.
+06-07 18:09:54.901   633   633 W IPCThreadState: Sending oneway calls to frozen process.
+06-07 18:09:54.902  3300  3492 I AiAiEcho: Predicting[0]:  [CONTEXT sampling_count=5 ]
+06-07 18:09:54.903  3300  3492 I AiAiEcho: EchoTargets: 
+06-07 18:09:54.903  3300  3492 I AiAiEcho: Filtered by AiAi flag check: 
+06-07 18:09:54.903  3300  3492 I AiAiEcho: [CONTEXT ratelimit_period="10 SECONDS" ]
+06-07 18:09:54.903   633   633 W IPCThreadState: Sending oneway calls to frozen process.
+06-07 18:09:54.907   633   633 W IPCThreadState: Sending oneway calls to frozen process.
+06-07 18:09:54.908  3300  3492 I AiAiEcho: Ranked targets strategy: SORT, count: 0, ranking metadata:  [CONTEXT ratelimit_period="10 SECONDS" ]
+06-07 18:09:54.908   633   633 W IPCThreadState: Sending oneway calls to frozen process.
+06-07 18:09:54.915  3300  3492 I AiAiEcho: #remoteViewsTwiddler: feature disabled.
+06-07 18:09:54.918  3300  3492 I AiAiEcho: #postPredictionTargets: Sending updates to UISurface lockscreen with targets# 0 (types=[])
+06-07 18:09:54.919   633   633 W IPCThreadState: Sending oneway calls to frozen process.
+06-07 18:09:54.920  3300  3492 I AiAiEcho: #postPredictionTargets: Sending updates to UISurface home with targets# 0 (types=[])
+06-07 18:09:54.921  3300  3492 I AiAiEcho: #postPredictionTargets: Sending updates to UISurface media_data_manager with targets# 0 (types=[])
+06-07 18:09:54.928   633   633 W IPCThreadState: Sending oneway calls to frozen process.
+06-07 18:09:54.928   633   633 W IPCThreadState: Sending oneway calls to frozen process.
+06-07 18:09:54.933   969   969 W PageIndicator: Total number of pages invalid: 0. Assuming 1 page.
+06-07 18:09:54.936   969   969 D SsMediaDataProvider: Forwarding Smartspace updates []
+06-07 18:09:54.944  1526  1526 D SsBaseTemplateCard: No text view can be set up
+06-07 18:09:54.945  1526  1526 D SsBaseTemplateCard: Passed-in item info is null
+06-07 18:09:54.948   633   633 W IPCThreadState: Sending oneway calls to frozen process.
+06-07 18:09:54.948  1526  1526 D SsBaseTemplateCard: Passed-in item info is null
+06-07 18:09:54.948  1526  1526 D SsBaseTemplateCard: Passed-in item info is null
+06-07 18:09:54.948  1526  1526 I SsBaseTemplateCard: Secondary card pane is null
+06-07 18:09:54.948   633   763 W MagnificationConnectionManager: requestConnection duplicated request: connect=false, mConnectionState=DISCONNECTED
+06-07 18:09:54.953   633   633 W IPCThreadState: Sending oneway calls to frozen process.
+06-07 18:09:54.954  3300  4058 I AiAiEcho: Settings changed for uri: content://settings/secure/accessibility_enabled
+06-07 18:09:54.955  3300  3492 I AiAiEcho: Predicting[0]:  [CONTEXT sampling_count=5 ]
+06-07 18:09:54.956  3300  3492 I AiAiEcho: EchoTargets: 
+06-07 18:09:54.956  3300  3492 I AiAiEcho: Filtered by AiAi flag check: 
+06-07 18:09:54.956  3300  3492 I AiAiEcho: [CONTEXT ratelimit_period="10 SECONDS" ]
+06-07 18:09:54.973   969  1017 W Looper  : Drained
+06-07 18:09:54.973   969  1017 W Looper  : Slow dispatch took 36ms wmshell.main h=android.view.ViewRootImpl$ViewRootHandler c=android.view.accessibility.AccessibilityManager$$ExternalSyntheticLambda0@df859c4 m=0
+06-07 18:09:54.977   633   633 D BatterySaverPolicy: accessibility changed to true, updating policy.
+06-07 18:09:54.981  3300  3492 I AiAiEcho: Ranked targets strategy: SORT, count: 0, ranking metadata:  [CONTEXT ratelimit_period="10 SECONDS" ]
+06-07 18:09:54.983  3300  3492 I AiAiEcho: #remoteViewsTwiddler: feature disabled.
+06-07 18:09:54.985  3300  3492 I AiAiEcho: Predicting[0]:  [CONTEXT sampling_count=5 ]
+06-07 18:09:54.985  3300  3492 I AiAiEcho: EchoTargets: 
+06-07 18:09:54.985  3300  3492 I AiAiEcho: Filtered by AiAi flag check: 
+06-07 18:09:54.985  3300  3492 I AiAiEcho: [CONTEXT ratelimit_period="10 SECONDS" ]
+06-07 18:09:54.998  3300  3492 I AiAiEcho: Ranked targets strategy: SORT, count: 0, ranking metadata:  [CONTEXT ratelimit_period="10 SECONDS" ]
+06-07 18:09:54.999   633   633 W IPCThreadState: Sending oneway calls to frozen process.
+06-07 18:09:54.999   633   633 W IPCThreadState: Sending oneway calls to frozen process.
+06-07 18:09:55.002   633   633 W IPCThreadState: Sending oneway calls to frozen process.
+06-07 18:09:55.003  3300  3492 I AiAiEcho: #remoteViewsTwiddler: feature disabled.
+06-07 18:09:55.005  3300  3492 I AiAiEcho: Predicting[0]:  [CONTEXT sampling_count=5 ]
+06-07 18:09:55.006   633   633 W IPCThreadState: Sending oneway calls to frozen process.
+06-07 18:09:55.008   633   633 W IPCThreadState: Sending oneway calls to frozen process.
+06-07 18:09:55.010  3300  3492 I AiAiEcho: EchoTargets: 
+06-07 18:09:55.010  3300  3492 I AiAiEcho: Filtered by AiAi flag check: 
+06-07 18:09:55.010  3300  3492 I AiAiEcho: [CONTEXT ratelimit_period="10 SECONDS" ]
+06-07 18:09:55.013  3300  3492 I AiAiEcho: Ranked targets strategy: SORT, count: 0, ranking metadata:  [CONTEXT ratelimit_period="10 SECONDS" ]
+06-07 18:09:55.017   633   633 W IPCThreadState: Sending oneway calls to frozen process.
+06-07 18:09:55.017  3300  3492 I AiAiEcho: #remoteViewsTwiddler: feature disabled.
+06-07 18:09:55.017   633   633 W IPCThreadState: Sending oneway calls to frozen process.
+06-07 18:09:55.022   633   633 W IPCThreadState: Sending oneway calls to frozen process.
+06-07 18:09:55.026   633   633 W IPCThreadState: Sending oneway calls to frozen process.
+06-07 18:09:55.028  3300  3492 I AiAiEcho: #postPredictionTargets: Sending updates to UISurface lockscreen with targets# 0 (types=[])
+06-07 18:09:55.038   633   633 W IPCThreadState: Sending oneway calls to frozen process.
+06-07 18:09:55.044  3300  3492 I AiAiEcho: #postPredictionTargets: Sending updates to UISurface home with targets# 0 (types=[])
+06-07 18:09:55.045   969   969 W PageIndicator: Total number of pages invalid: 0. Assuming 1 page.
+06-07 18:09:55.053  3300  3492 I AiAiEcho: #postPredictionTargets: Sending updates to UISurface media_data_manager with targets# 0 (types=[])
+06-07 18:09:55.057   969   969 D SsMediaDataProvider: Forwarding Smartspace updates []
+06-07 18:09:55.067  1526  1526 D SsBaseTemplateCard: No text view can be set up
+06-07 18:09:55.067  1526  1526 D SsBaseTemplateCard: Passed-in item info is null
+06-07 18:09:55.069  1526  1526 D SsBaseTemplateCard: Passed-in item info is null
+06-07 18:09:55.069  1526  1526 D SsBaseTemplateCard: Passed-in item info is null
+06-07 18:09:55.069  1526  1526 I SsBaseTemplateCard: Secondary card pane is null
+06-07 18:09:55.617   946   946 I wpa_supplicant: wlan0: CTRL-EVENT-BEACON-LOSS 
+06-07 18:09:56.073 15626 15626 W AccessibilityNodeInfoDumper: Fetch time: 15ms
+06-07 18:09:56.116 15298 15320 D EGL_emulation: app_time_stats: avg=3450.38ms min=45.87ms max=6854.90ms count=2
+06-07 18:09:56.130   633  2095 W MagnificationConnectionManager: requestConnection duplicated request: connect=false, mConnectionState=DISCONNECTED
+06-07 18:09:56.130   633  2095 D AccessibilityManagerService: restoreCurrentUserForTestAutomationIfNeededLocked(): ignoring because device doesn't support visible background users
+06-07 18:09:56.171  3300  4058 I AiAiEcho: Settings changed for uri: content://settings/secure/accessibility_enabled
+06-07 18:09:56.172 15626 15626 D AndroidRuntime: Shutting down VM
+06-07 18:09:56.186  3300  3492 I AiAiEcho: Predicting[0]:  [CONTEXT sampling_count=5 ]
+06-07 18:09:56.187  3300  3492 I AiAiEcho: EchoTargets: 
+06-07 18:09:56.187  3300  3492 I AiAiEcho: Filtered by AiAi flag check: 
+06-07 18:09:56.187  3300  3492 I AiAiEcho: [CONTEXT ratelimit_period="10 SECONDS" ]
+06-07 18:09:56.198  3300  3492 I AiAiEcho: Ranked targets strategy: SORT, count: 0, ranking metadata:  [CONTEXT ratelimit_period="10 SECONDS" ]
+06-07 18:09:56.200  3300  3492 I AiAiEcho: #remoteViewsTwiddler: feature disabled.
+06-07 18:09:56.205   633   633 W IPCThreadState: Sending oneway calls to frozen process.
+06-07 18:09:56.205  3300  3492 I AiAiEcho: Predicting[0]:  [CONTEXT sampling_count=5 ]
+06-07 18:09:56.206   633   633 W IPCThreadState: Sending oneway calls to frozen process.
+06-07 18:09:56.228   633   633 W IPCThreadState: Sending oneway calls to frozen process.
+06-07 18:09:56.233  3300  3492 I AiAiEcho: EchoTargets: 
+06-07 18:09:56.233  3300  3492 I AiAiEcho: Filtered by AiAi flag check: 
+06-07 18:09:56.233  3300  3492 I AiAiEcho: [CONTEXT ratelimit_period="10 SECONDS" ]
+06-07 18:09:56.234   633   633 W IPCThreadState: Sending oneway calls to frozen process.
+06-07 18:09:56.243  3300  3492 I AiAiEcho: Ranked targets strategy: SORT, count: 0, ranking metadata:  [CONTEXT ratelimit_period="10 SECONDS" ]
+06-07 18:09:56.253   633   633 W IPCThreadState: Sending oneway calls to frozen process.
+06-07 18:09:56.275   633   633 W IPCThreadState: Sending oneway calls to frozen process.
+06-07 18:09:56.277   633   633 W IPCThreadState: Sending oneway calls to frozen process.
+06-07 18:09:56.298   633   633 W IPCThreadState: Sending oneway calls to frozen process.
+06-07 18:09:56.328   633   633 W IPCThreadState: Sending oneway calls to frozen process.
+06-07 18:09:56.329   633   633 W IPCThreadState: Sending oneway calls to frozen process.
+06-07 18:09:56.330   969  1017 W Looper  : Slow dispatch took 39ms wmshell.main h=android.view.ViewRootImpl$ViewRootHandler c=android.view.accessibility.AccessibilityManager$$ExternalSyntheticLambda0@fb020ad m=0
+06-07 18:09:56.335  3300  3492 I AiAiEcho: #remoteViewsTwiddler: feature disabled.
+06-07 18:09:56.346  3300  3492 I AiAiEcho: Predicting[0]:  [CONTEXT sampling_count=5 ]
+06-07 18:09:56.356  3300  3492 I AiAiEcho: EchoTargets: 
+06-07 18:09:56.356  3300  3492 I AiAiEcho: Filtered by AiAi flag check: 
+06-07 18:09:56.356  3300  3492 I AiAiEcho: [CONTEXT ratelimit_period="10 SECONDS" ]
+06-07 18:09:56.362  3300  3492 I AiAiEcho: Ranked targets strategy: SORT, count: 0, ranking metadata:  [CONTEXT ratelimit_period="10 SECONDS" ]
+06-07 18:09:56.378  3300  3492 I AiAiEcho: #remoteViewsTwiddler: feature disabled.
+06-07 18:09:56.414  3300  3492 I AiAiEcho: #postPredictionTargets: Sending updates to UISurface lockscreen with targets# 0 (types=[])
+06-07 18:09:56.418   633   633 W Looper  : Slow delivery took 224ms main h=com.android.server.accessibility.AccessibilityManagerService$MainHandler c=<recycled PooledLambda@59647ab> m=0
+06-07 18:09:56.419   633   633 W IPCThreadState: Sending oneway calls to frozen process.
+06-07 18:09:56.420   633   633 W IPCThreadState: Sending oneway calls to frozen process.
+06-07 18:09:56.420   633   633 W IPCThreadState: Sending oneway calls to frozen process.
+06-07 18:09:56.420  3300  3492 I AiAiEcho: #postPredictionTargets: Sending updates to UISurface home with targets# 0 (types=[])
+06-07 18:09:56.421   633   633 W IPCThreadState: Sending oneway calls to frozen process.
+06-07 18:09:56.422   633   633 W IPCThreadState: Sending oneway calls to frozen process.
+06-07 18:09:56.424  3300  3492 I AiAiEcho: #postPredictionTargets: Sending updates to UISurface media_data_manager with targets# 0 (types=[])
+06-07 18:09:56.424   633   633 D BatterySaverPolicy: accessibility changed to false, updating policy.
+06-07 18:09:56.429   969   969 W PageIndicator: Total number of pages invalid: 0. Assuming 1 page.
+06-07 18:09:56.433  1526  1526 D SsBaseTemplateCard: No text view can be set up
+06-07 18:09:56.434  1526  1526 D SsBaseTemplateCard: Passed-in item info is null
+06-07 18:09:56.434  1526  1526 D SsBaseTemplateCard: Passed-in item info is null
+06-07 18:09:56.434   969   969 D SsMediaDataProvider: Forwarding Smartspace updates []
+06-07 18:09:56.434  1526  1526 D SsBaseTemplateCard: Passed-in item info is null
+06-07 18:09:56.434  1526  1526 I SsBaseTemplateCard: Secondary card pane is null
+06-07 18:09:56.439   633   633 W Looper  : Drained
+06-07 18:09:56.952   633   790 D ActivityManager: freezing 2254 com.google.android.apps.messaging
+06-07 18:09:57.298     0     0 I logd    : logdr: UID=2000 GID=2000 PID=15638 n tail=500 logMask=99 pid=0 start=0ns deadline=0ns

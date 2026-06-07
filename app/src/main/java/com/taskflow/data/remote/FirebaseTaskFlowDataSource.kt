@@ -9,6 +9,9 @@ import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.storageMetadata
 import com.taskflow.domain.model.Attachment
 import com.taskflow.domain.model.PendingOperation
+import com.taskflow.domain.model.TaskPriority
+import com.taskflow.domain.model.TaskStatus
+import com.taskflow.domain.model.UserPermission
 import kotlinx.coroutines.tasks.await
 import java.io.File
 
@@ -132,6 +135,35 @@ class FirebaseTaskFlowDataSource(
             .await()
     }
 
+    override suspend fun createInviteLink(invite: RemoteInviteLink): RemoteInviteLink {
+        requireConfigured()
+        requireAuthenticatedUserId()
+        firestoreProvider()
+            .collection(FirebaseCollections.InviteLinks)
+            .document(invite.token)
+            .set(invite.toRemoteMap())
+            .await()
+        return invite
+    }
+
+    override suspend fun resolveInviteLink(token: String): RemoteInviteLink? {
+        requireConfigured()
+        val doc = firestoreProvider()
+            .collection(FirebaseCollections.InviteLinks)
+            .document(token)
+            .get()
+            .await()
+        return doc.data?.toRemoteInviteLink()
+    }
+
+    override suspend fun acceptInviteLink(token: String, userId: String): RemoteInviteLink {
+        requireConfigured()
+        val acceptedAt = System.currentTimeMillis()
+        val ref = firestoreProvider().collection(FirebaseCollections.InviteLinks).document(token)
+        ref.update(mapOf("acceptedBy" to userId, "acceptedAt" to acceptedAt)).await()
+        return resolveInviteLink(token) ?: error("Convite remoto nao encontrado.")
+    }
+
     private fun requireConfigured() {
         check(isConfigured) {
             "Firebase is not configured. Add google-services.json and initialize FirebaseApp before enabling remote sync."
@@ -154,6 +186,54 @@ class FirebaseTaskFlowDataSource(
             "attempts" to attempts,
             "lastError" to lastError,
             "syncedAt" to System.currentTimeMillis()
+        )
+    }
+
+    private fun RemoteInviteLink.toRemoteMap(): Map<String, Any?> = mapOf(
+        "token" to token,
+        "permission" to permission.name,
+        "createdBy" to createdBy,
+        "createdAt" to createdAt,
+        "expiresAt" to expiresAt,
+        "acceptedBy" to acceptedBy,
+        "acceptedAt" to acceptedAt,
+        "task" to mapOf(
+            "id" to task.id,
+            "title" to task.title,
+            "description" to task.description,
+            "status" to task.status.name,
+            "priority" to task.priority.name,
+            "createdBy" to task.createdBy,
+            "assignedTo" to task.assignedTo,
+            "dueDateEpochMillis" to task.dueDateEpochMillis,
+            "createdAt" to task.createdAt,
+            "updatedAt" to task.updatedAt
+        )
+    )
+
+    @Suppress("UNCHECKED_CAST")
+    private fun Map<String, Any?>.toRemoteInviteLink(): RemoteInviteLink {
+        val taskMap = this["task"] as? Map<String, Any?> ?: error("Convite remoto sem tarefa.")
+        return RemoteInviteLink(
+            token = this["token"] as? String ?: "",
+            permission = UserPermission.valueOf(this["permission"] as? String ?: UserPermission.Viewer.name),
+            createdBy = this["createdBy"] as? String ?: "",
+            createdAt = (this["createdAt"] as? Number)?.toLong() ?: 0L,
+            expiresAt = (this["expiresAt"] as? Number)?.toLong(),
+            acceptedBy = this["acceptedBy"] as? String,
+            acceptedAt = (this["acceptedAt"] as? Number)?.toLong(),
+            task = RemoteInviteTaskSnapshot(
+                id = taskMap["id"] as? String ?: "",
+                title = taskMap["title"] as? String ?: "Tarefa compartilhada",
+                description = taskMap["description"] as? String ?: "",
+                status = TaskStatus.valueOf(taskMap["status"] as? String ?: TaskStatus.Todo.name),
+                priority = TaskPriority.valueOf(taskMap["priority"] as? String ?: TaskPriority.Medium.name),
+                createdBy = taskMap["createdBy"] as? String ?: "",
+                assignedTo = taskMap["assignedTo"] as? String,
+                dueDateEpochMillis = (taskMap["dueDateEpochMillis"] as? Number)?.toLong(),
+                createdAt = (taskMap["createdAt"] as? Number)?.toLong() ?: 0L,
+                updatedAt = (taskMap["updatedAt"] as? Number)?.toLong() ?: 0L
+            )
         )
     }
 

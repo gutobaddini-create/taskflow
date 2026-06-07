@@ -3,6 +3,7 @@ package com.taskflow
 import com.taskflow.data.remote.ConnectivityMonitor
 import com.taskflow.data.remote.PendingOperationQueue
 import com.taskflow.data.remote.RemoteAuthResult
+import com.taskflow.data.remote.RemoteInviteLink
 import com.taskflow.data.remote.RemoteSyncResult
 import com.taskflow.data.remote.RemoteTaskFlowDataSource
 import com.taskflow.data.remote.RemoteUploadResult
@@ -147,6 +148,9 @@ class SyncCoordinatorTest {
         }
         override suspend fun deleteAttachment(userId: String, attachment: Attachment) = error("Not used")
         override suspend fun registerFcmToken(userId: String, token: String) = error("Not used")
+        override suspend fun createInviteLink(invite: RemoteInviteLink): RemoteInviteLink = error("Not used")
+        override suspend fun resolveInviteLink(token: String): RemoteInviteLink? = error("Not used")
+        override suspend fun acceptInviteLink(token: String, userId: String): RemoteInviteLink = error("Not used")
 
         override suspend fun syncPendingOperation(operation: PendingOperation): RemoteSyncResult {
             synced += operation

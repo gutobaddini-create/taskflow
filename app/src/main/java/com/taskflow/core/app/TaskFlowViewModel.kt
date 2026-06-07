@@ -9,17 +9,28 @@ import androidx.lifecycle.viewModelScope
 import com.taskflow.data.local.TaskFlowDatabase
 import com.taskflow.data.local.TaskFlowPreferences
 import com.taskflow.data.local.TaskFlowUserPreferences
+import com.taskflow.data.mapper.toEntity
 import com.taskflow.data.remote.AndroidConnectivityMonitor
 import com.taskflow.data.remote.FirebaseTaskFlowDataSource
 import com.taskflow.data.remote.RemoteAuthResult
+import com.taskflow.data.remote.RemoteInviteLink
+import com.taskflow.data.remote.RemoteInviteTaskSnapshot
 import com.taskflow.data.remote.RoomPendingOperationQueue
 import com.taskflow.data.remote.SyncCoordinator
 import com.taskflow.data.repository.LocalTaskFlowRepository
+import com.taskflow.domain.model.ActivityLog
+import com.taskflow.domain.model.Invite
+import com.taskflow.domain.model.Space
 import com.taskflow.domain.model.Task
+import com.taskflow.domain.model.TaskList
 import com.taskflow.domain.model.User
+import com.taskflow.domain.model.now
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneId
 
 class TaskFlowViewModel(application: Application) : AndroidViewModel(application) {
     private val dao = TaskFlowDatabase.get(application).dao()
@@ -52,6 +63,7 @@ class TaskFlowViewModel(application: Application) : AndroidViewModel(application
         private set
     var selectedTaskId by mutableStateOf<String?>(null)
     var materialsTab by mutableStateOf("Anexos")
+    var pendingInviteToken by mutableStateOf<String?>(null)
 
     init {
         syncCoordinator.start(viewModelScope)
@@ -163,5 +175,73 @@ class TaskFlowViewModel(application: Application) : AndroidViewModel(application
     fun selectedTask(): Task? {
         val currentId = preferences.value.currentUserId
         return tasks.value.firstOrNull { it.id == selectedTaskId && (currentId.isBlank() || it.createdBy == currentId || it.assignedTo == currentId || currentId in it.participants) }
+    }
+
+    suspend fun createRemoteInvite(invite: Invite, task: Task): Result<RemoteInviteLink> = runCatching {
+        repo.createInvite(invite)
+        val link = RemoteInviteLink(
+            token = invite.token,
+            permission = invite.permission,
+            createdBy = invite.createdBy,
+            createdAt = invite.createdAt,
+            expiresAt = invite.expiresAt,
+            task = RemoteInviteTaskSnapshot(
+                id = task.id,
+                title = task.title,
+                description = task.description,
+                status = task.status,
+                priority = task.priority,
+                createdBy = task.createdBy,
+                assignedTo = task.assignedTo,
+                dueDateEpochMillis = task.dueDate?.atZone(ZoneId.systemDefault())?.toInstant()?.toEpochMilli(),
+                createdAt = task.createdAt,
+                updatedAt = task.updatedAt
+            )
+        )
+        firebaseRemote.createInviteLink(link)
+    }
+
+    suspend fun acceptRemoteInvite(token: String): Result<Task> = runCatching {
+        val current = currentUser()
+        check(current.id.isNotBlank() && current.id != "local") { "Entre ou crie uma conta antes de aceitar o convite." }
+        val remote = firebaseRemote.resolveInviteLink(token) ?: error("Convite remoto nao encontrado.")
+        val expiresAt = remote.expiresAt
+        if (expiresAt != null && expiresAt < now()) error("Convite expirado.")
+        val accepted = firebaseRemote.acceptInviteLink(token, current.id)
+        importAcceptedInvite(accepted, current.id)
+    }
+
+    suspend fun resolveRemoteInvite(token: String): Result<RemoteInviteLink?> = runCatching {
+        firebaseRemote.resolveInviteLink(token)
+    }
+
+    private suspend fun importAcceptedInvite(remote: RemoteInviteLink, userId: String): Task {
+        val existingSpace = spaces.value.firstOrNull { it.name == "Compartilhadas comigo" && userId in it.members }
+        val space = existingSpace ?: Space(name = "Compartilhadas comigo", ownerId = userId, members = listOf(userId))
+        val existingList = lists.value.firstOrNull { it.spaceId == space.id && it.name == "Convites aceitos" }
+        val list = existingList ?: TaskList(spaceId = space.id, name = "Convites aceitos", order = 0)
+        val task = Task(
+            id = remote.task.id,
+            spaceId = space.id,
+            listId = list.id,
+            title = remote.task.title,
+            description = remote.task.description,
+            status = remote.task.status,
+            priority = remote.task.priority,
+            createdBy = remote.task.createdBy,
+            assignedTo = remote.task.assignedTo,
+            participants = listOf(remote.task.createdBy, userId).distinct(),
+            dueDate = remote.task.dueDateEpochMillis?.let { LocalDateTime.ofInstant(Instant.ofEpochMilli(it), ZoneId.systemDefault()) },
+            createdAt = remote.task.createdAt,
+            updatedAt = now()
+        )
+        val invite = Invite(taskId = task.id, createdBy = remote.createdBy, permission = remote.permission, token = remote.token, acceptedBy = userId, createdAt = remote.createdAt, expiresAt = remote.expiresAt)
+        dao.upsertSpaces(listOf(space.toEntity()))
+        dao.upsertLists(listOf(list.toEntity()))
+        dao.upsertTasks(listOf(task.toEntity()))
+        dao.upsertInvites(listOf(invite.toEntity()))
+        dao.upsertActivity(listOf(ActivityLog(taskId = task.id, userId = userId, action = "Convite aceito: ${remote.permission.label}").toEntity()))
+        selectedTaskId = task.id
+        return task
     }
 }

@@ -65,16 +65,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 object DesignTokens {
-    val cardRadius = 24.dp
-    val compactRadius = 16.dp
+    val cardRadius = 18.dp
+    val compactRadius = 14.dp
     val pillRadius = 50.dp
-    val screenPadding = 24.dp
-    val screenBottomPadding = 36.dp
-    val navigationBottomPadding = 120.dp
-    val floatingActionBottomPadding = 156.dp
-    val cardPadding = 18.dp
-    val itemGap = 12.dp
-    val controlHeight = 54.dp
+    val screenPadding = 18.dp
+    val screenBottomPadding = 28.dp
+    val navigationBottomPadding = 104.dp
+    val floatingActionBottomPadding = 136.dp
+    val cardPadding = 14.dp
+    val itemGap = 10.dp
+    val controlHeight = 48.dp
 }
 
 object TaskFlowColors {
@@ -141,28 +141,28 @@ val TaskFlowGradient = Brush.horizontalGradient(listOf(TaskFlowColors.Blue, Task
 private val TaskFlowType = Typography(
     titleLarge = androidx.compose.ui.text.TextStyle(
         color = TaskFlowColors.Text,
-        fontSize = 24.sp,
+        fontSize = 22.sp,
         fontWeight = FontWeight.Bold,
-        lineHeight = 30.sp
+        lineHeight = 28.sp
     ),
     titleMedium = androidx.compose.ui.text.TextStyle(
         color = TaskFlowColors.Text,
-        fontSize = 18.sp,
+        fontSize = 17.sp,
         fontWeight = FontWeight.Bold,
         lineHeight = 24.sp
     ),
     bodyLarge = androidx.compose.ui.text.TextStyle(
         color = TaskFlowColors.Text,
-        fontSize = 16.sp,
-        lineHeight = 22.sp
+        fontSize = 15.sp,
+        lineHeight = 21.sp
     ),
     bodyMedium = androidx.compose.ui.text.TextStyle(
         color = TaskFlowColors.Muted,
-        fontSize = 14.sp,
-        lineHeight = 20.sp
+        fontSize = 13.sp,
+        lineHeight = 19.sp
     ),
     labelLarge = androidx.compose.ui.text.TextStyle(
-        fontSize = 15.sp,
+        fontSize = 14.sp,
         fontWeight = FontWeight.SemiBold,
         lineHeight = 20.sp
     )
@@ -272,7 +272,7 @@ fun Modifier.touchFeedback(enabled: Boolean = true, onClick: () -> Unit): Modifi
 fun TaskCard(title: String, subtitle: String, priorityColor: Color, modifier: Modifier = Modifier, onClick: () -> Unit = {}) {
     TaskFlowCard(modifier.touchFeedback(onClick = onClick)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Box(Modifier.width(5.dp).height(58.dp).clip(RoundedCornerShape(DesignTokens.pillRadius)).background(priorityColor))
+            Box(Modifier.width(4.dp).height(52.dp).clip(RoundedCornerShape(DesignTokens.pillRadius)).background(priorityColor))
             Spacer(Modifier.width(DesignTokens.itemGap))
             Box(Modifier.size(32.dp).border(2.dp, TaskFlowColors.Border, CircleShape).clip(CircleShape))
             Spacer(Modifier.width(DesignTokens.itemGap))
@@ -398,7 +398,7 @@ fun FloatingAddButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
         onClick = onClick,
         containerColor = TaskFlowColors.Purple,
         contentColor = Color.White,
-        modifier = modifier.size(64.dp)
+        modifier = modifier.size(58.dp)
     ) {
         Icon(Icons.Default.Add, null)
     }
