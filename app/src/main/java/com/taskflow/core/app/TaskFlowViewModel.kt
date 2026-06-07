@@ -156,8 +156,12 @@ class TaskFlowViewModel(application: Application) : AndroidViewModel(application
 
     fun currentUser(): User {
         val currentId = preferences.value.currentUserId
-        return users.value.firstOrNull { it.id == currentId } ?: users.value.firstOrNull() ?: User(name = "Manuel", email = "manuel@taskflow.local")
+        return users.value.firstOrNull { it.id == currentId }
+            ?: User(id = currentId.ifBlank { "local" }, name = "Voce", email = "")
     }
 
-    fun selectedTask(): Task? = tasks.value.firstOrNull { it.id == selectedTaskId } ?: tasks.value.firstOrNull()
+    fun selectedTask(): Task? {
+        val currentId = preferences.value.currentUserId
+        return tasks.value.firstOrNull { it.id == selectedTaskId && (currentId.isBlank() || it.createdBy == currentId || it.assignedTo == currentId || currentId in it.participants) }
+    }
 }

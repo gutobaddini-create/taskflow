@@ -54,6 +54,9 @@ interface TaskFlowDao {
     @Query("SELECT COUNT(*) FROM tasks")
     suspend fun taskCount(): Int
 
+    @Query("SELECT COUNT(*) FROM spaces WHERE ownerId = :ownerId")
+    suspend fun ownedSpaceCount(ownerId: String): Int
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun upsertUsers(values: List<UserEntity>)
 

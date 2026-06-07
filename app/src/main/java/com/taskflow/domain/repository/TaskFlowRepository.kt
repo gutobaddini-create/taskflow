@@ -23,7 +23,7 @@ interface TaskFlowRepository {
     fun updateTask(task: Task)
     fun completeTask(taskId: String)
     fun deleteTask(taskId: String)
-    fun createSpace(name: String)
+    fun createSpace(name: String, ownerId: String? = null)
     fun updateSpace(space: Space)
     fun deleteSpace(spaceId: String)
     fun createList(spaceId: String, name: String)

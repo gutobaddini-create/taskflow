@@ -136,7 +136,7 @@ Pendencias do Firebase real:
 - Release APK: `app/build/outputs/apk/release/app-release.apk`
 - Release AAB: `app/build/outputs/bundle/release/app-release.aab`
 - Manifesto de release: `docs/qa/release-manifest.json`
-- GitHub Release: `https://github.com/gutobaddini-create/taskflow/releases/tag/v0.1.0`
+- GitHub Release: `https://github.com/gutobaddini-create/taskflow/releases/tag/v0.1.1`
 
 O release atual foi gerado com keystore de producao local em `C:\Users\gutol\.taskflow\release\taskflow-release.keystore`. O arquivo de ambiente local fica em `C:\Users\gutol\.taskflow\release\taskflow-release-signing.env.ps1` e nao deve ser enviado ao Git.
 
@@ -170,6 +170,7 @@ Comandos executados com sucesso neste workspace:
 - `.\gradlew.bat --no-daemon --max-workers=1 :app:assembleDebug :app:assembleDebugAndroidTest :app:testDebugUnitTest --console=plain`
 - `adb -s RQGL203Q53K shell am instrument -w -r -e class com.taskflow.FirebaseRealInstrumentedTest com.taskflow.test/androidx.test.runner.AndroidJUnitRunner`
 - Release assinado de producao instalado e aberto no aparelho fisico `RQGL203Q53K` (`SM-S948B`), sem crash no buffer filtrado.
+- Release `0.1.1` assinado de producao instalado no aparelho fisico `RQGL203Q53K`; onboarding limpo validado com campos `Nome`, `E-mail` e `Senha` vazios, sem dados de exemplo antigos.
 - Instalacao e abertura do APK debug no emulador `TaskFlow_API35`, sem crash/ANR do pacote `com.taskflow` no log filtrado.
 
 ## Bloqueios Para Conclusao Total

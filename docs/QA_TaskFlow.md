@@ -255,6 +255,34 @@ Captured screenshots:
 - `docs/qa/screenshots/physical-production-signed-home-2026-06-07.png`
 - `docs/qa/screenshots/physical-production-signed-home-after-start-2026-06-07.png`
 
+## Polish QA 0.1.1
+
+Commands executed:
+
+```powershell
+.\gradlew.bat --no-daemon --max-workers=1 :app:testDebugUnitTest :app:assembleRelease :app:bundleRelease --console=plain
+npm run release:manifest
+$adb='C:\Users\gutol\AppData\Local\Android\Sdk\platform-tools\adb.exe'
+& $adb -s RQGL203Q53K uninstall com.taskflow
+& $adb -s RQGL203Q53K install app\build\outputs\apk\release\app-release.apk
+& $adb -s RQGL203Q53K shell monkey -p com.taskflow -c android.intent.category.LAUNCHER 1
+& $adb -s RQGL203Q53K exec-out uiautomator dump /dev/tty > docs\qa\polish-physical-v011-clean-onboarding-2026-06-07.xml
+```
+
+Result: passed.
+
+Observed evidence:
+
+- Version `0.1.1` production-signed APK installed and launched on physical device `RQGL203Q53K`.
+- Clean onboarding UI dump confirmed blank `Nome`, `E-mail`, and `Senha` fields.
+- No `Manuel`, `Ana`, or seeded task labels appeared in the clean onboarding pass.
+- Unit tests, release APK, release AAB, lint vital, and release manifest generation passed.
+- `apksigner verify --print-certs` confirmed the production certificate.
+
+Captured screenshots:
+
+- `docs/qa/screenshots/polish-physical-v011-clean-onboarding-2026-06-07.png`
+
 ## Current External Blockers
 
 No external blockers remain for the requested Firebase setup, physical QA, and production-signed artifact generation. Play Store publication still requires access to a Google Play developer account/listing, which is outside this repository.

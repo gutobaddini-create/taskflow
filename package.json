@@ -1,7 +1,7 @@
 {
   "name": "taskflow-android",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.1.1",
   "type": "module",
   "scripts": {
     "verify:local-mvp": "pwsh -NoProfile -File tools/qa/verify-local-mvp.ps1",

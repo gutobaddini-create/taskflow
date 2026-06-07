@@ -12,7 +12,7 @@ GitHub repository:
 
 - `https://github.com/gutobaddini-create/taskflow`
 - Published branch: `master`
-- Release: `https://github.com/gutobaddini-create/taskflow/releases/tag/v0.1.0`
+- Release: `https://github.com/gutobaddini-create/taskflow/releases/tag/v0.1.1`
 - GitHub CLI authentication: ready for account `gutobaddini-create`
 
 ## Verified Command
@@ -85,7 +85,7 @@ Screenshots:
 ## Release Notes
 
 - Package: `com.taskflow`
-- Version: `0.1.0`
+- Version: `0.1.1`
 - Release mode: local-first MVP
 - Firebase project: `gen-lang-client-0780081219`
 - Firebase Android App ID: `1:209004797664:android:ef4fc149b5b033f782ba85`

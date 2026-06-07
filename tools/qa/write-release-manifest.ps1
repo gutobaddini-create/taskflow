@@ -4,6 +4,7 @@ $root = Resolve-Path (Join-Path $PSScriptRoot "../..")
 Set-Location $root
 
 $manifestPath = Join-Path $root "docs/qa/release-manifest.json"
+$gradleFile = Join-Path $root "app/build.gradle.kts"
 $artifacts = @(
     "app/build/outputs/apk/debug/app-debug.apk",
     "app/build/outputs/apk/release/app-release.apk",
@@ -21,6 +22,13 @@ function Get-Sha256 {
         $stream.Dispose()
     }
 }
+
+$gradleText = Get-Content -Raw $gradleFile
+$versionMatch = [regex]::Match($gradleText, 'versionName\s*=\s*"([^"]+)"')
+if (-not $versionMatch.Success) {
+    throw "Unable to read versionName from $gradleFile"
+}
+$versionName = $versionMatch.Groups[1].Value
 
 $entries = foreach ($path in $artifacts) {
     if (-not (Test-Path $path)) {
@@ -43,7 +51,7 @@ $entries = foreach ($path in $artifacts) {
 $manifest = [ordered]@{
     generatedAtUtc = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
     appId = "com.taskflow"
-    version = "0.1.0"
+    version = $versionName
     mode = "local-first-mvp"
     artifacts = $entries
 }

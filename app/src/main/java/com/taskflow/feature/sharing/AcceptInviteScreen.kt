@@ -35,7 +35,7 @@ fun AcceptInviteScreen(vm: TaskFlowViewModel, token: String?, onDone: () -> Unit
     val preferences by vm.preferences.collectAsState()
     val invite = invites.firstOrNull { it.token == token }
     val task = invite?.let { value -> tasks.firstOrNull { it.id == value.taskId } }
-    val currentUser = users.firstOrNull { it.id == preferences.currentUserId } ?: users.firstOrNull() ?: vm.currentUser()
+    val currentUser = users.firstOrNull { it.id == preferences.currentUserId } ?: vm.currentUser()
     val expired = invite?.expiresAt?.let { it < now() } == true
     LazyColumn(Modifier.fillMaxSize().statusBarsPadding().padding(DesignTokens.screenPadding), contentPadding = PaddingValues(bottom = DesignTokens.screenBottomPadding)) {
         item {

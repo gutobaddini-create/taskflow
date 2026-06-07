@@ -34,13 +34,14 @@ import com.taskflow.core.design.TaskFlowColors
 fun SettingsScreen(vm: TaskFlowViewModel, onLogout: () -> Unit) {
     val preferences by vm.preferences.collectAsState()
     val pendingOperations by vm.pendingOperations.collectAsState()
+    val currentUser = vm.currentUser()
 
     LazyColumn(Modifier.fillMaxSize().statusBarsPadding().padding(DesignTokens.screenPadding), contentPadding = PaddingValues(bottom = DesignTokens.navigationBottomPadding)) {
         item {
             ScreenTitle("Ajustes")
             Spacer(Modifier.height(16.dp))
             TaskFlowCard {
-                InfoRow("Meu perfil", "Manuel")
+                InfoRow("Meu perfil", currentUser.name)
                 Row(
                     Modifier.fillMaxWidth().padding(vertical = 7.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -60,9 +61,9 @@ fun SettingsScreen(vm: TaskFlowViewModel, onLogout: () -> Unit) {
             }
             SectionTitle("Conta")
             TaskFlowCard {
-                InfoRow("E-mail", vm.currentUser().email)
-                InfoRow("Sessao", if (preferences.currentUserId.isBlank()) "Local" else "Usuario local")
-                InfoRow("Sincronizacao Firebase", "Preparada para credenciais")
+                InfoRow("E-mail", currentUser.email.ifBlank { "Nao informado" })
+                InfoRow("Sessao", if (preferences.currentUserId.isBlank()) "Nao iniciada" else "Ativa")
+                InfoRow("Sincronizacao Firebase", if (pendingOperations.isEmpty()) "Em dia" else "Aguardando rede")
             }
             SectionTitle("Privacidade")
             TaskFlowCard {

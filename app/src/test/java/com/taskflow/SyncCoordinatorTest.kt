@@ -9,6 +9,7 @@ import com.taskflow.data.remote.RemoteUploadResult
 import com.taskflow.data.remote.SyncCoordinator
 import com.taskflow.data.remote.SyncSkippedReason
 import com.taskflow.domain.model.Attachment
+import com.taskflow.domain.model.AttachmentType
 import com.taskflow.domain.model.PendingEntityType
 import com.taskflow.domain.model.PendingOperation
 import com.taskflow.domain.model.PendingOperationType
@@ -78,14 +79,45 @@ class SyncCoordinatorTest {
         assertEquals("Remote changed", queue.pending().single().lastError)
     }
 
+    @Test
+    fun attachmentCreateUploadsBinaryAndClearsOperation() = runBlocking {
+        val attachment = Attachment(
+            id = "att-1",
+            taskId = "task-1",
+            uploadedBy = "user-1",
+            fileName = "foto.jpg",
+            originalFileName = "foto.jpg",
+            fileType = AttachmentType.Image,
+            mimeType = "image/jpeg",
+            fileSize = 10,
+            storagePath = "content://taskflow/foto.jpg"
+        )
+        val operation = PendingOperation(entity = PendingEntityType.Attachment, entityId = attachment.id, operation = PendingOperationType.Create)
+        val queue = FakeQueue(listOf(operation), attachments = mapOf(attachment.id to attachment))
+        val remote = FakeRemote(isConfigured = true)
+        val coordinator = SyncCoordinator(queue, remote, FakeConnectivity(online = true))
+
+        val report = coordinator.syncOnce()
+
+        assertEquals(1, report.applied)
+        assertTrue(queue.pending().isEmpty())
+        assertEquals(listOf(attachment), remote.uploaded)
+        assertTrue(remote.synced.isEmpty())
+    }
+
     private class FakeConnectivity(online: Boolean) : ConnectivityMonitor {
         override val isOnline: StateFlow<Boolean> = MutableStateFlow(online)
     }
 
-    private class FakeQueue(initial: List<PendingOperation>) : PendingOperationQueue {
+    private class FakeQueue(
+        initial: List<PendingOperation>,
+        private val attachments: Map<String, Attachment> = emptyMap()
+    ) : PendingOperationQueue {
         private val operations = initial.toMutableList()
 
         override suspend fun pending(): List<PendingOperation> = operations.toList()
+
+        override suspend fun attachmentById(attachmentId: String): Attachment? = attachments[attachmentId]
 
         override suspend fun markApplied(operationId: String) {
             operations.removeAll { it.id == operationId }
@@ -103,12 +135,16 @@ class SyncCoordinatorTest {
         private val result: RemoteSyncResult = RemoteSyncResult.Applied
     ) : RemoteTaskFlowDataSource {
         val synced = mutableListOf<PendingOperation>()
+        val uploaded = mutableListOf<Attachment>()
 
         override suspend fun signIn(email: String, password: String): RemoteAuthResult = error("Not used")
         override suspend fun signUp(name: String, email: String, password: String): RemoteAuthResult = error("Not used")
         override suspend fun sendPasswordReset(email: String) = error("Not used")
         override suspend fun signOut(): RemoteAuthResult = error("Not used")
-        override suspend fun uploadAttachment(userId: String, attachment: Attachment): RemoteUploadResult = error("Not used")
+        override suspend fun uploadAttachment(userId: String, attachment: Attachment): RemoteUploadResult {
+            uploaded += attachment
+            return RemoteUploadResult("remote/${attachment.id}")
+        }
         override suspend fun deleteAttachment(userId: String, attachment: Attachment) = error("Not used")
         override suspend fun registerFcmToken(userId: String, token: String) = error("Not used")
 

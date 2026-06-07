@@ -57,6 +57,7 @@ import java.time.LocalTime
 @Composable
 fun NewTaskScreen(vm: TaskFlowViewModel, onCancel: () -> Unit) {
     val lists by vm.lists.collectAsState()
+    val spaces by vm.spaces.collectAsState()
     val users by vm.users.collectAsState()
     val user = vm.currentUser()
     var title by remember { mutableStateOf("") }
@@ -68,11 +69,13 @@ fun NewTaskScreen(vm: TaskFlowViewModel, onCancel: () -> Unit) {
     var dueDay by remember { mutableStateOf("Hoje") }
     var dueHour by remember { mutableStateOf("09:00") }
     var attemptedSave by remember { mutableStateOf(false) }
-    val selectedList = lists.firstOrNull { it.id == selectedListId } ?: lists.firstOrNull()
+    val visibleSpaceIds = spaces.filter { it.ownerId == user.id || user.id in it.members }.map { it.id }.toSet()
+    val visibleLists = lists.filter { it.spaceId in visibleSpaceIds }
+    val selectedList = visibleLists.firstOrNull { it.id == selectedListId } ?: visibleLists.firstOrNull()
     val assigneeOptions = users.ifEmpty { listOf(user) }
     val selectedAssignee = assigneeOptions.firstOrNull { it.id == selectedAssigneeId } ?: user
-    LaunchedEffect(lists) {
-        if (selectedListId == null && lists.isNotEmpty()) selectedListId = lists.first().id
+    LaunchedEffect(visibleLists) {
+        if (selectedListId !in visibleLists.map { it.id }) selectedListId = visibleLists.firstOrNull()?.id
     }
     LazyColumn(Modifier.fillMaxSize().statusBarsPadding().padding(DesignTokens.screenPadding), contentPadding = PaddingValues(bottom = DesignTokens.screenBottomPadding)) {
         item {
@@ -83,11 +86,11 @@ fun NewTaskScreen(vm: TaskFlowViewModel, onCancel: () -> Unit) {
             Spacer(Modifier.height(16.dp))
             TaskFlowCard {
                 Text("Lista", color = TaskFlowColors.Muted)
-                if (lists.isEmpty()) {
+                if (visibleLists.isEmpty()) {
                     Text("Crie uma lista antes de salvar tarefas.", color = TaskFlowColors.Danger, modifier = Modifier.padding(top = 8.dp))
                 } else {
-                    Segmented(lists.map { it.name }, selectedList?.name ?: lists.first().name) { name ->
-                        selectedListId = lists.first { it.name == name }.id
+                    Segmented(visibleLists.map { it.name }, selectedList?.name ?: visibleLists.first().name) { name ->
+                        selectedListId = visibleLists.first { it.name == name }.id
                     }
                 }
                 Text("Prazo", color = TaskFlowColors.Muted, modifier = Modifier.padding(top = 14.dp))
@@ -146,7 +149,7 @@ fun NewTaskScreen(vm: TaskFlowViewModel, onCancel: () -> Unit) {
                         onCancel()
                     }
                 }
-            }, Modifier.fillMaxWidth().testTag("save-new-task").semantics { contentDescription = "Salvar nova tarefa" }, enabled = lists.isNotEmpty())
+            }, Modifier.fillMaxWidth().testTag("save-new-task").semantics { contentDescription = "Salvar nova tarefa" }, enabled = visibleLists.isNotEmpty())
         }
     }
 }

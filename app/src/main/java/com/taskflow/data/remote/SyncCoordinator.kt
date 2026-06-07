@@ -8,9 +8,13 @@ import android.net.NetworkRequest
 import com.taskflow.data.local.TaskFlowDao
 import com.taskflow.data.mapper.toDomain
 import com.taskflow.data.mapper.toEntity
+import com.taskflow.domain.model.Attachment
+import com.taskflow.domain.model.PendingEntityType
 import com.taskflow.domain.model.PendingOperation
+import com.taskflow.domain.model.PendingOperationType
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -51,6 +55,7 @@ class AndroidConnectivityMonitor(context: Context) : ConnectivityMonitor {
 
 interface PendingOperationQueue {
     suspend fun pending(): List<PendingOperation>
+    suspend fun attachmentById(attachmentId: String): Attachment?
     suspend fun markApplied(operationId: String)
     suspend fun markFailed(operation: PendingOperation, message: String)
 }
@@ -60,6 +65,10 @@ class RoomPendingOperationQueue(
 ) : PendingOperationQueue {
     override suspend fun pending(): List<PendingOperation> {
         return dao.pendingOperationsSnapshot().map { it.toDomain() }
+    }
+
+    override suspend fun attachmentById(attachmentId: String): Attachment? {
+        return dao.attachmentById(attachmentId)?.toDomain()
     }
 
     override suspend fun markApplied(operationId: String) {
@@ -101,6 +110,12 @@ class SyncCoordinator(
                     if (online) syncOnce()
                 }
         }
+        scope.launch(Dispatchers.IO) {
+            while (true) {
+                delay(15_000)
+                if (connectivity.isOnline.value) syncOnce()
+            }
+        }
     }
 
     suspend fun syncOnce(): SyncRunReport {
@@ -116,7 +131,7 @@ class SyncCoordinator(
         var applied = 0
         var failed = 0
         pending.forEach { operation ->
-            when (val result = runCatching { remote.syncPendingOperation(operation) }.getOrElse { throwable ->
+            when (val result = runCatching { applyRemoteOperation(operation) }.getOrElse { throwable ->
                 queue.markFailed(operation, throwable.message ?: "Erro remoto")
                 failed += 1
                 null
@@ -142,5 +157,27 @@ class SyncCoordinator(
             }
         }
         return SyncRunReport(attempted = pending.size, applied = applied, failed = failed)
+    }
+
+    private suspend fun applyRemoteOperation(operation: PendingOperation): RemoteSyncResult {
+        if (operation.entity == PendingEntityType.Attachment) {
+            val attachment = queue.attachmentById(operation.entityId)
+            val userId = attachment?.uploadedBy
+            if (userId.isNullOrBlank()) {
+                return remote.syncPendingOperation(operation)
+            }
+            when (operation.operation) {
+                PendingOperationType.Create,
+                PendingOperationType.Update -> {
+                    remote.uploadAttachment(userId, attachment)
+                    return RemoteSyncResult.Applied
+                }
+                PendingOperationType.Delete -> {
+                    remote.deleteAttachment(userId, attachment)
+                    return RemoteSyncResult.Applied
+                }
+            }
+        }
+        return remote.syncPendingOperation(operation)
     }
 }

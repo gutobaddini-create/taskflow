@@ -153,7 +153,7 @@ fun MaterialsScreen(vm: TaskFlowViewModel, onBack: () -> Unit) {
         LoadingFullScreen("Carregando materiais...")
         return
     }
-    val currentUser = users.firstOrNull { it.id == preferences.currentUserId } ?: users.firstOrNull() ?: vm.currentUser()
+    val currentUser = users.firstOrNull { it.id == preferences.currentUserId } ?: vm.currentUser()
     val effectivePermission = PermissionPolicy.acceptedPermission(task.id, currentUser.id, invites)
     val canViewMaterial = PermissionPolicy.canViewMaterial(task, currentUser.id, effectivePermission)
     val canManageMaterial = PermissionPolicy.canManageMaterial(task, currentUser.id, effectivePermission)
@@ -186,7 +186,7 @@ fun MaterialsScreen(vm: TaskFlowViewModel, onBack: () -> Unit) {
                 vm.repo.addAttachment(
                     Attachment(
                         taskId = task.id,
-                        uploadedBy = vm.currentUser().id,
+                        uploadedBy = currentUser.id,
                         fileName = metadata.name,
                         originalFileName = metadata.name,
                         fileType = attachmentType(metadata.name),
@@ -208,7 +208,7 @@ fun MaterialsScreen(vm: TaskFlowViewModel, onBack: () -> Unit) {
 
     val filePicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         uri?.let {
-            context.contentResolver.takePersistableUriPermission(it, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            runCatching { context.contentResolver.takePersistableUriPermission(it, Intent.FLAG_GRANT_READ_URI_PERMISSION) }
             addUriAttachment(it, AttachmentSource.FilePicker)
         }
     }
@@ -301,7 +301,7 @@ fun MaterialsScreen(vm: TaskFlowViewModel, onBack: () -> Unit) {
                     message = "URL invalida."
                 } else {
                     if (current == null) {
-                        vm.repo.addLink(TaskLink(taskId = task.id, createdBy = vm.currentUser().id, title = title, url = url, description = description, category = category))
+                        vm.repo.addLink(TaskLink(taskId = task.id, createdBy = currentUser.id, title = title, url = url, description = description, category = category))
                     } else {
                         vm.repo.updateLink(current.copy(title = title, url = url, description = description, category = category))
                     }
@@ -321,7 +321,7 @@ fun MaterialsScreen(vm: TaskFlowViewModel, onBack: () -> Unit) {
             onDismiss = { fieldDialog = false; editingField = null },
             onSave = { name, type, value ->
                 if (current == null) {
-                    vm.repo.addCustomField(CustomField(taskId = task.id, createdBy = vm.currentUser().id, fieldName = name, fieldType = type, fieldValue = value))
+                    vm.repo.addCustomField(CustomField(taskId = task.id, createdBy = currentUser.id, fieldName = name, fieldType = type, fieldValue = value))
                 } else {
                     vm.repo.updateCustomField(current.copy(fieldName = name, fieldType = type, fieldValue = value))
                 }
@@ -356,16 +356,18 @@ fun MaterialsScreen(vm: TaskFlowViewModel, onBack: () -> Unit) {
                         openFilePicker(arrayOf("application/pdf", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "application/vnd.ms-excel", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "text/plain"))
                     }
                     SmallAction(Icons.Default.PhotoCamera, "Foto", Modifier.weight(1f)) {
-                        requestCamera()
-                    }
-                }
-                Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    SmallAction(Icons.Default.Image, "Imagem", Modifier.weight(1f)) {
                         openImagePicker()
                     }
                     SmallAction(Icons.Default.Link, "Link", Modifier.weight(1f)) {
                         if (canManageMaterial) linkDialog = true else message = "Sem permissao para alterar materiais."
                     }
+                }
+                TextButton(
+                    onClick = { requestCamera() },
+                    enabled = canManageMaterial && !isAddingAttachment,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Tirar foto com camera")
                 }
             }
             AttachmentUploadProgress(isAddingAttachment)

@@ -98,14 +98,14 @@ fun DetailScreen(vm: TaskFlowViewModel, onBack: () -> Unit, onMaterials: () -> U
     var confirmComplete by remember(task.id) { mutableStateOf(false) }
     var editDueDay by remember(task.id) { mutableStateOf(if (task.dueDate?.toLocalDate() == LocalDate.now().plusDays(1)) "Amanha" else "Hoje") }
     var editDueHour by remember(task.id) { mutableStateOf(task.dueDate?.toLocalTime()?.format(DateTimeFormatter.ofPattern("HH:mm")) ?: "09:00") }
-    val currentUser = users.firstOrNull { it.id == preferences.currentUserId } ?: users.firstOrNull() ?: vm.currentUser()
+    val currentUser = users.firstOrNull { it.id == preferences.currentUserId } ?: vm.currentUser()
     var editAssignedTo by remember(task.id, currentUser.id) { mutableStateOf(task.assignedTo ?: currentUser.id) }
     val userOptions = users.ifEmpty { listOf(currentUser) }
     val effectivePermission = PermissionPolicy.acceptedPermission(task.id, currentUser.id, invites)
     val canViewTask = PermissionPolicy.canViewTask(task, currentUser.id, effectivePermission)
     val canEditTask = PermissionPolicy.canEditTask(task, currentUser.id, effectivePermission)
     val canComment = PermissionPolicy.canCommentOnTask(task, currentUser.id, effectivePermission)
-    val assigneeName = userOptions.firstOrNull { it.id == task.assignedTo }?.name ?: "Manuel"
+    val assigneeName = userOptions.firstOrNull { it.id == task.assignedTo }?.name ?: currentUser.name
     val hasActiveReminders = reminders.any { it.taskId == task.id && it.isActive }
     if (confirmComplete) {
         AlertDialog(

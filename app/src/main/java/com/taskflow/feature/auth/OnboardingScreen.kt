@@ -40,8 +40,8 @@ fun OnboardingScreen(vm: TaskFlowViewModel, onStart: () -> Unit) {
     val users by vm.users.collectAsState()
     val scope = rememberCoroutineScope()
     var mode by remember { mutableStateOf("Criar conta") }
-    var name by remember(users) { mutableStateOf(users.firstOrNull()?.name ?: "Ana") }
-    var email by remember(users) { mutableStateOf(users.firstOrNull()?.email ?: "ana@taskflow.local") }
+    var name by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var message by remember { mutableStateOf("") }
     var busy by remember { mutableStateOf(false) }

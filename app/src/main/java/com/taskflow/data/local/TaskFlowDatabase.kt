@@ -23,7 +23,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
         InviteEntity::class,
         PendingOperationEntity::class
     ],
-    version = 2,
+    version = 3,
     exportSchema = true
 )
 abstract class TaskFlowDatabase : RoomDatabase() {
@@ -37,7 +37,7 @@ abstract class TaskFlowDatabase : RoomDatabase() {
                 context.applicationContext,
                 TaskFlowDatabase::class.java,
                 LocalPersistencePlan.databaseName
-            ).addMigrations(MIGRATION_1_2).build().also { instance = it }
+            ).addMigrations(MIGRATION_1_2, MIGRATION_2_3).build().also { instance = it }
         }
 
         private val MIGRATION_1_2 = object : Migration(1, 2) {
@@ -56,6 +56,24 @@ abstract class TaskFlowDatabase : RoomDatabase() {
                     )
                     """.trimIndent()
                 )
+            }
+        }
+
+        private val MIGRATION_2_3 = object : Migration(2, 3) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("DELETE FROM reminders WHERE taskId IN (SELECT id FROM tasks WHERE createdBy IN (SELECT id FROM users WHERE email IN ('manuel@taskflow.local', 'ana@taskflow.local')))")
+                db.execSQL("DELETE FROM attachments WHERE taskId IN (SELECT id FROM tasks WHERE createdBy IN (SELECT id FROM users WHERE email IN ('manuel@taskflow.local', 'ana@taskflow.local')))")
+                db.execSQL("DELETE FROM task_links WHERE taskId IN (SELECT id FROM tasks WHERE createdBy IN (SELECT id FROM users WHERE email IN ('manuel@taskflow.local', 'ana@taskflow.local')))")
+                db.execSQL("DELETE FROM custom_fields WHERE taskId IN (SELECT id FROM tasks WHERE createdBy IN (SELECT id FROM users WHERE email IN ('manuel@taskflow.local', 'ana@taskflow.local')))")
+                db.execSQL("DELETE FROM checklist_items WHERE taskId IN (SELECT id FROM tasks WHERE createdBy IN (SELECT id FROM users WHERE email IN ('manuel@taskflow.local', 'ana@taskflow.local')))")
+                db.execSQL("DELETE FROM comments WHERE taskId IN (SELECT id FROM tasks WHERE createdBy IN (SELECT id FROM users WHERE email IN ('manuel@taskflow.local', 'ana@taskflow.local')))")
+                db.execSQL("DELETE FROM activity_log WHERE taskId IN (SELECT id FROM tasks WHERE createdBy IN (SELECT id FROM users WHERE email IN ('manuel@taskflow.local', 'ana@taskflow.local')))")
+                db.execSQL("DELETE FROM invites WHERE taskId IN (SELECT id FROM tasks WHERE createdBy IN (SELECT id FROM users WHERE email IN ('manuel@taskflow.local', 'ana@taskflow.local')))")
+                db.execSQL("DELETE FROM pending_operations WHERE entityId IN (SELECT id FROM tasks WHERE createdBy IN (SELECT id FROM users WHERE email IN ('manuel@taskflow.local', 'ana@taskflow.local')))")
+                db.execSQL("DELETE FROM tasks WHERE createdBy IN (SELECT id FROM users WHERE email IN ('manuel@taskflow.local', 'ana@taskflow.local'))")
+                db.execSQL("DELETE FROM task_lists WHERE spaceId IN (SELECT id FROM spaces WHERE ownerId IN (SELECT id FROM users WHERE email IN ('manuel@taskflow.local', 'ana@taskflow.local')))")
+                db.execSQL("DELETE FROM spaces WHERE ownerId IN (SELECT id FROM users WHERE email IN ('manuel@taskflow.local', 'ana@taskflow.local'))")
+                db.execSQL("DELETE FROM users WHERE email IN ('manuel@taskflow.local', 'ana@taskflow.local')")
             }
         }
     }

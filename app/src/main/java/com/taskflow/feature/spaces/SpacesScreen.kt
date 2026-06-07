@@ -72,9 +72,10 @@ fun SpacesScreen(vm: TaskFlowViewModel, onDetail: (String) -> Unit) {
     var message by remember { mutableStateOf<String?>(null) }
     var selectedSpaceId by remember { mutableStateOf<String?>(null) }
     var selectedListId by remember { mutableStateOf<String?>(null) }
-    val currentUser = users.firstOrNull { it.id == preferences.currentUserId } ?: users.firstOrNull() ?: vm.currentUser()
+    val currentUser = users.firstOrNull { it.id == preferences.currentUserId } ?: vm.currentUser()
+    val visibleSpaces = spaces.filter { it.ownerId == currentUser.id || currentUser.id in it.members }
     val visibleTasks = TaskQueries.visibleForUser(tasks, currentUser.id, invites)
-    val selectedSpace = spaces.firstOrNull { it.id == selectedSpaceId }
+    val selectedSpace = visibleSpaces.firstOrNull { it.id == selectedSpaceId }
     val selectedSpaceTasks = selectedSpace?.let { space -> TaskQueries.inSpace(visibleTasks, space.id) } ?: emptyList()
     val selectedList = lists.firstOrNull { it.id == selectedListId }
     val selectedListTasks = selectedList?.let { list -> TaskQueries.inList(visibleTasks, list.id) } ?: emptyList()
@@ -93,7 +94,7 @@ fun SpacesScreen(vm: TaskFlowViewModel, onDetail: (String) -> Unit) {
             onDismiss = { dialog = null },
             onConfirm = { value ->
                 when (state.kind) {
-                    CrudKind.CreateSpace -> vm.repo.createSpace(value)
+                    CrudKind.CreateSpace -> vm.repo.createSpace(value, currentUser.id)
                     CrudKind.EditSpace -> state.space?.let { vm.repo.updateSpace(it.copy(name = value)) }
                     CrudKind.CreateList -> state.space?.let { vm.repo.createList(it.id, value) }
                     CrudKind.EditList -> state.list?.let { vm.repo.updateList(it.copy(name = value)) }
@@ -116,7 +117,7 @@ fun SpacesScreen(vm: TaskFlowViewModel, onDetail: (String) -> Unit) {
             FeedbackBanner(message, FeedbackKind.Error, Modifier.padding(top = 8.dp))
             Spacer(Modifier.height(16.dp))
         }
-        items(spaces) { space ->
+        items(visibleSpaces) { space ->
             TaskFlowCard {
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                     Column(
@@ -139,7 +140,7 @@ fun SpacesScreen(vm: TaskFlowViewModel, onDetail: (String) -> Unit) {
                         IconButton(onClick = { dialog = CrudDialogState(CrudKind.EditSpace, "Renomear espaco", space.name, space = space) }, modifier = Modifier.testTag("edit-space-${space.name}").semantics { contentDescription = "Renomear espaco ${space.name}" }) { Icon(Icons.Default.Edit, null, tint = TaskFlowColors.Muted) }
                         IconButton(onClick = { dialog = CrudDialogState(CrudKind.CreateList, "Nova lista", space = space) }, modifier = Modifier.testTag("create-list-${space.name}").semantics { contentDescription = "Criar lista em ${space.name}" }) { Icon(Icons.AutoMirrored.Filled.PlaylistAdd, null, tint = TaskFlowColors.Blue) }
                         IconButton(onClick = {
-                            if (tasks.any { it.spaceId == space.id }) message = "Exclua ou mova as tarefas antes de remover este espaco." else vm.repo.deleteSpace(space.id)
+                            if (space.ownerId != currentUser.id) message = "Apenas o proprietario pode excluir este espaco." else if (tasks.any { it.spaceId == space.id }) message = "Exclua ou mova as tarefas antes de remover este espaco." else vm.repo.deleteSpace(space.id)
                         }, modifier = Modifier.testTag("delete-space-${space.name}").semantics { contentDescription = "Excluir espaco ${space.name}" }) { Icon(Icons.Default.Delete, null, tint = TaskFlowColors.Danger) }
                     }
                 }
@@ -174,6 +175,12 @@ fun SpacesScreen(vm: TaskFlowViewModel, onDetail: (String) -> Unit) {
                 }
             }
             Spacer(Modifier.height(12.dp))
+        }
+        if (visibleSpaces.isEmpty()) {
+            item {
+                EmptyState("Nenhum espaco", "Crie seu primeiro espaco para organizar listas e tarefas.")
+                Spacer(Modifier.height(12.dp))
+            }
         }
         selectedSpace?.let { space ->
             item {
