@@ -12,6 +12,7 @@ GitHub repository:
 
 - `https://github.com/gutobaddini-create/taskflow`
 - Published branch: `master`
+- Release: `https://github.com/gutobaddini-create/taskflow/releases/tag/v0.1.0`
 - GitHub CLI authentication: ready for account `gutobaddini-create`
 
 ## Verified Command

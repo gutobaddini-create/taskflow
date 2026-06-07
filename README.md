@@ -136,6 +136,7 @@ Pendencias do Firebase real:
 - Release APK: `app/build/outputs/apk/release/app-release.apk`
 - Release AAB: `app/build/outputs/bundle/release/app-release.aab`
 - Manifesto de release: `docs/qa/release-manifest.json`
+- GitHub Release: `https://github.com/gutobaddini-create/taskflow/releases/tag/v0.1.0`
 
 O release atual foi gerado com keystore de producao local em `C:\Users\gutol\.taskflow\release\taskflow-release.keystore`. O arquivo de ambiente local fica em `C:\Users\gutol\.taskflow\release\taskflow-release-signing.env.ps1` e nao deve ser enviado ao Git.
 
