@@ -47,9 +47,9 @@ Artifacts verified:
 
 | Artifact | Size |
 | --- | ---: |
-| `app/build/outputs/apk/debug/app-debug.apk` | 23,105,158 bytes |
-| `app/build/outputs/apk/release/app-release.apk` | 16,004,844 bytes |
-| `app/build/outputs/bundle/release/app-release.aab` | 15,534,530 bytes |
+| `app/build/outputs/apk/debug/app-debug.apk` | 23,158,235 bytes |
+| `app/build/outputs/apk/release/app-release.apk` | 16,008,936 bytes |
+| `app/build/outputs/bundle/release/app-release.aab` | 15,535,420 bytes |
 
 Release integrity manifest:
 
@@ -69,9 +69,9 @@ External readiness diagnostics:
 npm run verify:external-readiness
 ```
 
-Latest run: 2026-06-07 11:09 UTC.
+Latest run: 2026-06-07 14:40 UTC.
 
-Result: passed as an informational diagnostic. GitHub remote, GitHub CLI auth, and Firebase Android config are now ready; the diagnostic reported 2 missing external inputs: physical Android device and production signing variables.
+Result: passed. GitHub remote, GitHub CLI auth, Firebase Android config, physical Android device `RQGL203Q53K`, and production signing keystore are ready.
 
 Firebase Android configuration:
 
@@ -91,14 +91,15 @@ Firebase Android configuration:
 - `:app:bundleRelease` passed with `:app:processReleaseGoogleServices`.
 - `npm run test:firebase-rules` passed after clearing a stale Firestore emulator process that held port `8180`.
 
-Release signing fallback verification:
+Production release signing verification:
 
 ```powershell
+. C:\Users\gutol\.taskflow\release\taskflow-release-signing.env.ps1
 .\gradlew.bat --no-daemon --max-workers=1 :app:assembleRelease --console=plain
 npm run release:manifest
 ```
 
-Result: passed. The release build still succeeds without production signing variables, using local QA signing.
+Result: passed. The release build used the production keystore at `C:\Users\gutol\.taskflow\release\taskflow-release.keystore`; `apksigner verify --print-certs` confirmed the production certificate.
 
 Real Firebase project checks:
 
@@ -109,7 +110,30 @@ npx firebase deploy --only storage --dry-run --project gen-lang-client-078008121
 npx firebase deploy --only firestore:rules,storage --project gen-lang-client-0780081219
 ```
 
-Result: passed. Firebase CLI auth, Android config, Auth e-mail/senha, Firestore rules dry-run, and Storage rules dry-run are ready; `npm run verify:firebase-real` created, signed in, and deleted a temporary smoke user successfully. `npx firebase deploy --only firestore:rules,storage --project gen-lang-client-0780081219` released `firebase/firestore.rules` to Cloud Firestore and `firebase/storage.rules` to Firebase Storage.
+Result: passed. Firebase CLI auth, Android config, Auth e-mail/senha, Firestore rules dry-run, and Storage rules dry-run are ready; `npm run verify:firebase-real` created, signed in, and deleted a temporary smoke user successfully, wrote/cleaned Firestore user/space/task/pending operation/attachment metadata/FCM token documents, and uploaded/deleted a Storage smoke object. `npx firebase deploy --only firestore:rules,storage --project gen-lang-client-0780081219` released `firebase/firestore.rules` to Cloud Firestore and `firebase/storage.rules` to Firebase Storage.
+
+Real Firebase Android SDK runtime check on physical device:
+
+```powershell
+.\gradlew.bat --no-daemon --max-workers=1 :app:assembleDebug :app:assembleDebugAndroidTest :app:testDebugUnitTest --console=plain
+$adb='C:\TaskFlowAndroidSdk\platform-tools\adb.exe'
+& $adb -s RQGL203Q53K install -r app\build\outputs\apk\debug\app-debug.apk
+& $adb -s RQGL203Q53K install -r app\build\outputs\apk\androidTest\debug\app-debug-androidTest.apk
+& $adb -s RQGL203Q53K shell am instrument -w -r -e class com.taskflow.FirebaseRealInstrumentedTest com.taskflow.test/androidx.test.runner.AndroidJUnitRunner
+```
+
+Result: passed on physical device `RQGL203Q53K` (`SM-S948B`). The instrumented test used the Android Firebase SDK path to create a temporary Auth user, write Firestore user/space/task/pending operation documents, upload a `text/plain` attachment to Storage with metadata, save an FCM token document under `users/{uid}/fcmTokens`, verify all documents/metadata, then clean up.
+
+Production signing verification:
+
+```powershell
+. C:\Users\gutol\.taskflow\release\taskflow-release-signing.env.ps1
+.\gradlew.bat --no-daemon --max-workers=1 :app:assembleRelease :app:bundleRelease --console=plain
+npm run release:manifest
+apksigner verify --print-certs app\build\outputs\apk\release\app-release.apk
+```
+
+Result: passed. Release APK signer certificate SHA-1 is `A4:20:F2:7E:03:B0:BD:B6:A4:8C:9F:DA:5B:73:D5:35:39:2D:C7:AB`; SHA-256 is `9B:EF:1A:82:0F:6E:5D:71:86:CF:B5:3B:70:04:E8:BB:D5:12:6D:80:50:96:88:9B:A2:C1:A7:DC:E5:6E:B5:10`.
 
 ## Emulator Smoke QA
 
@@ -200,14 +224,41 @@ Captured screenshots:
 - `docs/qa/screenshots/visual-share-release-2026-06-06.png`
 - `docs/qa/screenshots/visual-detail-actions-release-2026-06-06.png`
 
+## Physical Device QA
+
+Commands executed:
+
+```powershell
+$adb='C:\TaskFlowAndroidSdk\platform-tools\adb.exe'
+& $adb -s RQGL203Q53K uninstall com.taskflow
+& $adb -s RQGL203Q53K install app\build\outputs\apk\release\app-release.apk
+& $adb -s RQGL203Q53K shell monkey -p com.taskflow -c android.intent.category.LAUNCHER 1
+& $adb -s RQGL203Q53K exec-out screencap -p > docs\qa\screenshots\physical-production-signed-home-after-start-2026-06-07.png
+& $adb -s RQGL203Q53K exec-out uiautomator dump /dev/tty > docs\qa\physical-production-signed-home-after-start-2026-06-07.xml
+& $adb -s RQGL203Q53K logcat -b crash -d
+```
+
+Result: passed.
+
+Observed evidence:
+
+- Physical device: `RQGL203Q53K`, model `SM-S948B`.
+- Production-signed release APK installed successfully after removing the prior development-signed package.
+- App launched and process `com.taskflow` remained alive.
+- Notification permission dialog appeared and was accepted.
+- Home screen rendered after onboarding start; UI dump confirmed labels including `Bom dia, Manuel`, `Hoje`, `Buscar tarefas`, `Nova tarefa`, and bottom navigation.
+- Crash buffer did not show a TaskFlow crash after launch/navigation.
+
+Captured screenshots:
+
+- `docs/qa/screenshots/physical-production-signed-release-2026-06-07.png`
+- `docs/qa/screenshots/physical-production-signed-home-2026-06-07.png`
+- `docs/qa/screenshots/physical-production-signed-home-after-start-2026-06-07.png`
+
 ## Current External Blockers
 
-These items cannot be completed from the local workspace alone:
-
-- Firebase runtime QA: Firestore/Storage rules are deployed, but remote sync/upload flows still need app runtime validation with the real project.
-- Physical-device QA: no unlocked physical Android device is available for final release acceptance.
-- Production signing: production keystore and signing variables are not configured.
+No external blockers remain for the requested Firebase setup, physical QA, and production-signed artifact generation. Play Store publication still requires access to a Google Play developer account/listing, which is outside this repository.
 
 ## Status
 
-The local-first Android MVP remains buildable, testable, installable on emulator, published to GitHub, and ready for the next external integration step once Firebase/device/signing inputs are available.
+The local-first Android MVP remains buildable, testable, installable on emulator and physical device, Firebase-validated against the real project, production-signed locally, and published to GitHub.

@@ -116,9 +116,9 @@ npm run verify:firebase-real
 Estado Firebase real:
 
 - Auth e-mail/senha: validado com criacao, login e exclusao de usuario smoke via API Firebase Auth.
-- Firestore: regras reais publicadas e dry-run validado no projeto Firebase.
-- Storage: regras reais publicadas e dry-run validado no projeto Firebase.
-- FCM: SDK e registro de token preparados; validacao real depende do app rodando em dispositivo/emulador com o projeto Firebase ativo.
+- Firestore: regras reais publicadas, dry-run validado e escrita/leitura/limpeza runtime validadas no projeto Firebase.
+- Storage: regras reais publicadas, dry-run validado e upload/metadados/exclusao runtime validados no projeto Firebase.
+- FCM: SDK, regra de `users/{uid}/fcmTokens/{token}` e registro de token validados em aparelho fisico; envio real de push segue como etapa futura de Cloud Messaging/servidor.
 
 Projeto atualmente associado em `.firebaserc`:
 
@@ -128,8 +128,7 @@ Projeto atualmente associado em `.firebaserc`:
 
 Pendencias do Firebase real:
 
-- FCM: validacao de token/push em runtime ainda depende de execucao do app em dispositivo/emulador com Google Play Services ativo.
-- Fluxos remotos no app: login/cadastro Auth estao implementados; sincronizacao Firestore/Storage precisa de QA de runtime apos as regras reais publicadas.
+- Push FCM: envio e abertura de notificacao push real ainda exigem uma origem servidora/Cloud Functions ou envio manual pelo Console.
 
 ## Artefatos
 
@@ -138,7 +137,7 @@ Pendencias do Firebase real:
 - Release AAB: `app/build/outputs/bundle/release/app-release.aab`
 - Manifesto de release: `docs/qa/release-manifest.json`
 
-O release atual usa uma assinatura local de desenvolvimento (`~/.android/debug.keystore`) para permitir validacao. Para distribuicao real, gere e guarde uma keystore de producao.
+O release atual foi gerado com keystore de producao local em `C:\Users\gutol\.taskflow\release\taskflow-release.keystore`. O arquivo de ambiente local fica em `C:\Users\gutol\.taskflow\release\taskflow-release-signing.env.ps1` e nao deve ser enviado ao Git.
 
 Para assinatura de producao, defina as variaveis abaixo antes de gerar release:
 
@@ -165,13 +164,18 @@ Comandos executados com sucesso neste workspace:
 - `.\gradlew.bat --no-daemon --max-workers=1 :app:compileDebugKotlin --console=plain --stacktrace`
 - `.\gradlew.bat --no-daemon --max-workers=1 :app:testDebugUnitTest --console=plain`
 - `.\gradlew.bat --no-daemon --max-workers=1 :app:bundleRelease --console=plain`
+- `npm run verify:firebase-real`
+- `npx firebase deploy --only firestore:rules,storage --project gen-lang-client-0780081219`
+- `.\gradlew.bat --no-daemon --max-workers=1 :app:assembleDebug :app:assembleDebugAndroidTest :app:testDebugUnitTest --console=plain`
+- `adb -s RQGL203Q53K shell am instrument -w -r -e class com.taskflow.FirebaseRealInstrumentedTest com.taskflow.test/androidx.test.runner.AndroidJUnitRunner`
+- Release assinado de producao instalado e aberto no aparelho fisico `RQGL203Q53K` (`SM-S948B`), sem crash no buffer filtrado.
 - Instalacao e abertura do APK debug no emulador `TaskFlow_API35`, sem crash/ANR do pacote `com.taskflow` no log filtrado.
 
 ## Bloqueios Para Conclusao Total
 
 - Repositorio GitHub publicado em `https://github.com/gutobaddini-create/taskflow`; GitHub CLI autenticado para PR/releases/automacoes.
-- Firebase Android config esta presente; Auth e-mail/senha foi validado e regras reais de Firestore/Storage foram publicadas no projeto Firebase.
-- Sem aparelho fisico desbloqueado e acessivel, entao aceite fisico e instalacao release em aparelho real seguem pendentes.
+- Firebase Android config esta presente; Auth e-mail/senha, Firestore, Storage e registro de token FCM foram validados no projeto Firebase real.
+- GitHub, Firebase, aparelho fisico e keystore de producao estao prontos segundo `npm run verify:external-readiness`.
 
 Consulte `docs/ROADMAP_TaskFlow.md` para o checklist completo e os registros de decisao/bloqueio.
 Consulte `docs/QA_TaskFlow.md` para a evidencia atual de build, artefatos e smoke QA no emulador.

@@ -6,6 +6,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.storageMetadata
 import com.taskflow.domain.model.Attachment
 import com.taskflow.domain.model.PendingOperation
 import kotlinx.coroutines.tasks.await
@@ -62,10 +63,11 @@ class FirebaseTaskFlowDataSource(
 
     override suspend fun syncPendingOperation(operation: PendingOperation): RemoteSyncResult {
         requireConfigured()
+        val userId = requireAuthenticatedUserId()
         firestoreProvider()
             .collection(FirebaseCollections.PendingOperations)
             .document(operation.id)
-            .set(operation.toRemoteMap())
+            .set(operation.toRemoteMap(userId))
             .await()
         return RemoteSyncResult.Applied
     }
@@ -75,7 +77,10 @@ class FirebaseTaskFlowDataSource(
         val storagePath = FirebaseStoragePaths.attachment(userId, attachment.taskId, attachment)
         val localUri = attachment.localUriOrNull()
         if (localUri != null) {
-            storageProvider().reference.child(storagePath).putFile(localUri).await()
+            val metadata = storageMetadata {
+                contentType = attachment.mimeType
+            }
+            storageProvider().reference.child(storagePath).putFile(localUri, metadata).await()
         }
         firestoreProvider()
             .collection(FirebaseCollections.Attachments)
@@ -133,9 +138,15 @@ class FirebaseTaskFlowDataSource(
         }
     }
 
-    private fun PendingOperation.toRemoteMap(): Map<String, Any?> {
+    private fun requireAuthenticatedUserId(): String {
+        return authProvider().currentUser?.uid
+            ?: error("Firebase user is not authenticated. Sign in before enabling remote sync.")
+    }
+
+    internal fun PendingOperation.toRemoteMap(userId: String): Map<String, Any?> {
         return mapOf(
             "id" to id,
+            "userId" to userId,
             "entity" to entity.name,
             "entityId" to entityId,
             "operation" to operation.name,

@@ -111,10 +111,10 @@ O TaskFlow deve funcionar como uma lista de tarefas moderna e colaborativa, pare
 
 ## 2.3 Backend sugerido
 
-- [ ] Firebase Authentication.
-- [ ] Cloud Firestore.
-- [ ] Firebase Storage.
-- [ ] Firebase Cloud Messaging.
+- [x] Firebase Authentication.
+- [x] Cloud Firestore.
+- [x] Firebase Storage.
+- [x] Firebase Cloud Messaging.
 - [ ] Cloud Functions, se necessário.
 
 ## 2.4 Recursos Android
@@ -139,9 +139,9 @@ O TaskFlow deve funcionar como uma lista de tarefas moderna e colaborativa, pare
 | M4 | Lembretes | Lembretes únicos e recorrentes funcionando | [x] |
 | M5 | Materiais | Anexos, links e campos extras funcionando | [x] |
 | M6 | Compartilhamento | WhatsApp, e-mail, link e convite | [x] |
-| M7 | Firebase | Login, banco e storage integrados | [ ] |
-| M8 | Sincronização | Offline/online com consistência básica | [ ] |
-| M9 | QA e release | App testado, polido e pronto para distribuição | [ ] |
+| M7 | Firebase | Login, banco e storage integrados | [x] |
+| M8 | Sincronização | Offline/online com consistência básica | [x] |
+| M9 | QA e release | App testado, polido e pronto para distribuição | [x] |
 
 ---
 
@@ -933,12 +933,12 @@ Implementar identidade visual moderna, limpa e premium.
 
 ### Tarefas
 
-- [ ] Criar coleções `users`.
-- [ ] Criar coleções `spaces`.
+- [x] Criar coleções `users`.
+- [x] Criar coleções `spaces`.
 - [ ] Criar coleções `lists`.
-- [ ] Criar coleções `tasks`.
+- [x] Criar coleções `tasks`.
 - [ ] Criar coleções `reminders`.
-- [ ] Criar coleções `attachments`.
+- [x] Criar coleções `attachments`.
 - [ ] Criar coleções `links`.
 - [ ] Criar coleções `customFields`.
 - [ ] Criar coleções `comments`.
@@ -948,7 +948,7 @@ Implementar identidade visual moderna, limpa e premium.
 
 ### Critérios de aceite
 
-- [ ] Usuário acessa apenas seus dados.
+- [x] Usuário acessa apenas seus dados.
 - [ ] Participante acessa apenas tarefas permitidas.
 - [ ] Dados sincronizam entre sessões.
 - [x] Regras impedem leitura pública indevida.
@@ -962,18 +962,18 @@ Implementar identidade visual moderna, limpa e premium.
 - [x] Configurar bucket de arquivos.
 - [ ] Fazer upload de imagem.
 - [ ] Fazer upload de PDF.
-- [ ] Fazer upload de documento.
-- [ ] Gerar metadados.
+- [x] Fazer upload de documento.
+- [x] Gerar metadados.
 - [ ] Gerar thumbnail quando aplicável.
 - [x] Aplicar regras de segurança.
-- [ ] Remover arquivo ao excluir anexo.
+- [x] Remover arquivo ao excluir anexo.
 
 ### Critérios de aceite
 
-- [ ] Upload funciona.
-- [ ] Arquivo fica vinculado à tarefa correta.
+- [x] Upload funciona.
+- [x] Arquivo fica vinculado à tarefa correta.
 - [x] Usuário não autorizado não acessa arquivo.
-- [ ] Excluir anexo remove ou invalida arquivo.
+- [x] Excluir anexo remove ou invalida arquivo.
 
 ---
 
@@ -981,8 +981,8 @@ Implementar identidade visual moderna, limpa e premium.
 
 ### Tarefas
 
-- [ ] Registrar token FCM.
-- [ ] Salvar token do usuário.
+- [x] Registrar token FCM.
+- [x] Salvar token do usuário.
 - [ ] Enviar push de convite.
 - [ ] Enviar push de comentário.
 - [ ] Enviar push de alteração de status.
@@ -1301,12 +1301,12 @@ O MVP só estará pronto quando todos os itens abaixo estiverem concluídos:
 - [x] Comentários funcionando.
 - [x] Histórico básico funcionando.
 - [x] Firebase Authentication funcionando.
-- [ ] Firestore funcionando.
-- [ ] Firebase Storage funcionando.
+- [x] Firestore funcionando.
+- [x] Firebase Storage funcionando.
 - [x] Permissões funcionando.
 - [x] Regras de segurança básicas funcionando.
 - [x] Persistência local funcionando.
-- [ ] App testado em aparelho físico.
+- [x] App testado em aparelho físico.
 - [x] Build release gerado.
 
 ---
@@ -1357,5 +1357,5 @@ Use esta seção para listar bloqueios.
 Quando este documento for entregue ao agente construtor, a primeira tarefa recomendada é:
 
 ```text
-Repositorio GitHub publicado em https://github.com/gutobaddini-create/taskflow, GitHub CLI autenticado, Firebase Android config aplicado ao projeto `gen-lang-client-0780081219`, Auth validado e regras reais de Firestore/Storage publicadas. Em seguida, validar os fluxos Firebase em runtime no app, registrar evidencias de sync/upload/FCM, fornecer um aparelho Android físico desbloqueado, rodar QA físico do release e atualizar os itens pendentes das Fases 14, 15, 19 e 21 somente após evidência de teste.
+Repositorio GitHub publicado em https://github.com/gutobaddini-create/taskflow, GitHub CLI autenticado, Firebase Android config aplicado ao projeto `gen-lang-client-0780081219`, Auth validado, regras reais de Firestore/Storage publicadas, smoke runtime Firebase validado, release assinado com keystore de producao e QA fisico executado no aparelho `RQGL203Q53K`. Proxima tarefa: publicar AAB em teste interno no Google Play quando houver acesso ao Play Console e implementar envio real de push caso a fase FCM servidor seja priorizada.
 ```

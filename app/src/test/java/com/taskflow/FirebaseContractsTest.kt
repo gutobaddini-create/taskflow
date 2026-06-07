@@ -6,6 +6,8 @@ import com.taskflow.data.remote.FirebaseTaskFlowDataSource
 import com.taskflow.domain.model.Attachment
 import com.taskflow.domain.model.AttachmentType
 import com.taskflow.domain.model.PendingEntityType
+import com.taskflow.domain.model.PendingOperation
+import com.taskflow.domain.model.PendingOperationType
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -86,5 +88,25 @@ class FirebaseContractsTest {
 
         assertTrue(error is IllegalStateException)
         assertTrue(error?.message.orEmpty().contains("Firebase is not configured"))
+    }
+
+    @Test
+    fun pendingOperationRemotePayloadIncludesAuthenticatedUserId() {
+        val operation = PendingOperation(
+            id = "op-1",
+            entity = PendingEntityType.Task,
+            entityId = "task-1",
+            operation = PendingOperationType.Create,
+            createdAt = 1234
+        )
+        val payload = with(FirebaseTaskFlowDataSource(forceConfigured = false)) {
+            operation.toRemoteMap(userId = "user-1")
+        }
+
+        assertEquals("user-1", payload["userId"])
+        assertEquals("op-1", payload["id"])
+        assertEquals("Task", payload["entity"])
+        assertEquals("task-1", payload["entityId"])
+        assertEquals("Create", payload["operation"])
     }
 }
