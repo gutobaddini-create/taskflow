@@ -64,7 +64,7 @@ if ($googleServices) {
     } else {
         ".firebaserc not found"
     }
-    Add-Check "Firebase config" "ready" "$($googleServices.FullName)`n$projectEvidence" "Enable Firebase console products and run real-project validation."
+    Add-Check "Firebase config" "ready" "$($googleServices.FullName)`n$projectEvidence" "Run npm run verify:firebase-real after Firebase console/product changes."
 } else {
     Add-Check "Firebase config" "missing" "No google-services.json found under the project." "Add app/google-services.json from the Firebase Android app configuration."
 }
