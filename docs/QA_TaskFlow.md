@@ -69,9 +69,9 @@ External readiness diagnostics:
 npm run verify:external-readiness
 ```
 
-Latest run: 2026-06-07 10:39 UTC.
+Latest run: 2026-06-07 11:09 UTC.
 
-Result: passed as an informational diagnostic. GitHub remote is now ready and points to `https://github.com/gutobaddini-create/taskflow.git`; the diagnostic reported 4 missing external inputs: GitHub CLI auth, Firebase `google-services.json`, physical Android device, and production signing variables.
+Result: passed as an informational diagnostic. GitHub remote and GitHub CLI auth are now ready; the diagnostic reported 3 missing external inputs: Firebase `google-services.json`, physical Android device, and production signing variables.
 
 Release signing fallback verification:
 
@@ -175,9 +175,9 @@ Captured screenshots:
 
 These items cannot be completed from the local workspace alone:
 
-- GitHub PR/CLI automation: repository was published to `https://github.com/gutobaddini-create/taskflow`, but `gh auth status` is not authenticated.
 - Firebase real integration: no Firebase project credentials or `google-services.json` are present.
 - Physical-device QA: no unlocked physical Android device is available for final release acceptance.
+- Production signing: production keystore and signing variables are not configured.
 
 ## Status
 

@@ -156,7 +156,7 @@ Comandos executados com sucesso neste workspace:
 
 ## Bloqueios Para Conclusao Total
 
-- Repositorio GitHub publicado em `https://github.com/gutobaddini-create/taskflow`; `gh auth status` ainda nao esta autenticado para abrir PR ou usar automacoes via GitHub CLI.
+- Repositorio GitHub publicado em `https://github.com/gutobaddini-create/taskflow`; GitHub CLI autenticado para PR/releases/automacoes.
 - Sem `google-services.json`, entao Firebase Auth/Firestore/Storage/FCM real nao pode ser validado.
 - Sem aparelho fisico desbloqueado e acessivel, entao aceite fisico e instalacao release em aparelho real seguem pendentes.
 

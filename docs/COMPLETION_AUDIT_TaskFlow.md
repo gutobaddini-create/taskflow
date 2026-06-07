@@ -8,7 +8,7 @@ This document maps the requested final state to current evidence in the local wo
 
 The TaskFlow Android local-first MVP is complete and verified on emulator.
 
-The full original goal is not fully complete yet because real Firebase integration, physical-device QA, production signing, and optional GitHub CLI/PR automation require external inputs that are not currently available on this machine/session.
+The full original goal is not fully complete yet because real Firebase integration, physical-device QA, and production signing require external inputs that are not currently available on this machine/session.
 
 ## Evidence Snapshot
 
@@ -18,7 +18,7 @@ Commands and state inspected on 2026-06-07:
 - `git remote -v`: `origin` points to `https://github.com/gutobaddini-create/taskflow.git`.
 - `git push -u origin master`: published local `master` to `origin/master`.
 - `git ls-remote --heads origin`: confirms `refs/heads/master` at commit `1c783c9`.
-- `gh auth status`: not logged into any GitHub host.
+- `gh auth status`: authenticated to `github.com` as `gutobaddini-create` with `repo` and `workflow` scopes.
 - `Get-ChildItem -Recurse -File -Filter google-services.json`: no Firebase config found in the project.
 - `C:\TaskFlowAndroidSdk\platform-tools\adb.exe devices -l`: only `emulator-5554` is attached.
 - `npm run verify:local-mvp`: latest documented pass at 2026-06-06 23:13 UTC.
@@ -41,16 +41,15 @@ Commands and state inspected on 2026-06-07:
 | Emulator install, launch, screenshots, and crash/log inspection | `docs/QA_TaskFlow.md` records debug and release emulator QA on `emulator-5554` | Complete |
 | Git checkpoints | Local Git repo exists with latest commit `2a83c94 Add local release handoff summary` | Complete locally |
 | GitHub publishing | `origin/master` was pushed to `https://github.com/gutobaddini-create/taskflow.git` | Complete |
-| GitHub PR/CLI automation | `gh` is not authenticated | Blocked by external input if PR/CLI automation is required |
+| GitHub PR/CLI automation | `gh auth status` confirms login as `gutobaddini-create` with `repo` and `workflow` scopes | Complete |
 | Physical-device acceptance | ADB currently lists only `emulator-5554`; no unlocked physical device is available | Blocked by external input |
 | Production distribution signing | Gradle supports production signing through `TASKFLOW_RELEASE_*` environment variables, but no production keystore or passwords are currently provided | Blocked by external input |
 
 ## External Inputs Needed To Finish The Original Goal
 
-1. GitHub authentication if a PR, release, or further GitHub CLI automation is required.
-2. Firebase project configuration, including `google-services.json` and test credentials.
-3. Unlocked physical Android device with USB debugging authorized.
-4. Production signing keystore if public distribution is required.
+1. Firebase project configuration, including `google-services.json` and test credentials.
+2. Unlocked physical Android device with USB debugging authorized.
+3. Production signing keystore if public distribution is required.
 
 Run this anytime to refresh the external-input status:
 
@@ -60,8 +59,7 @@ npm run verify:external-readiness
 
 ## Next Completion Steps After Inputs Arrive
 
-1. Authenticate GitHub CLI if a PR, release, or GitHub automation is required.
-2. Add Firebase configuration, enable Auth/Firestore/Storage/FCM, wire real Firebase data sources, and validate against the real project.
-3. Install and run the release build on a physical device, capture QA evidence, and update `docs/QA_TaskFlow.md`.
-4. Sign release artifacts with a production keystore and regenerate the release manifest.
-5. Mark the remaining roadmap items complete only after the corresponding evidence is captured.
+1. Add Firebase configuration, enable Auth/Firestore/Storage/FCM, wire real Firebase data sources, and validate against the real project.
+2. Install and run the release build on a physical device, capture QA evidence, and update `docs/QA_TaskFlow.md`.
+3. Sign release artifacts with a production keystore and regenerate the release manifest.
+4. Mark the remaining roadmap items complete only after the corresponding evidence is captured.
