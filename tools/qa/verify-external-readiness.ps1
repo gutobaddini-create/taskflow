@@ -58,7 +58,13 @@ if ($gh.exitCode -eq 0) {
 
 $googleServices = Get-ChildItem -Path $root -Recurse -File -Filter "google-services.json" -ErrorAction SilentlyContinue | Select-Object -First 1
 if ($googleServices) {
-    Add-Check "Firebase config" "ready" $googleServices.FullName "Enable real Firebase integration and run real-project validation."
+    $firebaserc = Join-Path $root ".firebaserc"
+    $projectEvidence = if (Test-Path $firebaserc) {
+        (Get-Content $firebaserc -Raw).Trim()
+    } else {
+        ".firebaserc not found"
+    }
+    Add-Check "Firebase config" "ready" "$($googleServices.FullName)`n$projectEvidence" "Enable Firebase console products and run real-project validation."
 } else {
     Add-Check "Firebase config" "missing" "No google-services.json found under the project." "Add app/google-services.json from the Firebase Android app configuration."
 }

@@ -11,7 +11,8 @@ TaskFlow e um app Android nativo em Kotlin/Jetpack Compose para organizar tarefa
 - Materiais com picker de imagem/documento, camera, links, campos complementares e checklist.
 - Compartilhamento local com texto de convite, deep link `taskflow://invite/...` e permissao local.
 - Fila de operacoes pendentes para sync futuro de espacos, listas, tarefas, lembretes, anexos, links, campos, checklist, comentarios e convites.
-- Contratos Firebase, regras Firestore/Storage e testes de regras preparados, mas Firebase real permanece desativado sem credenciais.
+- Contratos Firebase, regras Firestore/Storage e testes de regras preparados; a configuracao Android Firebase esta aplicada, mas produtos reais ainda dependem de ativacao no console.
+- Config Firebase Android criado para o projeto `gen-lang-client-0780081219`, app `TaskFlow Android`, package `com.taskflow`; `app/google-services.json` esta presente e o Gradle processa `google-services` em debug/release.
 
 ## Estrutura
 
@@ -101,7 +102,7 @@ $adb='C:\TaskFlowAndroidSdk\platform-tools\adb.exe'
 
 ## Firebase
 
-O MVP nao exige `google-services.json` para compilar. A classe `FirebaseTaskFlowDataSource` falha fechada ate o projeto Firebase real ser configurado.
+O projeto agora inclui `app/google-services.json` e processa o plugin Google Services em debug/release. A classe `FirebaseTaskFlowDataSource` ainda falha fechada ate Auth/Firestore/Storage/FCM reais serem habilitados e conectados aos repositórios.
 
 Para validar regras localmente:
 
@@ -113,13 +114,23 @@ npm run test:storage-rules
 
 Para concluir Firebase real, sera necessario fornecer:
 
-- projeto Firebase;
-- `google-services.json`;
+- projeto Firebase com billing habilitado para criar/usar Firestore real;
 - Auth com e-mail/senha habilitado;
 - Firestore;
 - Storage;
 - FCM;
 - credenciais/ambiente de teste.
+
+Projeto atualmente associado em `.firebaserc`:
+
+- Project ID: `gen-lang-client-0780081219`
+- Android App ID: `1:209004797664:android:ef4fc149b5b033f782ba85`
+- Package: `com.taskflow`
+
+Pendencias do console Firebase real:
+
+- Firestore: a criacao/publicacao real retornou HTTP 403 exigindo billing habilitado no projeto.
+- Storage: o bucket ainda precisa ser inicializado no Console Firebase em `https://console.firebase.google.com/project/gen-lang-client-0780081219/storage`.
 
 ## Artefatos
 
@@ -152,12 +163,15 @@ Comandos executados com sucesso neste workspace:
 - `.\gradlew.bat --no-daemon --max-workers=1 :app:bundleRelease --console=plain --stacktrace`
 - `npm run test:firebase-rules`
 - `npm run verify:local-mvp`
+- `.\gradlew.bat --no-daemon --max-workers=1 :app:compileDebugKotlin --console=plain --stacktrace`
+- `.\gradlew.bat --no-daemon --max-workers=1 :app:testDebugUnitTest --console=plain`
+- `.\gradlew.bat --no-daemon --max-workers=1 :app:bundleRelease --console=plain`
 - Instalacao e abertura do APK debug no emulador `TaskFlow_API35`, sem crash/ANR do pacote `com.taskflow` no log filtrado.
 
 ## Bloqueios Para Conclusao Total
 
 - Repositorio GitHub publicado em `https://github.com/gutobaddini-create/taskflow`; GitHub CLI autenticado para PR/releases/automacoes.
-- Sem `google-services.json`, entao Firebase Auth/Firestore/Storage/FCM real nao pode ser validado.
+- Firebase Android config esta presente; Firestore real ainda exige billing habilitado e Storage precisa ser inicializado no Console Firebase.
 - Sem aparelho fisico desbloqueado e acessivel, entao aceite fisico e instalacao release em aparelho real seguem pendentes.
 
 Consulte `docs/ROADMAP_TaskFlow.md` para o checklist completo e os registros de decisao/bloqueio.

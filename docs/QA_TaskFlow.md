@@ -71,7 +71,23 @@ npm run verify:external-readiness
 
 Latest run: 2026-06-07 11:09 UTC.
 
-Result: passed as an informational diagnostic. GitHub remote and GitHub CLI auth are now ready; the diagnostic reported 3 missing external inputs: Firebase `google-services.json`, physical Android device, and production signing variables.
+Result: passed as an informational diagnostic. GitHub remote, GitHub CLI auth, and Firebase Android config are now ready; the diagnostic reported 2 missing external inputs: physical Android device and production signing variables.
+
+Firebase Android configuration:
+
+- Firebase CLI authenticated as `gutobaddini@gmail.com`.
+- Active project: `gen-lang-client-0780081219`.
+- Android app: `TaskFlow Android`.
+- Android App ID: `1:209004797664:android:ef4fc149b5b033f782ba85`.
+- Package: `com.taskflow`.
+- Config file: `app/google-services.json`.
+- Gradle plugin: `com.google.gms.google-services`.
+- Firebase SDKs added through BoM `33.7.0`: Auth, Firestore, Storage, and Messaging.
+- `:app:compileDebugKotlin` passed with `:app:processDebugGoogleServices`.
+- `:app:testDebugUnitTest` passed.
+- `:app:assembleRelease` passed with `:app:processReleaseGoogleServices`.
+- `:app:bundleRelease` passed with `:app:processReleaseGoogleServices`.
+- `npm run test:firebase-rules` passed after clearing a stale Firestore emulator process that held port `8180`.
 
 Release signing fallback verification:
 
@@ -81,6 +97,15 @@ npm run release:manifest
 ```
 
 Result: passed. The release build still succeeds without production signing variables, using local QA signing.
+
+Real Firebase project checks:
+
+```powershell
+npx firebase deploy --only firestore:rules --dry-run --project gen-lang-client-0780081219
+npx firebase deploy --only storage --dry-run --project gen-lang-client-0780081219
+```
+
+Result: blocked by Firebase project setup. Firestore real deployment returned HTTP 403 because billing is not enabled for project `gen-lang-client-0780081219`. Storage deployment reported that Firebase Storage has not been set up and must be initialized in the Firebase Console.
 
 ## Emulator Smoke QA
 
@@ -175,7 +200,7 @@ Captured screenshots:
 
 These items cannot be completed from the local workspace alone:
 
-- Firebase real integration: no Firebase project credentials or `google-services.json` are present.
+- Firebase real product activation: Firestore requires billing and Storage requires console initialization before real rules/storage validation.
 - Physical-device QA: no unlocked physical Android device is available for final release acceptance.
 - Production signing: production keystore and signing variables are not configured.
 
