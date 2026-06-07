@@ -1,6 +1,6 @@
 # TaskFlow Completion Audit
 
-Date: 2026-06-06
+Date: 2026-06-07
 
 This document maps the requested final state to current evidence in the local workspace. It is intentionally strict: an item is treated as complete only when the current project state has direct evidence.
 
@@ -8,14 +8,16 @@ This document maps the requested final state to current evidence in the local wo
 
 The TaskFlow Android local-first MVP is complete and verified on emulator.
 
-The full original goal is not fully complete yet because GitHub publishing, real Firebase integration, and physical-device QA require external inputs that are not currently available on this machine/session.
+The full original goal is not fully complete yet because real Firebase integration, physical-device QA, production signing, and optional GitHub CLI/PR automation require external inputs that are not currently available on this machine/session.
 
 ## Evidence Snapshot
 
-Commands and state inspected on 2026-06-06:
+Commands and state inspected on 2026-06-07:
 
-- `git status --short`: clean after commit `2a83c94`.
-- `git remote -v`: no remote configured.
+- `git status --short`: clean before documenting the GitHub publish update.
+- `git remote -v`: `origin` points to `https://github.com/gutobaddini-create/taskflow.git`.
+- `git push -u origin master`: published local `master` to `origin/master`.
+- `git ls-remote --heads origin`: confirms `refs/heads/master` at commit `1c783c9`.
 - `gh auth status`: not logged into any GitHub host.
 - `Get-ChildItem -Recurse -File -Filter google-services.json`: no Firebase config found in the project.
 - `C:\TaskFlowAndroidSdk\platform-tools\adb.exe devices -l`: only `emulator-5554` is attached.
@@ -38,13 +40,14 @@ Commands and state inspected on 2026-06-06:
 | Debug/release APK and release AAB generation | `docs/qa/release-manifest.json` contains sizes and SHA-256 hashes; handoff document lists artifacts | Complete |
 | Emulator install, launch, screenshots, and crash/log inspection | `docs/QA_TaskFlow.md` records debug and release emulator QA on `emulator-5554` | Complete |
 | Git checkpoints | Local Git repo exists with latest commit `2a83c94 Add local release handoff summary` | Complete locally |
-| GitHub publishing/PR | No Git remote configured; `gh` is not authenticated | Blocked by external input |
+| GitHub publishing | `origin/master` was pushed to `https://github.com/gutobaddini-create/taskflow.git` | Complete |
+| GitHub PR/CLI automation | `gh` is not authenticated | Blocked by external input if PR/CLI automation is required |
 | Physical-device acceptance | ADB currently lists only `emulator-5554`; no unlocked physical device is available | Blocked by external input |
 | Production distribution signing | Gradle supports production signing through `TASKFLOW_RELEASE_*` environment variables, but no production keystore or passwords are currently provided | Blocked by external input |
 
 ## External Inputs Needed To Finish The Original Goal
 
-1. GitHub repository remote URL and GitHub authentication.
+1. GitHub authentication if a PR, release, or further GitHub CLI automation is required.
 2. Firebase project configuration, including `google-services.json` and test credentials.
 3. Unlocked physical Android device with USB debugging authorized.
 4. Production signing keystore if public distribution is required.
@@ -57,7 +60,7 @@ npm run verify:external-readiness
 
 ## Next Completion Steps After Inputs Arrive
 
-1. Add the GitHub remote, push the current branch, and open a PR or publish the repository.
+1. Authenticate GitHub CLI if a PR, release, or GitHub automation is required.
 2. Add Firebase configuration, enable Auth/Firestore/Storage/FCM, wire real Firebase data sources, and validate against the real project.
 3. Install and run the release build on a physical device, capture QA evidence, and update `docs/QA_TaskFlow.md`.
 4. Sign release artifacts with a production keystore and regenerate the release manifest.

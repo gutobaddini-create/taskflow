@@ -6,7 +6,12 @@ Date: 2026-06-06
 
 TaskFlow is ready as a local-first Android MVP. The app builds, tests, installs, and runs on the Android emulator with Room/DataStore persistence, local reminders, local notifications, materials, sharing/invites, comments, history, and prepared Firebase boundaries.
 
-Firebase real integration, GitHub publishing, and physical-device acceptance remain external follow-up items.
+Firebase real integration, GitHub CLI/PR automation, production signing, and physical-device acceptance remain external follow-up items.
+
+GitHub repository:
+
+- `https://github.com/gutobaddini-create/taskflow`
+- Published branch: `master`
 
 ## Verified Command
 
@@ -75,10 +80,11 @@ Screenshots:
 
 ## External Inputs Still Required
 
-- GitHub remote URL to push commits, publish artifacts, or open a PR.
+- GitHub CLI authentication if a PR, release, or further GitHub automation is required.
 - Firebase project and `google-services.json` to enable real Auth, Firestore, Storage, and FCM.
 - Unlocked physical Android device with USB debugging authorized for final physical-device QA.
+- Production keystore and signing passwords for public distribution.
 
 ## Recommended Next Step
 
-Provide the GitHub remote first, then Firebase credentials, then an unlocked physical device. After each input is available, rerun the relevant verification and update `docs/ROADMAP_TaskFlow.md` only after evidence is captured.
+Provide Firebase credentials, then an unlocked physical device, then production signing credentials when public distribution is required. After each input is available, rerun the relevant verification and update `docs/ROADMAP_TaskFlow.md` only after evidence is captured.

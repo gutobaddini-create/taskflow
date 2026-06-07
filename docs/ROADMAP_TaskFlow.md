@@ -1347,6 +1347,7 @@ Use esta seção para listar bloqueios.
 
 | Data | Bloqueio | Impacto | Responsável | Status |
 |---|---|---|---|---|
+| 2026-06-07 | GitHub CLI sem autenticação (`gh auth status`). | O repositório já foi publicado, mas PR/releases/automações via `gh` dependem de login. | Dono da conta GitHub | Aberto |
 | 2026-06-06 | Ausência de projeto Firebase/`google-services.json`/credenciais de teste. | Impede validar Firebase Authentication, Firestore, Storage, FCM e regras publicadas. | Dono do projeto Firebase | Aberto |
 | 2026-06-06 | Aparelho físico conectado exige PIN/biometria. | APK release instala no aparelho, mas os fluxos navegáveis não puderam ser testados fisicamente via adb. | Dono do aparelho | Aberto |
 
@@ -1357,5 +1358,5 @@ Use esta seção para listar bloqueios.
 Quando este documento for entregue ao agente construtor, a primeira tarefa recomendada é:
 
 ```text
-Forneça um repositório GitHub remoto, um projeto Firebase com google-services.json e um aparelho Android físico desbloqueado. Em seguida, integrar Firebase Auth/Firestore/Storage/FCM, publicar/validar regras no projeto real, rodar QA físico do release e atualizar os itens pendentes das Fases 14, 15, 19 e 21 somente após evidência de teste.
+Repositorio GitHub publicado em https://github.com/gutobaddini-create/taskflow. Em seguida, autenticar GitHub CLI se PR/release automatizado for necessário, fornecer um projeto Firebase com google-services.json e um aparelho Android físico desbloqueado. Depois integrar Firebase Auth/Firestore/Storage/FCM, publicar/validar regras no projeto real, rodar QA físico do release e atualizar os itens pendentes das Fases 14, 15, 19 e 21 somente após evidência de teste.
 ```
