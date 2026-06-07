@@ -68,9 +68,10 @@ if ($apiKey) {
     $body = @{ email = $email; password = $password; returnSecureToken = $true } | ConvertTo-Json
     try {
         $created = Invoke-RestMethod -Method Post -Uri "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=$apiKey" -ContentType "application/json" -Body $body
-        $deleteBody = @{ idToken = $created.idToken } | ConvertTo-Json
+        $signIn = Invoke-RestMethod -Method Post -Uri "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=$apiKey" -ContentType "application/json" -Body $body
+        $deleteBody = @{ idToken = $signIn.idToken } | ConvertTo-Json
         Invoke-RestMethod -Method Post -Uri "https://identitytoolkit.googleapis.com/v1/accounts:delete?key=$apiKey" -ContentType "application/json" -Body $deleteBody | Out-Null
-        Add-Result $results "Firebase Auth email/password" "ready" "Created and deleted smoke user $email."
+        Add-Result $results "Firebase Auth email/password" "ready" "Created, signed in, and deleted smoke user $email."
     } catch {
         $message = $_.ErrorDetails.Message
         if (-not $message) { $message = $_.Exception.Message }

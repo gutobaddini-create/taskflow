@@ -913,17 +913,17 @@ Implementar identidade visual moderna, limpa e premium.
 
 ### Tarefas
 
-- [ ] Configurar Firebase no projeto.
-- [ ] Implementar login com e-mail e senha.
-- [ ] Implementar cadastro.
-- [ ] Implementar logout.
-- [ ] Implementar recuperação de senha.
+- [x] Configurar Firebase no projeto.
+- [x] Implementar login com e-mail e senha.
+- [x] Implementar cadastro.
+- [x] Implementar logout.
+- [x] Implementar recuperação de senha.
 - [ ] Preparar login Google.
 
 ### Critérios de aceite
 
-- [ ] Usuário cria conta real.
-- [ ] Usuário faz login.
+- [x] Usuário cria conta real.
+- [x] Usuário faz login.
 - [ ] Sessão é mantida.
 - [ ] Logout funciona.
 
@@ -959,7 +959,7 @@ Implementar identidade visual moderna, limpa e premium.
 
 ### Tarefas
 
-- [ ] Configurar bucket de arquivos.
+- [x] Configurar bucket de arquivos.
 - [ ] Fazer upload de imagem.
 - [ ] Fazer upload de PDF.
 - [ ] Fazer upload de documento.
@@ -1300,7 +1300,7 @@ O MVP só estará pronto quando todos os itens abaixo estiverem concluídos:
 - [x] Convite funcionando.
 - [x] Comentários funcionando.
 - [x] Histórico básico funcionando.
-- [ ] Firebase Authentication funcionando.
+- [x] Firebase Authentication funcionando.
 - [ ] Firestore funcionando.
 - [ ] Firebase Storage funcionando.
 - [x] Permissões funcionando.
@@ -1347,7 +1347,7 @@ Use esta seção para listar bloqueios.
 
 | Data | Bloqueio | Impacto | Responsável | Status |
 |---|---|---|---|---|
-| 2026-06-07 | Firestore real exige billing habilitado no projeto `gen-lang-client-0780081219`; Firebase Storage ainda precisa ser inicializado no Console. | Impede publicar/validar regras reais e testar Firestore/Storage/FCM em ambiente Firebase real. Auth e-mail/senha ja foi validado. | Dono do projeto Firebase | Aberto |
+| 2026-06-07 | Firestore real exigia billing habilitado no projeto `gen-lang-client-0780081219`; Firebase Storage precisava ser inicializado no Console. | Resolvido: `npm run verify:firebase-real` passou completo e `npx firebase deploy --only firestore:rules,storage --project gen-lang-client-0780081219` publicou as regras reais. | Dono do projeto Firebase | Resolvido |
 | 2026-06-06 | Aparelho físico conectado exige PIN/biometria. | APK release instala no aparelho, mas os fluxos navegáveis não puderam ser testados fisicamente via adb. | Dono do aparelho | Aberto |
 
 ---
@@ -1357,5 +1357,5 @@ Use esta seção para listar bloqueios.
 Quando este documento for entregue ao agente construtor, a primeira tarefa recomendada é:
 
 ```text
-Repositorio GitHub publicado em https://github.com/gutobaddini-create/taskflow, GitHub CLI autenticado e Firebase Android config aplicado ao projeto `gen-lang-client-0780081219`. Em seguida, habilitar billing/Firestore, inicializar Storage, habilitar Auth e fornecer um aparelho Android físico desbloqueado. Depois validar regras no projeto real, rodar QA físico do release e atualizar os itens pendentes das Fases 14, 15, 19 e 21 somente após evidência de teste.
+Repositorio GitHub publicado em https://github.com/gutobaddini-create/taskflow, GitHub CLI autenticado, Firebase Android config aplicado ao projeto `gen-lang-client-0780081219`, Auth validado e regras reais de Firestore/Storage publicadas. Em seguida, validar os fluxos Firebase em runtime no app, registrar evidencias de sync/upload/FCM, fornecer um aparelho Android físico desbloqueado, rodar QA físico do release e atualizar os itens pendentes das Fases 14, 15, 19 e 21 somente após evidência de teste.
 ```

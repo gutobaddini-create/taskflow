@@ -31,19 +31,21 @@ class FirebaseTaskFlowDataSource(
         requireConfigured()
         val result = authProvider().createUserWithEmailAndPassword(email.trim(), password).await()
         val user = result.user ?: return RemoteAuthResult.SignedOut
-        firestoreProvider()
-            .collection(FirebaseCollections.Users)
-            .document(user.uid)
-            .set(
-                mapOf(
-                    "id" to user.uid,
-                    "name" to name.trim(),
-                    "email" to email.trim().lowercase(),
-                    "createdAt" to System.currentTimeMillis(),
-                    "notificationPermissionStatus" to "unknown"
+        runCatching {
+            firestoreProvider()
+                .collection(FirebaseCollections.Users)
+                .document(user.uid)
+                .set(
+                    mapOf(
+                        "id" to user.uid,
+                        "name" to name.trim(),
+                        "email" to email.trim().lowercase(),
+                        "createdAt" to System.currentTimeMillis(),
+                        "notificationPermissionStatus" to "unknown"
+                    )
                 )
-            )
-            .await()
+                .await()
+        }
         return RemoteAuthResult.SignedIn(user.uid)
     }
 

@@ -6,7 +6,7 @@ Date: 2026-06-07
 
 TaskFlow is ready as a local-first Android MVP. The app builds, tests, installs, and runs on the Android emulator with Room/DataStore persistence, local reminders, local notifications, materials, sharing/invites, comments, history, and prepared Firebase boundaries.
 
-Firebase Android configuration is present. Firebase product activation, production signing, and physical-device acceptance remain external follow-up items.
+Firebase Android configuration is present. Firebase Auth is validated, and Firestore/Storage rules are deployed to the real Firebase project. Production signing and physical-device acceptance remain external follow-up items.
 
 GitHub repository:
 
@@ -41,8 +41,8 @@ Covered checks:
 | Artifact | Size | SHA-256 |
 | --- | ---: | --- |
 | `app/build/outputs/apk/debug/app-debug.apk` | 23,105,158 bytes | `30f28563872826e48b44a2bdfb4895ef2b43f7e0b270311b6816b048d2be7dfc` |
-| `app/build/outputs/apk/release/app-release.apk` | 16,004,844 bytes | `e2b77d55e30df8a7f3e3dfd6f988f5092be48fca30978741ae42d9cc902b0303` |
-| `app/build/outputs/bundle/release/app-release.aab` | 15,534,629 bytes | `0224b8ffce567e32fb8742a0ffc52211decf9b030ebc8ebae25f1965264eeb95` |
+| `app/build/outputs/apk/release/app-release.apk` | 16,004,844 bytes | `75424b5056840b9ec4674c3b22ed5290cef9ab4417844b14c2543892d72a81cb` |
+| `app/build/outputs/bundle/release/app-release.aab` | 15,534,530 bytes | `ed99c6a17b25490c70f50f0c8ca27d44b5169196a347c762341c218dcf734dc5` |
 
 Canonical artifact manifest:
 
@@ -77,6 +77,7 @@ Screenshots:
 - Firebase project: `gen-lang-client-0780081219`
 - Firebase Android App ID: `1:209004797664:android:ef4fc149b5b033f782ba85`
 - Firebase Auth e-mail/senha: validated through `npm run verify:firebase-real`
+- Firebase Firestore/Storage rules: validated through `npm run verify:firebase-real` and deployed with `npx firebase deploy --only firestore:rules,storage --project gen-lang-client-0780081219`
 - Firebase SDK path: Auth, Firestore, Storage, Messaging, FCM token registration, and pending-operation sync are implemented behind the local-first app.
 - Release signing: local development signing through the Android debug keystore, suitable for validation only.
 - Production distribution requires a dedicated production keystore.
@@ -85,10 +86,10 @@ Screenshots:
 
 ## External Inputs Still Required
 
-- Firebase console activation: billing for Firestore, Storage initialization, and runtime FCM/device validation.
+- Firebase runtime QA: real sync/upload flows and FCM token registration in the app still need runtime/device validation.
 - Unlocked physical Android device with USB debugging authorized for final physical-device QA.
 - Production keystore and signing passwords for public distribution.
 
 ## Recommended Next Step
 
-Enable Firebase billing/Firestore, initialize Storage, enable Auth email/password, then provide an unlocked physical device and production signing credentials when public distribution is required. After each input is available, rerun the relevant verification and update `docs/ROADMAP_TaskFlow.md` only after evidence is captured.
+Validate real Firebase runtime flows in the app, then provide an unlocked physical device and production signing credentials when public distribution is required. After each input is available, rerun the relevant verification and update `docs/ROADMAP_TaskFlow.md` only after evidence is captured.

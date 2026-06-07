@@ -10,7 +10,7 @@ Validated target:
 
 - Android emulator: `emulator-5554`
 - App package: `com.taskflow`
-- Build mode: local-first MVP with Firebase Android config and real Auth SDK path prepared
+- Build mode: local-first MVP with Firebase Android config, real Auth SDK path, and deployed Firestore/Storage rules
 
 ## Automated Verification
 
@@ -49,7 +49,7 @@ Artifacts verified:
 | --- | ---: |
 | `app/build/outputs/apk/debug/app-debug.apk` | 23,105,158 bytes |
 | `app/build/outputs/apk/release/app-release.apk` | 16,004,844 bytes |
-| `app/build/outputs/bundle/release/app-release.aab` | 15,534,629 bytes |
+| `app/build/outputs/bundle/release/app-release.aab` | 15,534,530 bytes |
 
 Release integrity manifest:
 
@@ -106,9 +106,10 @@ Real Firebase project checks:
 npm run verify:firebase-real
 npx firebase deploy --only firestore:rules --dry-run --project gen-lang-client-0780081219
 npx firebase deploy --only storage --dry-run --project gen-lang-client-0780081219
+npx firebase deploy --only firestore:rules,storage --project gen-lang-client-0780081219
 ```
 
-Result: partially passed. Firebase CLI auth, Android config, and Auth e-mail/senha are ready; `npm run verify:firebase-real` created and deleted a temporary smoke user successfully. Firestore real deployment returned HTTP 403 because billing is not enabled for project `gen-lang-client-0780081219`. Storage deployment reported that Firebase Storage has not been set up and must be initialized in the Firebase Console.
+Result: passed. Firebase CLI auth, Android config, Auth e-mail/senha, Firestore rules dry-run, and Storage rules dry-run are ready; `npm run verify:firebase-real` created, signed in, and deleted a temporary smoke user successfully. `npx firebase deploy --only firestore:rules,storage --project gen-lang-client-0780081219` released `firebase/firestore.rules` to Cloud Firestore and `firebase/storage.rules` to Firebase Storage.
 
 ## Emulator Smoke QA
 
@@ -203,7 +204,7 @@ Captured screenshots:
 
 These items cannot be completed from the local workspace alone:
 
-- Firebase real product activation: Firestore requires billing and Storage requires console initialization before real rules/storage validation.
+- Firebase runtime QA: Firestore/Storage rules are deployed, but remote sync/upload flows still need app runtime validation with the real project.
 - Physical-device QA: no unlocked physical Android device is available for final release acceptance.
 - Production signing: production keystore and signing variables are not configured.
 

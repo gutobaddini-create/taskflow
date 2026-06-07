@@ -11,7 +11,7 @@ TaskFlow e um app Android nativo em Kotlin/Jetpack Compose para organizar tarefa
 - Materiais com picker de imagem/documento, camera, links, campos complementares e checklist.
 - Compartilhamento local com texto de convite, deep link `taskflow://invite/...` e permissao local.
 - Fila de operacoes pendentes para sync futuro de espacos, listas, tarefas, lembretes, anexos, links, campos, checklist, comentarios e convites.
-- Contratos Firebase, regras Firestore/Storage e testes de regras preparados; a configuracao Android Firebase esta aplicada, mas produtos reais ainda dependem de ativacao no console.
+- Contratos Firebase, regras Firestore/Storage e testes de regras preparados; a configuracao Android Firebase esta aplicada e as regras reais foram publicadas no projeto Firebase.
 - Config Firebase Android criado para o projeto `gen-lang-client-0780081219`, app `TaskFlow Android`, package `com.taskflow`; `app/google-services.json` esta presente e o Gradle processa `google-services` em debug/release.
 
 ## Estrutura
@@ -102,7 +102,7 @@ $adb='C:\TaskFlowAndroidSdk\platform-tools\adb.exe'
 
 ## Firebase
 
-O projeto inclui `app/google-services.json`, processa o plugin Google Services em debug/release e possui `FirebaseTaskFlowDataSource` ligado ao SDK real para Auth, Firestore, Storage e FCM. O app continua local-first, mas tenta Auth Firebase real no login/cadastro e mantem fallback local quando o Firebase real nao estiver disponivel.
+O projeto inclui `app/google-services.json`, processa o plugin Google Services em debug/release e possui `FirebaseTaskFlowDataSource` ligado ao SDK real para Auth, Firestore, Storage e FCM. O app continua local-first, mas tenta Auth Firebase real no login/cadastro e mantem fallback local quando o Firebase real nao estiver disponivel. No cadastro, a criacao do usuario no Auth nao depende da gravacao imediata do perfil no Firestore; se o Firestore estiver temporariamente indisponivel, essa gravacao remota fica em best effort e o app preserva a sessao local-first.
 
 Para validar regras localmente:
 
@@ -115,9 +115,9 @@ npm run verify:firebase-real
 
 Estado Firebase real:
 
-- Auth e-mail/senha: validado com criacao e exclusao de usuario smoke via API Firebase Auth.
-- Firestore: bloqueado ate billing ser habilitado no projeto.
-- Storage: bloqueado ate inicializacao do produto no Console Firebase.
+- Auth e-mail/senha: validado com criacao, login e exclusao de usuario smoke via API Firebase Auth.
+- Firestore: regras reais publicadas e dry-run validado no projeto Firebase.
+- Storage: regras reais publicadas e dry-run validado no projeto Firebase.
 - FCM: SDK e registro de token preparados; validacao real depende do app rodando em dispositivo/emulador com o projeto Firebase ativo.
 
 Projeto atualmente associado em `.firebaserc`:
@@ -126,11 +126,10 @@ Projeto atualmente associado em `.firebaserc`:
 - Android App ID: `1:209004797664:android:ef4fc149b5b033f782ba85`
 - Package: `com.taskflow`
 
-Pendencias do console Firebase real:
+Pendencias do Firebase real:
 
-- Firestore: a criacao/publicacao real retornou HTTP 403 exigindo billing habilitado no projeto.
-- Storage: o bucket ainda precisa ser inicializado no Console Firebase em `https://console.firebase.google.com/project/gen-lang-client-0780081219/storage`.
-- Billing: `https://console.developers.google.com/billing/enable?project=gen-lang-client-0780081219`
+- FCM: validacao de token/push em runtime ainda depende de execucao do app em dispositivo/emulador com Google Play Services ativo.
+- Fluxos remotos no app: login/cadastro Auth estao implementados; sincronizacao Firestore/Storage precisa de QA de runtime apos as regras reais publicadas.
 
 ## Artefatos
 
@@ -171,7 +170,7 @@ Comandos executados com sucesso neste workspace:
 ## Bloqueios Para Conclusao Total
 
 - Repositorio GitHub publicado em `https://github.com/gutobaddini-create/taskflow`; GitHub CLI autenticado para PR/releases/automacoes.
-- Firebase Android config esta presente; Firestore real ainda exige billing habilitado e Storage precisa ser inicializado no Console Firebase.
+- Firebase Android config esta presente; Auth e-mail/senha foi validado e regras reais de Firestore/Storage foram publicadas no projeto Firebase.
 - Sem aparelho fisico desbloqueado e acessivel, entao aceite fisico e instalacao release em aparelho real seguem pendentes.
 
 Consulte `docs/ROADMAP_TaskFlow.md` para o checklist completo e os registros de decisao/bloqueio.
