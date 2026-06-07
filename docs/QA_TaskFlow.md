@@ -1,6 +1,6 @@
 # TaskFlow QA Report
 
-Date: 2026-06-06
+Date: 2026-06-07
 
 ## Scope
 
@@ -10,7 +10,7 @@ Validated target:
 
 - Android emulator: `emulator-5554`
 - App package: `com.taskflow`
-- Build mode: local-first MVP, without real Firebase credentials
+- Build mode: local-first MVP with Firebase Android config and real Auth SDK path prepared
 
 ## Automated Verification
 
@@ -47,9 +47,9 @@ Artifacts verified:
 
 | Artifact | Size |
 | --- | ---: |
-| `app/build/outputs/apk/debug/app-debug.apk` | 18,397,193 bytes |
-| `app/build/outputs/apk/release/app-release.apk` | 11,911,970 bytes |
-| `app/build/outputs/bundle/release/app-release.aab` | 11,534,310 bytes |
+| `app/build/outputs/apk/debug/app-debug.apk` | 23,105,158 bytes |
+| `app/build/outputs/apk/release/app-release.apk` | 16,004,844 bytes |
+| `app/build/outputs/bundle/release/app-release.aab` | 15,534,629 bytes |
 
 Release integrity manifest:
 
@@ -83,6 +83,8 @@ Firebase Android configuration:
 - Config file: `app/google-services.json`.
 - Gradle plugin: `com.google.gms.google-services`.
 - Firebase SDKs added through BoM `33.7.0`: Auth, Firestore, Storage, and Messaging.
+- `FirebaseTaskFlowDataSource` now uses FirebaseAuth, FirebaseFirestore, FirebaseStorage, FirebaseMessaging, and coroutine task awaiters.
+- Onboarding now attempts Firebase login/cadastro with password and falls back to local mode when Firebase is unavailable.
 - `:app:compileDebugKotlin` passed with `:app:processDebugGoogleServices`.
 - `:app:testDebugUnitTest` passed.
 - `:app:assembleRelease` passed with `:app:processReleaseGoogleServices`.
@@ -101,11 +103,12 @@ Result: passed. The release build still succeeds without production signing vari
 Real Firebase project checks:
 
 ```powershell
+npm run verify:firebase-real
 npx firebase deploy --only firestore:rules --dry-run --project gen-lang-client-0780081219
 npx firebase deploy --only storage --dry-run --project gen-lang-client-0780081219
 ```
 
-Result: blocked by Firebase project setup. Firestore real deployment returned HTTP 403 because billing is not enabled for project `gen-lang-client-0780081219`. Storage deployment reported that Firebase Storage has not been set up and must be initialized in the Firebase Console.
+Result: partially passed. Firebase CLI auth, Android config, and Auth e-mail/senha are ready; `npm run verify:firebase-real` created and deleted a temporary smoke user successfully. Firestore real deployment returned HTTP 403 because billing is not enabled for project `gen-lang-client-0780081219`. Storage deployment reported that Firebase Storage has not been set up and must be initialized in the Firebase Console.
 
 ## Emulator Smoke QA
 

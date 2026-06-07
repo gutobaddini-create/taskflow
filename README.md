@@ -102,7 +102,7 @@ $adb='C:\TaskFlowAndroidSdk\platform-tools\adb.exe'
 
 ## Firebase
 
-O projeto agora inclui `app/google-services.json` e processa o plugin Google Services em debug/release. A classe `FirebaseTaskFlowDataSource` ainda falha fechada ate Auth/Firestore/Storage/FCM reais serem habilitados e conectados aos repositórios.
+O projeto inclui `app/google-services.json`, processa o plugin Google Services em debug/release e possui `FirebaseTaskFlowDataSource` ligado ao SDK real para Auth, Firestore, Storage e FCM. O app continua local-first, mas tenta Auth Firebase real no login/cadastro e mantem fallback local quando o Firebase real nao estiver disponivel.
 
 Para validar regras localmente:
 
@@ -110,16 +110,15 @@ Para validar regras localmente:
 npm install
 npm run test:firestore-rules
 npm run test:storage-rules
+npm run verify:firebase-real
 ```
 
-Para concluir Firebase real, sera necessario fornecer:
+Estado Firebase real:
 
-- projeto Firebase com billing habilitado para criar/usar Firestore real;
-- Auth com e-mail/senha habilitado;
-- Firestore;
-- Storage;
-- FCM;
-- credenciais/ambiente de teste.
+- Auth e-mail/senha: validado com criacao e exclusao de usuario smoke via API Firebase Auth.
+- Firestore: bloqueado ate billing ser habilitado no projeto.
+- Storage: bloqueado ate inicializacao do produto no Console Firebase.
+- FCM: SDK e registro de token preparados; validacao real depende do app rodando em dispositivo/emulador com o projeto Firebase ativo.
 
 Projeto atualmente associado em `.firebaserc`:
 
@@ -131,6 +130,7 @@ Pendencias do console Firebase real:
 
 - Firestore: a criacao/publicacao real retornou HTTP 403 exigindo billing habilitado no projeto.
 - Storage: o bucket ainda precisa ser inicializado no Console Firebase em `https://console.firebase.google.com/project/gen-lang-client-0780081219/storage`.
+- Billing: `https://console.developers.google.com/billing/enable?project=gen-lang-client-0780081219`
 
 ## Artefatos
 

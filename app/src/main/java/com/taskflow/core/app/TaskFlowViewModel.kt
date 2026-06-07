@@ -11,6 +11,7 @@ import com.taskflow.data.local.TaskFlowPreferences
 import com.taskflow.data.local.TaskFlowUserPreferences
 import com.taskflow.data.remote.AndroidConnectivityMonitor
 import com.taskflow.data.remote.FirebaseTaskFlowDataSource
+import com.taskflow.data.remote.RemoteAuthResult
 import com.taskflow.data.remote.RoomPendingOperationQueue
 import com.taskflow.data.remote.SyncCoordinator
 import com.taskflow.data.repository.LocalTaskFlowRepository
@@ -29,6 +30,7 @@ class TaskFlowViewModel(application: Application) : AndroidViewModel(application
         remote = FirebaseTaskFlowDataSource(),
         connectivity = AndroidConnectivityMonitor(application)
     )
+    private val firebaseRemote = FirebaseTaskFlowDataSource()
     val users = repo.users
     val spaces = repo.spaces
     val lists = repo.lists
@@ -117,6 +119,39 @@ class TaskFlowViewModel(application: Application) : AndroidViewModel(application
         repo.saveUser(user)
         setCurrentUser(user.id)
         return true
+    }
+
+    suspend fun loginFirebase(email: String, password: String): Result<Unit> {
+        val normalized = email.trim().lowercase()
+        if (normalized.isBlank() || password.isBlank()) return Result.failure(IllegalArgumentException("Informe e-mail e senha."))
+        return runCatching {
+            when (val result = firebaseRemote.signIn(normalized, password)) {
+                is RemoteAuthResult.SignedIn -> {
+                    val user = users.value.firstOrNull { it.email.lowercase() == normalized }
+                        ?: User(id = result.userId, name = normalized.substringBefore("@").ifBlank { "TaskFlow" }, email = normalized)
+                    repo.saveUser(user.copy(id = result.userId, email = normalized))
+                    setCurrentUser(result.userId)
+                }
+                RemoteAuthResult.SignedOut -> error("Firebase nao retornou usuario autenticado.")
+            }
+        }
+    }
+
+    suspend fun registerFirebase(name: String, email: String, password: String): Result<Unit> {
+        val cleanName = name.trim()
+        val normalized = email.trim().lowercase()
+        if (cleanName.isBlank() || !normalized.contains("@") || password.length < 6) {
+            return Result.failure(IllegalArgumentException("Informe nome, e-mail valido e senha com 6+ caracteres."))
+        }
+        return runCatching {
+            when (val result = firebaseRemote.signUp(cleanName, normalized, password)) {
+                is RemoteAuthResult.SignedIn -> {
+                    repo.saveUser(User(id = result.userId, name = cleanName, email = normalized))
+                    setCurrentUser(result.userId)
+                }
+                RemoteAuthResult.SignedOut -> error("Firebase nao retornou usuario cadastrado.")
+            }
+        }
     }
 
     fun currentUser(): User {

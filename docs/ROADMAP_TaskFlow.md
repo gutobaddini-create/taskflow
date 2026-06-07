@@ -1347,7 +1347,7 @@ Use esta seção para listar bloqueios.
 
 | Data | Bloqueio | Impacto | Responsável | Status |
 |---|---|---|---|---|
-| 2026-06-07 | Firestore real exige billing habilitado no projeto `gen-lang-client-0780081219`; Firebase Storage ainda precisa ser inicializado no Console. | Impede publicar/validar regras reais e testar Auth/Firestore/Storage/FCM em ambiente Firebase real. | Dono do projeto Firebase | Aberto |
+| 2026-06-07 | Firestore real exige billing habilitado no projeto `gen-lang-client-0780081219`; Firebase Storage ainda precisa ser inicializado no Console. | Impede publicar/validar regras reais e testar Firestore/Storage/FCM em ambiente Firebase real. Auth e-mail/senha ja foi validado. | Dono do projeto Firebase | Aberto |
 | 2026-06-06 | Aparelho físico conectado exige PIN/biometria. | APK release instala no aparelho, mas os fluxos navegáveis não puderam ser testados fisicamente via adb. | Dono do aparelho | Aberto |
 
 ---

@@ -79,7 +79,7 @@ class FirebaseContractsTest {
 
     @Test
     fun firebaseDataSourceFailsClosedUntilConfigured() = runTest {
-        val dataSource = FirebaseTaskFlowDataSource()
+        val dataSource = FirebaseTaskFlowDataSource(forceConfigured = false)
 
         assertFalse(dataSource.isConfigured)
         val error = runCatching { dataSource.signIn("ana@taskflow.local", "secret") }.exceptionOrNull()

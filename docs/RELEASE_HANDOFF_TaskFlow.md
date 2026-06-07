@@ -40,9 +40,9 @@ Covered checks:
 
 | Artifact | Size | SHA-256 |
 | --- | ---: | --- |
-| `app/build/outputs/apk/debug/app-debug.apk` | 18,397,193 bytes | `a63321fb6ad1231e53636099d32da5810c4b19eb8fdbf2c5f43e6301d17d2f80` |
-| `app/build/outputs/apk/release/app-release.apk` | 16,004,844 bytes | `189ff44eb7ba073223b793a018e6499c6a88582ac7157437c657e6091e5a376e` |
-| `app/build/outputs/bundle/release/app-release.aab` | 15,530,771 bytes | `c87cbcc47aab9074b13f8f2b74e705069657cd4eb9a80e62352b42acfd73354a` |
+| `app/build/outputs/apk/debug/app-debug.apk` | 23,105,158 bytes | `30f28563872826e48b44a2bdfb4895ef2b43f7e0b270311b6816b048d2be7dfc` |
+| `app/build/outputs/apk/release/app-release.apk` | 16,004,844 bytes | `e2b77d55e30df8a7f3e3dfd6f988f5092be48fca30978741ae42d9cc902b0303` |
+| `app/build/outputs/bundle/release/app-release.aab` | 15,534,629 bytes | `0224b8ffce567e32fb8742a0ffc52211decf9b030ebc8ebae25f1965264eeb95` |
 
 Canonical artifact manifest:
 
@@ -76,6 +76,8 @@ Screenshots:
 - Release mode: local-first MVP
 - Firebase project: `gen-lang-client-0780081219`
 - Firebase Android App ID: `1:209004797664:android:ef4fc149b5b033f782ba85`
+- Firebase Auth e-mail/senha: validated through `npm run verify:firebase-real`
+- Firebase SDK path: Auth, Firestore, Storage, Messaging, FCM token registration, and pending-operation sync are implemented behind the local-first app.
 - Release signing: local development signing through the Android debug keystore, suitable for validation only.
 - Production distribution requires a dedicated production keystore.
 - Production signing is wired through `TASKFLOW_RELEASE_STORE_FILE`, `TASKFLOW_RELEASE_STORE_PASSWORD`, `TASKFLOW_RELEASE_KEY_ALIAS`, and `TASKFLOW_RELEASE_KEY_PASSWORD`; without those variables the build keeps using local QA signing.
@@ -83,7 +85,7 @@ Screenshots:
 
 ## External Inputs Still Required
 
-- Firebase console activation: billing for Firestore, Storage initialization, Auth email/password, FCM/test credentials.
+- Firebase console activation: billing for Firestore, Storage initialization, and runtime FCM/device validation.
 - Unlocked physical Android device with USB debugging authorized for final physical-device QA.
 - Production keystore and signing passwords for public distribution.
 
